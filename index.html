@@ -1081,8 +1081,18 @@
             <div class="period-chip">
                 <label>Okres</label>
                 <input type="date" id="dateFrom" style="min-width: 110px;">
+                <button type="button" id="setNextMonday" class="btn-ghost" style="padding: 4px 10px; font-size: 11px; height: 35px; border-radius: 8px; margin-left: -5px; display: flex; align-items: center; justify-content: center;" title="Ustaw najbliższy poniedziałek">
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-main);">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+    <line x1="16" y1="2" x2="16" y2="6"></line>
+    <line x1="8" y1="2" x2="8" y2="6"></line>
+    <line x1="3" y1="10" x2="21" y2="10"></line>
+    <path d="M12 14l2 2-2 2"></path>
+    <path d="M8 16h6"></path>
+  </svg>
+</button>
                 <span style="color:var(--text-muted);">×</span>
-                <input type="number" id="weeksCount" min="1" max="52" placeholder="Tyg." style="width: 70px;">
+                <input type="number" id="weeksCount" min="1" placeholder="Tyg." style="width: 70px;">
                 <span style="color:var(--text-muted);">Do:</span>
                 <strong id="dateToLabel" style="font-size:14px;">—</strong>
                 <span class="period-tag" id="periodSummary">0 / 0 tyg.</span>
@@ -1727,10 +1737,10 @@
         cells[0].style.position = 'relative';
         cells[0].innerHTML = `
             <button type="button" class="goal-delete-btn" onclick="window.deleteGoal(${table.rows.length - 1})" title="Usuń cel">×</button>
-            <input type="text" placeholder="Nazwa celu">
+            <input type="text" placeholder="Np. Trening siłowy">
         `;
-        cells[1].innerHTML = '<input type="text" placeholder="Opis celu">';
-        cells[2].innerHTML = '<input type="text" placeholder="Min. / tydz.">';
+        cells[1].innerHTML = '<input type="text" placeholder="Krótko: co i jak?">';
+        cells[2].innerHTML = '<input type="text" placeholder="Np. 3× / tydz.">';
         cells[3].innerHTML = `
             <button type="button" class="type-icon-btn" data-type="ILOŚĆ" onclick="window.openTypeMenu(event, this)">
                 ILOŚĆ
@@ -2305,6 +2315,29 @@
             congratsModal.style.display = 'none';
         }
     };
+
+    // Przycisk ustawiania najbliższego poniedziałku
+    document.getElementById('setNextMonday').addEventListener('click', () => {
+        const today = new Date();
+        const day = today.getDay(); // 0 (Nd) do 6 (So)
+        // Jeśli jest poniedziałek (1), to chcemy następny poniedziałek (+7 dni).
+        // W przeciwnym razie obliczamy ile dni do najbliższego poniedziałku.
+        const diff = (day === 1) ? 7 : (day === 0 ? 1 : 8 - day);
+        const nextMonday = new Date(today);
+        nextMonday.setDate(today.getDate() + diff);
+
+        const yyyy = nextMonday.getFullYear();
+        const mm = String(nextMonday.getMonth() + 1).padStart(2, '0');
+        const dd = String(nextMonday.getDate()).padStart(2, '0');
+
+        const input = document.getElementById('dateFrom');
+        input.value = `${yyyy}-${mm}-${dd}`;
+
+        // Wywołanie aktualizacji okresu
+        const event = new Event('change');
+        input.dispatchEvent(event);
+    });
+
 </script>
 
 <!-- Congratulations Modal -->
