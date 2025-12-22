@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>SMASH YOUR GOALS – Planner</title>
-    <style>
+<meta charset="utf-8"/>
+<title>SMASH YOUR GOALS – Planner</title>
+<style>
         :root {
             --bg-dark: #0f172a;
             --bg-gradient: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 70%);
@@ -734,6 +735,13 @@
             position: relative; 
         }
 
+        
+        .week-card.current-week {
+            border: 2px solid #ffffff !important;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.02);
+            z-index: 10;
+        }
         .week-card.week-success {
             background: rgba(16, 185, 129, 0.15) !important;
             border-color: var(--success) !important;
@@ -1040,230 +1048,240 @@
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
 }
 
-</style>
+
+    /* Back to top button */
+    .back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    .back-to-top.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    .back-to-top:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+    }
+    </style>
 </head>
 <body>
-
 <div id="profileOverlay">
-    <div class="profile-overlay-inner">
-        <h2>Wybierz profil</h2>
-        <p class="muted">Każdy profil ma własne cele i tygodnie. Wybierz, dla kogo teraz planujesz.</p>
-        <div class="profiles-grid-overlay" id="profilesGridOverlay"></div>
-        <div class="profile-overlay-actions" style="text-align:center; margin-top:20px;">
-            <button type="button" id="addProfileFromOverlay" class="btn-outline-light">
+<div class="profile-overlay-inner">
+<h2>Wybierz profil</h2>
+<p class="muted">Każdy profil ma własne cele i tygodnie. Wybierz, dla kogo teraz planujesz.</p>
+<div class="profiles-grid-overlay" id="profilesGridOverlay"></div>
+<div class="profile-overlay-actions" style="text-align:center; margin-top:20px;">
+<button class="btn-outline-light" id="addProfileFromOverlay" type="button">
                 + Dodaj nowy profil
             </button>
-        </div>
-    </div>
 </div>
-
+</div>
+</div>
 <div class="wrapper">
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-logo"></div>
-            <div class="brand-text">
-                <h1>SMASH YOUR GOALS</h1>
-                <span>Skoncentrowany planner celów tygodniowych</span>
-            </div>
-        </div>
-
-        <div class="topbar-right">
-            <div class="user-pill">
-                <div class="user-avatar" id="userAvatar">?</div>
-                <div class="user-name-wrap">
-                    <span class="user-name" id="accountInfo">Niezalogowano</span>
-                    <span class="user-sub" id="activeProfileLabel">Brak profilu</span>
-                </div>
-            </div>
-            <button type="button" id="openAuthModal" class="btn-ghost btn-icon" title="Ustawienia konta">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-            <div class="period-chip">
-                <label>Okres</label>
-                <input type="date" id="dateFrom" style="min-width: 110px;">
-                <button type="button" id="setNextMonday" class="btn-ghost" style="padding: 4px 10px; font-size: 11px; height: 35px; border-radius: 8px; margin-left: -5px; display: flex; align-items: center; justify-content: center;" title="Ustaw najbliższy poniedziałek">
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-main);">
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-    <line x1="16" y1="2" x2="16" y2="6"></line>
-    <line x1="8" y1="2" x2="8" y2="6"></line>
-    <line x1="3" y1="10" x2="21" y2="10"></line>
-    <path d="M12 14l2 2-2 2"></path>
-    <path d="M8 16h6"></path>
-  </svg>
+<header class="topbar">
+<div class="brand">
+<div class="brand-logo"></div>
+<div class="brand-text">
+<h1>SMASH YOUR GOALS</h1>
+<span>Skoncentrowany planner celów tygodniowych</span>
+</div>
+</div>
+<div class="topbar-right">
+<div class="user-pill">
+<div class="user-avatar" id="userAvatar">?</div>
+<div class="user-name-wrap">
+<span class="user-name" id="accountInfo">Niezalogowano</span>
+<span class="user-sub" id="activeProfileLabel">Brak profilu</span>
+</div>
+</div>
+<button class="btn-ghost btn-icon" id="openAuthModal" title="Ustawienia konta" type="button">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
 </button>
-                <span style="color:var(--text-muted);">×</span>
-                <input type="number" id="weeksCount" min="1" placeholder="Tyg." style="width: 70px;">
-                <span style="color:var(--text-muted);">Do:</span>
-                <strong id="dateToLabel" style="font-size:14px;">—</strong>
-                <span class="period-tag" id="periodSummary">0 / 0 tyg.</span>
-            </div>
-        </div>
-    </header>
-
-    <div id="authModal">
-        <div class="auth-card">
-            <button type="button" id="closeAuthModal" style="
+<div class="period-chip">
+<label>Okres</label>
+<input id="dateFrom" style="min-width: 110px;" type="date"/>
+<button class="btn-ghost" id="setNextMonday" style="padding: 4px 10px; font-size: 11px; height: 35px; border-radius: 8px; margin-left: -5px; display: flex; align-items: center; justify-content: center;" title="Ustaw najbliższy poniedziałek" type="button">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="color: var(--text-main);" viewbox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="4"></rect>
+<line x1="16" x2="16" y1="2" y2="6"></line>
+<line x1="8" x2="8" y1="2" y2="6"></line>
+<line x1="3" x2="21" y1="10" y2="10"></line>
+<path d="M12 14l2 2-2 2"></path>
+<path d="M8 16h6"></path>
+</svg>
+</button>
+<span style="color:var(--text-muted);">×</span>
+<input id="weeksCount" min="1" placeholder="Tyg." style="width: 70px;" type="number"/>
+<span style="color:var(--text-muted);">Do:</span>
+<strong id="dateToLabel" style="font-size:14px;">—</strong>
+<span class="period-tag" id="periodSummary">0 / 0 tyg.</span>
+</div>
+</div>
+</header>
+<div id="authModal">
+<div class="auth-card">
+<button id="closeAuthModal" style="
                 position:absolute; right:16px; top:16px;
                 background:transparent; border:none; color:#6b7280;
-                font-size:24px; cursor:pointer;">&times;</button>
-
-            <h2 style="margin:0 0 8px;font-size:20px;">Konto i profile</h2>
-            <p class="muted" style="margin:0 0 20px;">
+                font-size:24px; cursor:pointer;" type="button">×</button>
+<h2 style="margin:0 0 8px;font-size:20px;">Konto i profile</h2>
+<p class="muted" style="margin:0 0 20px;">
                 Zaloguj się, ustaw pseudonim i zarządzaj profilami.
             </p>
-
-            <div id="authFormArea">
-                <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-                    <div>
-                        <label class="muted" style="font-size:12px;display:block;margin-bottom:4px;">Email</label>
-                        <input type="email" id="authEmail" placeholder="twoj@email.com" style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);color:white;border-radius:6px;">
-                    </div>
-                    <div>
-                        <label class="muted" style="font-size:12px;display:block;margin-bottom:4px;">Hasło</label>
-                        <input type="password" id="authPassword" placeholder="min. 6 znaków" style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);color:white;border-radius:6px;">
-                    </div>
-                </div>
-                <button type="button" id="btnLogin" class="btn-primary" style="width:100%;">
+<div id="authFormArea">
+<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+<div>
+<label class="muted" style="font-size:12px;display:block;margin-bottom:4px;">Email</label>
+<input id="authEmail" placeholder="twoj@email.com" style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);color:white;border-radius:6px;" type="email"/>
+</div>
+<div>
+<label class="muted" style="font-size:12px;display:block;margin-bottom:4px;">Hasło</label>
+<input id="authPassword" placeholder="min. 6 znaków" style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);color:white;border-radius:6px;" type="password"/>
+</div>
+</div>
+<button class="btn-primary" id="btnLogin" style="width:100%;" type="button">
                     Zaloguj / Zarejestruj
                 </button>
-            </div>
-
-            <div id="profileArea" style="margin-top:24px;border-top:1px solid var(--glass-border);padding-top:16px;">
-                <label class="muted" style="font-size:12px;">Pseudonim / nick konta</label>
-                <div style="display:flex;gap:8px;margin-top:4px;">
-                    <input type="text" id="nicknameInput" placeholder="Twój nick" style="background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);padding:8px;color:white;border-radius:6px;flex:1;">
-                    <button type="button" id="saveNickname" class="btn-ghost" style="padding:8px 12px;">Zapisz</button>
-                </div>
-
-                <div style="margin-top:16px;">
-                    <label class="muted" style="font-size:12px;">Twoje profile</label>
-                    <div class="profiles-grid" id="profilesGrid"></div>
-                </div>
-
-                <div style="margin-top:12px;display:flex;gap:8px;">
-                    <input type="text" id="newProfileName" placeholder="Nowy profil (np. Daniel)" style="background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);padding:8px;color:white;border-radius:6px;flex:1;">
-                    <button type="button" id="addProfileBtn" class="btn-ghost">Dodaj</button>
-                </div>
-
-                <button type="button" id="confirmProfileBtn" style="margin-top:16px;width:100%;" class="btn-primary">
+</div>
+<div id="profileArea" style="margin-top:24px;border-top:1px solid var(--glass-border);padding-top:16px;">
+<label class="muted" style="font-size:12px;">Pseudonim / nick konta</label>
+<div style="display:flex;gap:8px;margin-top:4px;">
+<input id="nicknameInput" placeholder="Twój nick" style="background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);padding:8px;color:white;border-radius:6px;flex:1;" type="text"/>
+<button class="btn-ghost" id="saveNickname" style="padding:8px 12px;" type="button">Zapisz</button>
+</div>
+<div style="margin-top:16px;">
+<label class="muted" style="font-size:12px;">Twoje profile</label>
+<div class="profiles-grid" id="profilesGrid"></div>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;">
+<input id="newProfileName" placeholder="Nowy profil (np. Daniel)" style="background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);padding:8px;color:white;border-radius:6px;flex:1;" type="text"/>
+<button class="btn-ghost" id="addProfileBtn" type="button">Dodaj</button>
+</div>
+<button class="btn-primary" id="confirmProfileBtn" style="margin-top:16px;width:100%;" type="button">
                     Ustaw zaznaczony profil (domyślny)
                 </button>
-            </div>
-
-            <button type="button" id="btnLogout" class="btn-ghost" style="margin-top:16px;width:100%;display:none;">
+</div>
+<button class="btn-ghost" id="btnLogout" style="margin-top:16px;width:100%;display:none;" type="button">
                 Wyloguj się
             </button>
-
-            <div id="authStatus" style="margin-top:12px;font-size:13px;color:var(--warning);text-align:center;min-height:20px;"></div>
-        </div>
-    </div>
-
-    <main class="layout">
-        <section class="card">
-            <div class="card-header">
-                <div>
-                    <h2>Cele profilu</h2>
-                    <span>Najważniejsze cele w aktualnym okresie dla wybranego profilu.</span>
-                </div>
-            </div>
-
-            <div style="overflow-x:auto;">
-                <table id="goalsTable">
-                    <thead>
-                    <tr>
-                        <th style="width:30%;">Cel</th>
-                        <th style="width:25%;">Opis</th>
-                        <th style="width:15%;">Min. / tydz.</th>
-                        <th style="width:15%;">Rodzaj</th>
-                        <th style="width:15%;">Postęp</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td><input type="text" placeholder="Np. Trening siłowy"></td>
-                        <td><input type="text" placeholder="Krótko: co i jak?"></td>
-                        <td><input type="text" placeholder="Np. 3× / tydz."></td>
-                        <td>
-                            <button type="button" class="type-icon-btn" data-type="ILOŚĆ" onclick="window.openTypeMenu(event, this)">
+<div id="authStatus" style="margin-top:12px;font-size:13px;color:var(--warning);text-align:center;min-height:20px;"></div>
+</div>
+</div>
+<main class="layout">
+<section class="card">
+<div class="card-header">
+<div>
+<h2>Cele profilu</h2>
+<span>Najważniejsze cele w aktualnym okresie dla wybranego profilu.</span>
+</div>
+</div>
+<div style="overflow-x:auto;">
+<table id="goalsTable">
+<thead>
+<tr>
+<th style="width:30%;">Cel</th>
+<th style="width:25%;">Opis</th>
+<th style="width:15%;">Min. / tydz.</th>
+<th style="width:15%;">Rodzaj</th>
+<th style="width:15%;">Postęp</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><input placeholder="Np. Trening siłowy" type="text"/></td>
+<td><input placeholder="Krótko: co i jak?" type="text"/></td>
+<td><input placeholder="Np. 3× / tydz." type="text"/></td>
+<td>
+<button class="type-icon-btn" data-type="ILOŚĆ" onclick="window.openTypeMenu(event, this)" type="button">
                                 ILOŚĆ
                             </button>
-                        </td>
-                        <td>
-                            <button type="button" class="status-icon-btn" data-status="W TRAKCIE" title="Zmień status">
-                                <svg class="icon-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4a2 2 0 0 0 .88 1.56c1.3 1.01 1.97 2.8 1.13 4.42-.13.26-.2.54-.2.82v5.2c0 1.1.9 2 2 2Z"/><path d="M5 2h14"/><path d="M5 22h14"/><path d="M15 2v5.5L21 7.5"/></svg>
-                            </button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="goals-footer">
-                <span class="muted">Cele zapisują się automatycznie w chmurze dla aktywnego profilu.</span>
-                <button type="button" class="btn-primary" id="addGoalBtn">+ Dodaj cel</button>
-            </div>
-
-            <div class="weeks-card">
-                <div class="weeks-card-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:16px;">
-                    <div>
-                        <h3 style="margin:0;font-size:16px;font-weight:600;">Tygodnie</h3>
-                        <span class="muted">Oznacz tydzień jako udany (✔) lub nie (✖) i dodaj notatkę.</span>
-                    </div>
-                </div>
-
-                <div class="weeks-grid" id="weeksGrid"></div>
-                <p class="muted" style="margin-top:16px;text-align:center;">
+</td>
+<td>
+<button class="status-icon-btn" data-status="W TRAKCIE" title="Zmień status" type="button">
+<svg class="icon-spin" fill="none" height="20" stroke="#94a3b8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M5 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4a2 2 0 0 0 .88 1.56c1.3 1.01 1.97 2.8 1.13 4.42-.13.26-.2.54-.2.82v5.2c0 1.1.9 2 2 2Z"></path><path d="M5 2h14"></path><path d="M5 22h14"></path><path d="M15 2v5.5L21 7.5"></path></svg>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="goals-footer">
+<span class="muted">Cele zapisują się automatycznie w chmurze dla aktywnego profilu.</span>
+<button class="btn-primary" id="addGoalBtn" type="button">+ Dodaj cel</button>
+</div>
+<div class="weeks-card">
+<div class="weeks-card-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:16px;">
+<div>
+<h3 style="margin:0;font-size:16px;font-weight:600;">Tygodnie</h3>
+<span class="muted">Oznacz tydzień jako udany (✔) lub nie (✖) i dodaj notatkę.</span>
+</div>
+</div>
+<div class="weeks-grid" id="weeksGrid"></div>
+<p class="muted" style="margin-top:16px;text-align:center;">
                     Notatki, status i oceny tygodni zapisują się osobno dla każdego profilu.
                 </p>
-            </div>
-        </section>
-
-        <section class="card">
-            <div class="card-header">
-                <div>
-                    <h2>Podsumowanie</h2>
-                    <span>Szybki podgląd powodzenia.</span>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat">
-                    <div class="stat-label">% realizacji celów</div>
-                    <div class="stat-value stat-success" id="goalsProgressPercent">0%</div>
-                    <div class="stat-extra">Odsetek celów z wynikiem „POWIODŁO SIĘ”.</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">% udanych tygodni</div>
-                    <div class="stat-value stat-success" id="weeklySuccess">0%</div>
-                    <div class="stat-extra">Ile tygodni oznaczono jako udane.</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">Średnia ocena</div>
-                    <div class="stat-value" id="avgRating">0,0 / 10</div>
-                    <div class="stat-extra">Średnia z ocen tygodnia w tym okresie.</div>
-                </div>
-            </div>
-        </section>
-    </main>
 </div>
-
+</section>
+<section class="card">
+<div class="card-header">
+<div>
+<h2>Podsumowanie</h2>
+<span>Szybki podgląd powodzenia.</span>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat">
+<div class="stat-label">% realizacji celów</div>
+<div class="stat-value stat-success" id="goalsProgressPercent">0%</div>
+<div class="stat-extra">Odsetek celów z wynikiem „POWIODŁO SIĘ”.</div>
+</div>
+<div class="stat">
+<div class="stat-label">% udanych tygodni</div>
+<div class="stat-value stat-success" id="weeklySuccess">0%</div>
+<div class="stat-extra">Ile tygodni oznaczono jako udane.</div>
+</div>
+<div class="stat">
+<div class="stat-label">Średnia ocena</div>
+<div class="stat-value" id="avgRating">0,0 / 10</div>
+<div class="stat-extra">Średnia z ocen tygodnia w tym okresie.</div>
+</div>
+</div>
+</section>
+</main>
+</div>
 <div id="penaltyModal">
-    <div id="penaltyModalInner">
-        <button id="closePenaltyModal" style="
+<div id="penaltyModalInner">
+<button id="closePenaltyModal" style="
             position:absolute;right:16px;top:16px;
             background:transparent;border:none;color:#9ca3af;
-            font-size:24px;cursor:pointer;">&times;</button>
-        <h2 id="penaltyModalTitle" style="margin-top:0;color:var(--danger);">Kara za niepowodzenia</h2>
-        <p id="penaltyModalMessage" style="font-size:15px;line-height:1.5;"></p>
-        <p id="penaltyModalTotal" style="font-size:15px;margin:12px 0;white-space:nowrap;"></p>
-        <p id="penaltyModalHint" class="muted" style="font-size:13px;">Po wysłaniu przelewu możesz zresetować wszystkie kary, aby zacząć od zera.</p>
-        <div class="penalty-actions" style="display:flex;gap:10px;margin-top:20px;">
-            <button id="resetPenaltyBtn" class="btn-primary" style="background:var(--warning);color:#000;">Zresetuj karę (wysłano przelew)</button>
-            <button id="closePenaltyBottomBtn" class="btn-ghost">Zamknij</button>
-        </div>
-    </div>
+            font-size:24px;cursor:pointer;">×</button>
+<h2 id="penaltyModalTitle" style="margin-top:0;color:var(--danger);">Kara za niepowodzenia</h2>
+<p id="penaltyModalMessage" style="font-size:15px;line-height:1.5;"></p>
+<p id="penaltyModalTotal" style="font-size:15px;margin:12px 0;white-space:nowrap;"></p>
+<p class="muted" id="penaltyModalHint" style="font-size:13px;">Po wysłaniu przelewu możesz zresetować wszystkie kary, aby zacząć od zera.</p>
+<div class="penalty-actions" style="display:flex;gap:10px;margin-top:20px;">
+<button class="btn-primary" id="resetPenaltyBtn" style="background:var(--warning);color:#000;">Zresetuj karę (wysłano przelew)</button>
+<button class="btn-ghost" id="closePenaltyBottomBtn">Zamknij</button>
 </div>
-
+</div>
+</div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import {
@@ -1438,38 +1456,58 @@
     }
 
     function renderWeeks(startDate, weeksCount) {
-        const weeksGrid = document.getElementById('weeksGrid');
-        weeksGrid.innerHTML = '';
-        if (!startDate || !weeksCount || weeksCount <= 0) return;
+  const weeksGrid = document.getElementById("weeksGrid");
+  weeksGrid.innerHTML = "";
+  if (!startDate || !weeksCount || weeksCount <= 0) return;
 
-        for (let i = 0; i < weeksCount; i++) {
-            const weekStart = addWeeks(startDate, i);
-            const weekEnd = addWeeks(startDate, i + 1);
-            const card = document.createElement('div');
-            card.className = 'week-card';
-            card.innerHTML = `
-                <div class="week-row-top">
-                    <span class="badge-week">Tydzień ${i + 1}</span>
-                    <span class="week-date">${formatDate(weekStart)} – ${formatDate(new Date(weekEnd.getTime() - 1))}</span>
-                </div>
-                
-                <div class="week-toggles">
-                    <button type="button" class="week-btn btn-success" title="Tydzień udany">✔</button>
-                    <button type="button" class="week-btn btn-fail" title="Tydzień nieudany">✖</button>
-                </div>
+  for (let i = 0; i < weeksCount; i++) {
+    const weekStart = addWeeks(startDate, i);
+    const weekEnd = addWeeks(startDate, i + 1);
+    const card = document.createElement("div");
+    card.className = "week-card";
+    card.innerHTML = `
+      <div class="week-row-top">
+        <span class="badge-week">Tydzień ${i + 1}</span>
+        <span class="week-date">${formatDate(weekStart)} – ${formatDate(new Date(weekEnd.getTime() - 1))}</span>
+      </div>
+      <div class="week-toggles">
+        <button type="button" class="week-btn btn-success" title="Tydzień udany">✓</button>
+        <button type="button" class="week-btn btn-fail" title="Tydzień nieudany">✕</button>
+      </div>
+      <textarea class="week-note" placeholder="Notatka z tygodnia..."></textarea>
+      <div class="week-rating">
+        <span>Ocena tygodnia</span>
+        <input type="number" class="week-rating-input" min="1" max="10" step="1" placeholder="1-10" />
+      </div>
+      <div class="rating-bar-container"><div class="rating-bar-fill"></div></div>
+    `;
+    weeksGrid.appendChild(card);
+  }
 
-                <textarea class="week-note" placeholder="Notatka z tygodnia..."></textarea>
-                <div class="week-rating">
-                    <span>Ocena tygodnia:</span>
-                    <input type="number" class="week-rating-input" min="1" max="10" step="1" placeholder="1-10">
-                </div>
-                <div class="rating-bar-container"><div class="rating-bar-fill"></div></div>
-            `;
-            weeksGrid.appendChild(card);
-        }
-        attachWeekListeners();
-        updateStats();
-    }
+  attachWeekListeners();
+  updateStats();
+
+  // AUTO-SCROLL do aktualnego tygodnia
+  const today = new Date();
+  const cards = weeksGrid.querySelectorAll(".week-card");
+
+  let targetCard = null;
+  if (startDate) {
+    const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+    const diffMs = today.getTime() - startDate.getTime();
+    const passedWeeks = diffMs > 0 ? Math.floor(diffMs / msPerWeek) : 0;
+    const index = Math.min(Math.max(passedWeeks, 0), cards.length - 1);
+            cards[index].classList.add("current-week");
+    targetCard = cards[index] || null;   // aktualny tydzień
+  } else {
+    targetCard = cards[cards.length - 1] || null; // fallback: ostatni tydzień
+  }
+
+  if (targetCard) {
+    targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
 
     function attachWeekListeners() {
         const updateCardStyle = (card, successBtn, failBtn) => {
@@ -2339,16 +2377,35 @@
     });
 
 </script>
-
 <!-- Congratulations Modal -->
 <div id="congratsModal">
-    <div id="congratsContent">
-        <div id="congratsConfetti"></div>
-        <div id="congratsIcon">🎉</div>
-        <h2>Gratulacje!</h2>
-        <p>Świetna robota! Udało Ci się osiągnąć cel!</p>
-        <button id="closeCongratsBtn">Zamknij</button>
-    </div>
+<div id="congratsContent">
+<div id="congratsConfetti"></div>
+<div id="congratsIcon">🎉</div>
+<h2>Gratulacje!</h2>
+<p>Świetna robota! Udało Ci się osiągnąć cel!</p>
+<button id="closeCongratsBtn">Zamknij</button>
 </div>
-</body>
+</div>
+<button class="back-to-top" id="backToTopBtn" title="Powrót na górę">↑</button><script>
+// Back to top button
+const backToTopBtn = document.getElementById('backToTopBtn');
+
+// Show/hide button on scroll
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+});
+
+// Scroll to top on click
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+</script></body>
 </html>
