@@ -1079,7 +1079,38 @@
         background: var(--primary-hover);
         transform: translateY(-2px);
     }
-    </style>
+    
+.profile-stats-container {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--glass-border);
+}
+.profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+.p-stat {
+    background: rgba(255,255,255,0.03);
+    padding: 10px 5px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    border: 1px solid var(--glass-border);
+}
+.p-stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.p-stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+</style>
 </head>
 <body>
 <div id="profileOverlay">
@@ -1178,7 +1209,26 @@
                     Ustaw zaznaczony profil (domyślny)
                 </button>
 </div>
-<button class="btn-ghost" id="btnLogout" style="margin-top:16px;width:100%;display:none;" type="button">
+
+        <div class="profile-stats-container">
+            <label class="muted" style="font-size:12px">Statystyki aktywnego profilu</label>
+            <div class="profile-stats-grid">
+                <div class="p-stat">
+                    <div class="p-stat-label">Cele</div>
+                    <div class="p-stat-value" id="p-stat-goals">0</div>
+                </div>
+                <div class="p-stat">
+                    <div class="p-stat-label">Kary</div>
+                    <div class="p-stat-value" id="p-stat-money">0 zł</div>
+                </div>
+                <div class="p-stat">
+                    <div class="p-stat-label">Tygodnie</div>
+                    <div class="p-stat-value" id="p-stat-weeks">0</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-ghost" id="btnLogout" style="margin-top:16px;width:100%;display:none;" type="button">
                 Wyloguj się
             </button>
 <div id="authStatus" style="margin-top:12px;font-size:13px;color:var(--warning);text-align:center;min-height:20px;"></div>
@@ -1352,6 +1402,40 @@
     let selectedProfileIdTemp = null;
     let saveTimeout = null;
 
+async function updateProfileGlobalStats() {
+    if (!currentUser || !activeProfileId) {
+        document.getElementById('p-stat-goals').textContent = '0';
+        document.getElementById('p-stat-money').textContent = '0 zł';
+        document.getElementById('p-stat-weeks').textContent = '0';
+        return;
+    }
+    try {
+        const goalsQuery = query(collection(db, 'goals'), where('userId', '==', currentUser.uid), where('profileId', '==', activeProfileId));
+        const goalsSnap = await getDocs(goalsQuery);
+        let done = 0;
+        let money = 0;
+        goalsSnap.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'POWIODŁO SIĘ') done++;
+            if (data.penaltyAmount) money += Number(data.penaltyAmount);
+        });
+
+        const weeksQuery = query(collection(db, 'weeks'), where('userId', '==', currentUser.uid), where('profileId', '==', activeProfileId));
+        const weeksSnap = await getDocs(weeksQuery);
+        let goodWeeks = 0;
+        weeksSnap.forEach(doc => {
+            if (doc.data().success === true) goodWeeks++;
+        });
+
+        document.getElementById('p-stat-goals').textContent = done;
+        document.getElementById('p-stat-money').textContent = money + ' zł';
+        document.getElementById('p-stat-weeks').textContent = goodWeeks;
+    } catch (e) {
+        console.error("Błąd statystyk:", e);
+    }
+}
+
+
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
@@ -1394,7 +1478,7 @@
         penaltyModalMessage.textContent = 'Kary zostały zresetowane. Zaczynasz od zera.';
     });
 
-    openAuthModalBtn.addEventListener('click', () => {
+    openAuthModalBtn.addEventListener('click', () => { updateProfileGlobalStats();
         authModal.style.display = 'flex';
     });
     closeAuthModalBtn.addEventListener('click', () => {
@@ -1975,7 +2059,7 @@
             }
 
             const uid = currentUser.uid;
-            activeProfileId = id;
+            activeProfileId = id; updateProfileGlobalStats();
             selectedProfileIdTemp = id;
 
             await setDoc(
