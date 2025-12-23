@@ -2,6 +2,7 @@
 
 <html lang="pl">
 <head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%236366f1%22/><circle cx=%2250%22 cy=%2250%22 r=%2225%22 fill=%22none%22 stroke=%22white%22 stroke-width=%228%22/><circle cx=%2250%22 cy=%2250%22 r=%228%22 fill=%22white%22/></svg>">
 <meta charset="utf-8"/>
 <title>SMASH YOUR GOALS – Planner</title>
 <style>
@@ -70,21 +71,36 @@
             gap: 14px;
         }
 
+        
         .brand-logo {
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            background: conic-gradient(from 45deg, #6366f1, #ec4899, #6366f1);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             position: relative;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.5);
+            overflow: hidden;
         }
-        .brand-logo::after {
-            content: '';
+        .brand-logo::before {
+            content: "";
             position: absolute;
-            inset: 3px;
-            background: #020617;
-            border-radius: 9px;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            top: -20%;
+            left: -20%;
         }
+        .brand-logo svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+            z-index: 1;
+        }
+
+        
 
         .brand-text h1 {
             margin: 0;
@@ -917,10 +933,35 @@
             box-shadow: var(--shadow-soft);
         }
 
+        
         .brand-logo {
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.5);
+            overflow: hidden;
         }
+        .brand-logo::before {
+            content: "";
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            top: -20%;
+            left: -20%;
+        }
+        .brand-logo svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+            z-index: 1;
+        }
+
 
         .card {
             background: var(--glass-surface);
@@ -1166,7 +1207,7 @@
 <div class="wrapper">
 <header class="topbar">
 <div class="brand">
-<div class="brand-logo"></div>
+<div class="brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
 <div class="brand-text">
 <h1>SMASH YOUR GOALS</h1>
 <span>Skoncentrowany planner celów tygodniowych</span>
@@ -1307,7 +1348,7 @@
 </div>
 <div class="goals-footer">
 
-<button class="btn-primary" id="addGoalBtn" type="button">+ DODAJ CEL</button>
+<button class="btn-primary" id="addGoalBtn" type="button" title="Dodaj cel" style="width: 45px; height: 45px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 24px; border-radius: 50%;">+</button>
 </div>
 <div class="weeks-card"><div class="card-label">Tygodnie</div>
 <div class="weeks-card-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:16px;">
@@ -2314,7 +2355,7 @@ async function updateProfileGlobalStats() {
 
         const dateFromInput = document.getElementById('dateFrom');
         const weeksInput = document.getElementById('weeksCount');
-        const settingsDocRef = doc(db, 'users', uid);
+        const settingsDocRef = doc(db, 'profiles', activeProfileId);
 
         const settings = {
             dateFrom: dateFromInput.value || null,
@@ -2416,7 +2457,7 @@ async function updateProfileGlobalStats() {
     function scheduleSave() {
         if (!currentUser || !activeProfileId) return;
         clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(saveAllData, 2000);
+        saveTimeout = setTimeout(saveAllData, 300);
     }
 
     ['dateFrom', 'weeksCount'].forEach(id => {
@@ -2534,6 +2575,14 @@ async function updateProfileGlobalStats() {
         });
     }
 
+
+window.addEventListener('beforeunload', () => {
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveAllData();
+    }
+});
+
 </script>
 <!-- Congratulations Modal -->
 <div id="congratsModal">
@@ -2545,7 +2594,7 @@ async function updateProfileGlobalStats() {
 <button id="closeCongratsBtn">Zamknij</button>
 </div>
 </div>
-<button class="back-to-top" id="backToTopBtn" title="Powrót na górę">↑</button><script>
+<button class="back-to-top" id="backToTopBtn" title="Powrót na górę"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg></button><script>
 // Back to top button
 const backToTopBtn = document.getElementById('backToTopBtn');
 
@@ -2610,6 +2659,14 @@ backToTopBtn.addEventListener('click', () => {
             }
         });
     }
+
+
+window.addEventListener('beforeunload', () => {
+    if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveAllData();
+    }
+});
 
 </script>
 
