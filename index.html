@@ -1189,7 +1189,45 @@
         pointer-events: none;
     }
 
-    </style>
+    
+/* Styl dla ikonki zmiany na awatarze */
+.user-pill {
+    position: relative;
+    transition: all 0.3s ease !important;
+    cursor: pointer;
+}
+.user-pill:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--primary) !important;
+    transform: translateY(-1px);
+}
+.user-avatar {
+    position: relative;
+    transition: all 0.3s ease;
+}
+.user-pill:hover .user-avatar {
+    transform: rotate(15deg);
+}
+.user-pill:hover .user-avatar::after {
+    content: '⇄';
+    position: absolute;
+    inset: 0;
+    background: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    animation: fadeInScale 0.2s ease-out;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+</style>
 </head>
 <body>
 <div id="profileOverlay">
@@ -2061,6 +2099,46 @@ async function updateProfileGlobalStats() {
         accountInfoEl.textContent = nick ? nick : 'Zalogowano';
         userAvatarEl.textContent = nick ? nick[0].toUpperCase() : '?';
     });
+// Szybkie przełączanie profili po kliknięciu w awatar
+if (userAvatarEl && userAvatarEl.parentElement) {
+    userAvatarEl.parentElement.title = 'Kliknij, aby szybko zmienić profil';
+    userAvatarEl.parentElement.addEventListener('click', async () => {
+        if (!currentUser) return;
+        try {
+            const profilesSnap = await getDocs(query(collection(db, "profiles"), where("userId", "==", currentUser.uid)));
+            const profiles = [];
+            profilesSnap.forEach(d => profiles.push({ id: d.id, ...d.data() }));
+
+            if (profiles.length < 2) {
+                authStatus.textContent = "Dodaj więcej profilów, aby móc się przełączać.";
+                return;
+            }
+
+            const currentIndex = profiles.findIndex(p => p.id === activeProfileId);
+            const nextIndex = (currentIndex + 1) % profiles.length;
+            const nextProfile = profiles[nextIndex];
+
+            if (activeProfileId) await saveAllData();
+
+            activeProfileId = nextProfile.id;
+            await setDoc(doc(db, "users", currentUser.uid), { 
+                activeProfileId: nextProfile.id,
+                defaultProfileId: nextProfile.id 
+            }, { merge: true });
+
+            activeProfileLabelEl.textContent = `Aktywny profil: ${nextProfile.name}`;
+            userAvatarEl.textContent = nextProfile.name[0].toUpperCase();
+            authStatus.textContent = `Przełączono na profil: ${nextProfile.name}`;
+
+            clearPlanner();
+            await loadAllData();
+            updateProfileGlobalStats();
+        } catch (err) {
+            console.error("Błąd przełączania:", err);
+        }
+    });
+}
+
 
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
