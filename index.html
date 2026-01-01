@@ -2427,94 +2427,86 @@ if (userAvatarEl && userAvatarEl.parentElement) {
         return weeks;
     }
 
-    async function saveAllData() {
+        async function saveAllData() {
         if (!currentUser || !activeProfileId) return;
         const uid = currentUser.uid;
 
         const dateFromInput = document.getElementById('dateFrom');
         const weeksInput = document.getElementById('weeksCount');
-        const settingsDocRef = doc(db, 'profiles', activeProfileId);
+        const profileDocRef = doc(db, 'profiles', activeProfileId);
 
-        const settings = {
-            dateFrom: dateFromInput.value || null,
-            weeksCount: weeksInput.value ? Number(weeksInput.value) : null
-        };
+        // Zapis ustawień okresu
+        await setDoc(profileDocRef, {
+            dateFrom: dateFromInput.value || "",
+            weeksCount: weeksInput.value ? Number(weeksInput.value) : 0
+        }, { merge: true });
 
         const goals = getGoalsFromUI();
         const weeks = getWeeksFromUI();
 
-        await setDoc(settingsDocRef, { settings }, { merge: true });
-
         const goalsCol = collection(db, 'goals');
         const weeksCol = collection(db, 'weeks');
 
-        const oldGoals = await getDocs(query(goalsCol, where('userId', '==', uid), where('profileId', '==', activeProfileId)));
-        oldGoals.forEach(async g => { await deleteDoc(g.ref); });
-
-        const oldWeeks = await getDocs(query(weeksCol, where('userId', '==', uid), where('profileId', '==', activeProfileId)));
-        oldWeeks.forEach(async w => { await deleteDoc(w.ref); });
-
+        // Zapis celów (używamy stałych ID na podstawie kolejności)
         for (const g of goals) {
-            const id = uid + '_p_' + activeProfileId + '_goal_' + g.order + '_' + Date.now() + Math.random();
-            await setDoc(doc(goalsCol, id), { userId: uid, profileId: activeProfileId, ...g });
-        }
-        for (const w of weeks) {
-            const id = uid + '_p_' + activeProfileId + '_week_' + w.index + '_' + Date.now() + Math.random();
-            await setDoc(doc(weeksCol, id), { userId: uid, profileId: activeProfileId, ...w });
+            const gid = `${uid}_${activeProfileId}_goal_${g.order}`;
+            await setDoc(doc(goalsCol, gid), { userId: uid, profileId: activeProfileId, ...g });
         }
 
-        authStatus.textContent = 'Zapisano dane profilu w chmurze.';
+        // Zapis tygodni (używamy stałych ID na podstawie indeksu)
+        for (const w of weeks) {
+            const wid = `${uid}_${activeProfileId}_week_${w.index}`;
+            await setDoc(doc(weeksCol, wid), { userId: uid, profileId: activeProfileId, ...w });
+        }
+
+        authStatus.textContent = 'Synchronizacja zakończona pomyślnie.';
+        setTimeout(() => { authStatus.textContent = ''; }, 3000);
     }
 
-    async function loadAllData() {
+        async function loadAllData() {
         if (!currentUser || !activeProfileId) {
             clearPlanner();
             return;
         }
         const uid = currentUser.uid;
 
-        const settingsSnap = await getDoc(doc(db, 'users', uid));
-        if (settingsSnap.exists()) {
-            const settings = settingsSnap.data().settings || {};
-            if (settings.dateFrom) document.getElementById('dateFrom').value = settings.dateFrom;
-            if (settings.weeksCount) document.getElementById('weeksCount').value = settings.weeksCount;
+        // 1. Ładowanie ustawień profilu
+        const profileSnap = await getDoc(doc(db, 'profiles', activeProfileId));
+        if (profileSnap.exists()) {
+            const pData = profileSnap.data();
+            if (pData.dateFrom) document.getElementById('dateFrom').value = pData.dateFrom;
+            if (pData.weeksCount) document.getElementById('weeksCount').value = pData.weeksCount;
         }
 
+        // 2. Renderowanie pustej siatki na podstawie ustawień
+        const startD = getDateFromInput(document.getElementById('dateFrom'));
+        const wCount = parseInt(document.getElementById('weeksCount').value) || 0;
+        renderWeeks(startD, wCount);
         updatePeriod();
 
-        const goalsSnap = await getDocs(
-            query(collection(db, 'goals'),
-                where('userId', '==', uid),
-                where('profileId', '==', activeProfileId))
-        );
+        // 3. Ładowanie celów
+        const goalsSnap = await getDocs(query(collection(db, 'goals'), 
+            where('userId', '==', uid), where('profileId', '==', activeProfileId)));
         const goals = [];
         goalsSnap.forEach(d => goals.push(d.data()));
         goals.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
         window.renderGoalsTable(goals);
 
-        const weeksSnap = await getDocs(
-            query(collection(db, 'weeks'),
-                where('userId', '==', uid),
-                where('profileId', '==', activeProfileId))
-        );
+        // 4. Ładowanie danych tygodni i wypełnianie kart
+        const weeksSnap = await getDocs(query(collection(db, 'weeks'), 
+            where('userId', '==', uid), where('profileId', '==', activeProfileId)));
 
-        const weeksData = [];
-        weeksSnap.forEach(d => weeksData.push(d.data()));
+        const weeksGrid = document.getElementById('weeksGrid');
+        const weekCards = weeksGrid.querySelectorAll('.week-card');
 
-        const weekCards = document.querySelectorAll('#weeksGrid .week-card');
-
-        weeksData.forEach(w => {
+        weeksSnap.forEach(docSnap => {
+            const w = docSnap.data();
             if (w.index < weekCards.length) {
                 const card = weekCards[w.index];
                 const successBtn = card.querySelector('.btn-success');
                 const failBtn = card.querySelector('.btn-fail');
                 const noteArea = card.querySelector('.week-note');
                 const ratingInput = card.querySelector('.week-rating-input');
-
-                successBtn.classList.remove('active');
-                failBtn.classList.remove('active');
-                card.classList.remove('week-success', 'week-fail');
 
                 if (w.success) {
                     successBtn.classList.add('active');
@@ -2523,9 +2515,11 @@ if (userAvatarEl && userAvatarEl.parentElement) {
                     failBtn.classList.add('active');
                     card.classList.add('week-fail');
                 }
-
                 if (w.note) noteArea.value = w.note;
-                if (w.rating) { ratingInput.value = w.rating; updateRatingBar(ratingInput); }
+                if (w.rating) { 
+                    ratingInput.value = w.rating; 
+                    updateRatingBar(ratingInput); 
+                }
             }
         });
 
