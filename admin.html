@@ -7,55 +7,90 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #0f0f0f; color: white; margin: 0; padding: 20px; }
+        :root {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --accent: #d4af37;
+            --border: #ddd;
+            --input-bg: #ffffff;
+            --table-head: #1a1a1a;
+        }
+
+        body.dark-mode {
+            --bg: #0f0f0f;
+            --card: #161616;
+            --text: #ffffff;
+            --accent: #d4af37;
+            --border: #333;
+            --input-bg: #0a0a0a;
+            --table-head: #000000;
+        }
+
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
+
+        /* Overlay Logowania */
         .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0a; display:flex; justify-content:center; align-items:center; z-index:9999; }
+        .login-box { background: #161616; padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align:center; }
+
         .container { max-width: 1300px; margin: 0 auto; display:none; }
 
-        /* Menu zakładek */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .tab-btn { background: #222; color: #888; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .tab-btn.active { background: #d4af37; color: black; }
+        .header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 
-        .section { background: #161616; padding: 30px; border-radius: 15px; border: 1px solid #222; display: none; }
+        /* Tryb Ciemny Przełącznik */
+        .theme-toggle { background: var(--accent); color: black; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        .tab-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .tab-btn.active { background: var(--accent); color: black; border-color: var(--accent); }
+
+        .section { background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid var(--border); display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .section.active { display: block; }
 
-        h1 { color: #d4af37; margin-top: 0; }
-        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: #d4af37; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; background: #0a0a0a; color: white; margin-bottom: 10px; }
+        h1 { color: var(--accent); margin: 0; }
+        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: var(--accent); }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--input-bg); color: var(--text); }
 
-        .btn-save { background: #d4af37; color: black; width: 100%; padding: 18px; margin-top: 10px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
+        .btn-save { background: var(--accent); color: black; width: 100%; padding: 18px; margin-top: 20px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; color: #ccc; }
-        th, td { padding: 15px; border-bottom: 1px solid #222; text-align: left; }
-        th { background: #0a0a0a; color: #d4af37; text-transform: uppercase; letter-spacing: 1px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        th, td { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
+        th { background: var(--table-head); color: var(--accent); text-transform: uppercase; }
 
         .status-btn { padding: 6px 12px; border-radius: 5px; font-weight: bold; border: none; cursor: pointer; }
         .paid { background: #2ecc71; color: white; }
         .unpaid { background: #e74c3c; color: white; }
-        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        .delete-btn:hover { background: #e74c3c; color: white; }
+        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
 
-        .source-tag { background: #333; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; color: #aaa; }
+        .remember-me { margin-top: 15px; color: #888; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
     </style>
 </head>
-<body>
+<body class="light-mode">
     <div id="loginOverlay" class="login-overlay">
-        <div style="background:#161616; padding:40px; border-radius:20px; border:1px solid #d4af37; text-align:center;">
-            <h2 style="color:#d4af37; margin-bottom:20px;">ADMIN PANEL</h2>
-            <input type="password" id="adminPass" placeholder="Hasło" style="text-align:center;"><br>
-            <button onclick="checkPass()" style="padding:12px 40px; background:#d4af37; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">ZALOGUJ</button>
+        <div class="login-box">
+            <h2 style="color:var(--accent); margin-bottom:20px;">ADMIN PANEL</h2>
+            <input type="password" id="adminPass" placeholder="Hasło" style="text-align:center; background:#222; color:white; border:1px solid #333; padding:10px; border-radius:5px; margin-bottom:10px;"><br>
+            <div class="remember-me">
+                <input type="checkbox" id="rememberPass" checked> Zapamiętaj mnie
+            </div>
+            <button onclick="checkPass()" style="padding:12px 40px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-top:20px;">ZALOGUJ</button>
         </div>
     </div>
 
     <div id="adminContent" class="container">
-        <h1>BOGACKA HEELS | PANEL STEROWANIA</h1>
+        <div class="header-tools">
+            <h1>BOGACKA HEELS</h1>
+            <div>
+                <button class="theme-toggle" onclick="toggleTheme()">TRYB CIEMNY / JASNY</button>
+                <button onclick="logout()" style="padding:8px 15px; border-radius:5px; border:none; cursor:pointer; background:#555; color:white; margin-left:10px;">WYLOGUJ</button>
+            </div>
+        </div>
 
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('registrationsTab', this)">LISTA ZAPISÓW</button>
             <button class="tab-btn" onclick="showTab('settingsTab', this)">USTAWIENIA STRONY</button>
         </div>
 
-        <!-- Sekcja 1: Lista Zapisów -->
         <div id="registrationsTab" class="section active">
             <h2>Uczestnicy Warsztatów</h2>
             <div style="overflow-x: auto;">
@@ -76,25 +111,24 @@
             </div>
         </div>
 
-        <!-- Sekcja 2: Ustawienia -->
         <div id="settingsTab" class="section">
             <h2>Konfiguracja Treści</h2>
             <div style="max-width: 600px;">
-                <label>Nazwa Eventu (np. Heels on Fire vol. 4)</label>
+                <label>Nazwa Eventu</label>
                 <input type="text" id="set_title">
-                <label>Data wyświetlana na stronie (np. 7 marca 2026, godz. 10:00)</label>
+                <label>Data wyświetlana</label>
                 <input type="text" id="set_dateDisplay">
                 <label>Data dla licznika</label>
                 <input type="datetime-local" id="set_targetDate">
-                <label>Cena warsztatów (PLN)</label>
+                <label>Cena (PLN)</label>
                 <input type="number" id="set_price">
-                <label>Lokalizacja (Nazwa studia)</label>
+                <label>Lokalizacja</label>
                 <input type="text" id="set_location">
-                <label>Link Google Maps (Pinezka)</label>
+                <label>Link Google Maps</label>
                 <input type="text" id="set_mapUrl">
-                <label>Lista eventów w rejestracji (oddziel przecinkami)</label>
+                <label>Lista eventów (oddziel przecinkami)</label>
                 <textarea id="set_eventList" rows="4"></textarea>
-                <button class="btn-save" onclick="saveSettings()">ZAPISZ ZMIANY NA STRONIE</button>
+                <button class="btn-save" onclick="saveSettings()">ZAPISZ ZMIANY</button>
             </div>
         </div>
     </div>
@@ -112,12 +146,39 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // Sprawdź zapamiętane hasło przy starcie
+        window.onload = function() {
+            const savedPass = localStorage.getItem('admin_password');
+            const savedTheme = localStorage.getItem('admin_theme');
+
+            if(savedTheme === 'dark') document.body.classList.add('dark-mode');
+
+            if(savedPass === 'DanielAdmin123!') {
+                document.getElementById('adminPass').value = savedPass;
+                checkPass();
+            }
+        };
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('admin_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
         function checkPass() {
-            if(document.getElementById('adminPass').value === 'DanielAdmin123!') {
+            const pass = document.getElementById('adminPass').value;
+            if(pass === 'DanielAdmin123!') {
+                if(document.getElementById('rememberPass').checked) {
+                    localStorage.setItem('admin_password', pass);
+                }
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 initPanel();
             } else { alert('Błędne hasło!'); }
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_password');
+            location.reload();
         }
 
         function showTab(tabId, btn) {
@@ -128,7 +189,6 @@
         }
 
         function initPanel() {
-            // Ładowanie ustawień
             database.ref('settings').once('value', snapshot => {
                 const s = snapshot.val();
                 if(s) {
@@ -142,7 +202,6 @@
                 }
             });
 
-            // Ładowanie zapisów
             database.ref('registrations').on('value', snapshot => {
                 const body = document.getElementById('tableBody');
                 body.innerHTML = '';
@@ -152,18 +211,12 @@
                     const row = body.insertRow();
                     row.innerHTML = `
                         <td>${d.date}</td>
-                        <td style="color:white; font-weight:600;">${d.firstName} ${d.lastName}</td>
+                        <td style="font-weight:600;">${d.firstName} ${d.lastName}</td>
                         <td>${d.email}</td>
                         <td>${d.event}</td>
-                        <td><span class="source-tag">${d.source || '-'}</span></td>
-                        <td>
-                            <button class="status-btn ${d.paid ? 'paid' : 'unpaid'}" onclick="togglePaid('${key}', ${d.paid})">
-                                ${d.paid ? 'OPŁACONE' : 'NIEOPŁACONE'}
-                            </button>
-                        </td>
-                        <td>
-                            <button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button>
-                        </td>
+                        <td><span style="background:#eee; color:#333; padding:2px 5px; border-radius:3px;">${d.source || '-'}</span></td>
+                        <td><button class="status-btn ${d.paid ? 'paid' : 'unpaid'}" onclick="togglePaid('${key}', ${d.paid})">${d.paid ? 'TAK' : 'NIE'}</button></td>
+                        <td><button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button></td>
                     `;
                 });
             });
@@ -179,18 +232,11 @@
                 mapUrl: document.getElementById('set_mapUrl').value,
                 eventList: document.getElementById('set_eventList').value
             };
-            database.ref('settings').set(data).then(() => alert('Strona została zaktualizowana!'));
+            database.ref('settings').set(data).then(() => alert('Zapisano!'));
         }
 
-        function togglePaid(key, status) {
-            database.ref('registrations/' + key).update({ paid: !status });
-        }
-
-        function deleteReg(key) {
-            if(confirm('Czy na pewno chcesz trwale usunąć to zgłoszenie?')) {
-                database.ref('registrations/' + key).remove();
-            }
-        }
+        function togglePaid(key, status) { database.ref('registrations/' + key).update({ paid: !status }); }
+        function deleteReg(key) { if(confirm('Usunąć?')) database.ref('registrations/' + key).remove(); }
     </script>
 </body>
 </html>
