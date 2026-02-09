@@ -7,134 +7,82 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root {
-            --bg: #f0f2f5;
-            --card: #ffffff;
-            --text: #1a1a1a;
-            --accent: #d4af37;
-            --border: #ddd;
-            --input-bg: #ffffff;
-            --table-head: #1a1a1a;
-        }
-
-        body.dark-mode {
-            --bg: #0f0f0f;
-            --card: #161616;
-            --text: #ffffff;
-            --accent: #d4af37;
-            --border: #333;
-            --input-bg: #0a0a0a;
-            --table-head: #000000;
-        }
-
+        :root { --bg: #f8f9fa; --card: #ffffff; --text: #212529; --accent: #d4af37; --border: #dee2e6; --input-bg: #ffffff; --tag-bg: #e9ecef; --tag-text: #495057; }
+        body.dark-mode { --bg: #121212; --card: #1e1e1e; --text: #e9ecef; --accent: #d4af37; --border: #333333; --input-bg: #2d2d2d; --tag-bg: #333333; --tag-text: #adb5bd; }
         body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
-
-        /* Overlay Logowania */
         .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0a; display:flex; justify-content:center; align-items:center; z-index:9999; }
-        .login-box { background: #161616; padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align:center; }
-
+        .login-box { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align:center; color: white; }
         .container { max-width: 1300px; margin: 0 auto; display:none; }
-
         .header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-
-        /* Tryb Ciemny Przełącznik */
-        .theme-toggle { background: var(--accent); color: black; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         .tab-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .tab-btn.active { background: var(--accent); color: black; border-color: var(--accent); }
-
-        .section { background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid var(--border); display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .section { background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid var(--border); display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .section.active { display: block; }
-
-        h1 { color: var(--accent); margin: 0; }
         label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: var(--accent); }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--input-bg); color: var(--text); }
-
-        .btn-save { background: var(--accent); color: black; width: 100%; padding: 18px; margin-top: 20px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--input-bg); color: var(--text); }
+        .btn-save { background: var(--accent); color: #000; width: 100%; padding: 18px; margin-top: 20px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
-        th { background: var(--table-head); color: var(--accent); text-transform: uppercase; }
-
-        .status-btn { padding: 6px 12px; border-radius: 5px; font-weight: bold; border: none; cursor: pointer; }
-        .paid { background: #2ecc71; color: white; }
-        .unpaid { background: #e74c3c; color: white; }
-        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-
-        .remember-me { margin-top: 15px; color: #888; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        th { background: rgba(0,0,0,0.05); color: var(--text); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        body.dark-mode th { background: rgba(255,255,255,0.05); }
+        .status-btn { padding: 8px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.75rem; }
+        .paid { background: #2ecc71; color: #fff; }
+        .unpaid { background: #e74c3c; color: #fff; }
+        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
+        .source-tag { background: var(--tag-bg); color: var(--tag-text); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+        .theme-toggle { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
     </style>
 </head>
-<body class="light-mode">
+<body>
     <div id="loginOverlay" class="login-overlay">
         <div class="login-box">
-            <h2 style="color:var(--accent); margin-bottom:20px;">ADMIN PANEL</h2>
-            <input type="password" id="adminPass" placeholder="Hasło" style="text-align:center; background:#222; color:white; border:1px solid #333; padding:10px; border-radius:5px; margin-bottom:10px;"><br>
-            <div class="remember-me">
-                <input type="checkbox" id="rememberPass" checked> Zapamiętaj mnie
-            </div>
-            <button onclick="checkPass()" style="padding:12px 40px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-top:20px;">ZALOGUJ</button>
+            <h2 style="color:var(--accent);">ADMIN PANEL</h2>
+            <input type="password" id="adminPass" placeholder="Hasło" style="margin-bottom:10px; background:#333; border:1px solid #444; color:white; padding:12px; width:250px; border-radius:8px; text-align:center;"><br>
+            <div style="margin: 10px 0; font-size: 0.8rem; color: #888;"><input type="checkbox" id="rememberPass" checked> Zapamiętaj mnie</div>
+            <button onclick="checkPass()" style="padding:12px 40px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:250px;">ZALOGUJ</button>
         </div>
     </div>
-
     <div id="adminContent" class="container">
         <div class="header-tools">
             <h1>BOGACKA HEELS</h1>
             <div>
-                <button class="theme-toggle" onclick="toggleTheme()">TRYB CIEMNY / JASNY</button>
-                <button onclick="logout()" style="padding:8px 15px; border-radius:5px; border:none; cursor:pointer; background:#555; color:white; margin-left:10px;">WYLOGUJ</button>
+                <button class="theme-toggle" onclick="toggleTheme()">ZMIEŃ MOTYW</button>
+                <button onclick="logout()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer; background:#6c757d; color:white; margin-left:10px; font-weight:600;">WYLOGUJ</button>
             </div>
         </div>
-
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('registrationsTab', this)">LISTA ZAPISÓW</button>
             <button class="tab-btn" onclick="showTab('settingsTab', this)">USTAWIENIA STRONY</button>
         </div>
-
         <div id="registrationsTab" class="section active">
             <h2>Uczestnicy Warsztatów</h2>
             <div style="overflow-x: auto;">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Data i Godz.</th>
-                            <th>Osoba</th>
-                            <th>E-mail</th>
-                            <th>Event</th>
-                            <th>Źródło</th>
-                            <th>Płatność</th>
-                            <th>Akcja</th>
-                        </tr>
+                        <tr><th>Data</th><th>Uczestnik</th><th>E-mail</th><th>Event</th><th>Źródło</th><th>Status</th><th>Akcja</th></tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
-
         <div id="settingsTab" class="section">
-            <h2>Konfiguracja Treści</h2>
-            <div style="max-width: 600px;">
-                <label>Nazwa Eventu</label>
-                <input type="text" id="set_title">
-                <label>Data wyświetlana</label>
-                <input type="text" id="set_dateDisplay">
-                <label>Data dla licznika</label>
-                <input type="datetime-local" id="set_targetDate">
-                <label>Cena (PLN)</label>
-                <input type="number" id="set_price">
-                <label>Lokalizacja</label>
-                <input type="text" id="set_location">
-                <label>Link Google Maps</label>
-                <input type="text" id="set_mapUrl">
-                <label>Lista eventów (oddziel przecinkami)</label>
-                <textarea id="set_eventList" rows="4"></textarea>
-                <button class="btn-save" onclick="saveSettings()">ZAPISZ ZMIANY</button>
+            <h2>Konfiguracja Warsztatów</h2>
+            <div style="max-width: 700px;">
+                <label>Nazwa Eventu</label><input type="text" id="set_title">
+                <label>Data wyświetlana</label><input type="text" id="set_dateDisplay">
+                <label>Data dla licznika</label><input type="datetime-local" id="set_targetDate">
+                <label>Opis warsztatów (pod licznikiem)</label><textarea id="set_description" rows="5" placeholder="Opisz co będzie się działo na warsztatach..."></textarea>
+                <label>Cena (PLN)</label><input type="number" id="set_price">
+                <label>Lokalizacja</label><input type="text" id="set_location">
+                <label>Link Google Maps</label><input type="text" id="set_mapUrl">
+                <label>Lista eventów (oddziel przecinkami)</label><textarea id="set_eventList" rows="3"></textarea>
+                <button class="btn-save" onclick="saveSettings()">Zapisz zmiany na stronie</button>
             </div>
         </div>
     </div>
-
     <script>
-        const firebaseConfig = {
+        const firebaseConfig = {{
             apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
             authDomain: "bogacka-heels.firebaseapp.com",
             databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
@@ -142,101 +90,75 @@
             storageBucket: "bogacka-heels.firebasestorage.app",
             messagingSenderId: "825219158791",
             appId: "1:825219158791:web:38acf635db61854739eba2"
-        };
+        }};
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-
-        // Sprawdź zapamiętane hasło przy starcie
-        window.onload = function() {
+        window.onload = function() {{
             const savedPass = localStorage.getItem('admin_password');
             const savedTheme = localStorage.getItem('admin_theme');
-
             if(savedTheme === 'dark') document.body.classList.add('dark-mode');
-
-            if(savedPass === 'DanielAdmin123!') {
-                document.getElementById('adminPass').value = savedPass;
-                checkPass();
-            }
-        };
-
-        function toggleTheme() {
+            if(savedPass === 'DanielAdmin123!') {{ document.getElementById('adminPass').value = savedPass; checkPass(); }}
+        }};
+        function toggleTheme() {{
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('admin_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-
-        function checkPass() {
+        }}
+        function checkPass() {{
             const pass = document.getElementById('adminPass').value;
-            if(pass === 'DanielAdmin123!') {
-                if(document.getElementById('rememberPass').checked) {
-                    localStorage.setItem('admin_password', pass);
-                }
+            if(pass === 'DanielAdmin123!') {{
+                if(document.getElementById('rememberPass').checked) localStorage.setItem('admin_password', pass);
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 initPanel();
-            } else { alert('Błędne hasło!'); }
-        }
-
-        function logout() {
-            localStorage.removeItem('admin_password');
-            location.reload();
-        }
-
-        function showTab(tabId, btn) {
+            }} else {{ alert('Błędne hasło!'); }}
+        {{}}
+        function logout() {{ localStorage.removeItem('admin_password'); location.reload(); }}
+        function showTab(tabId, btn) {{
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             btn.classList.add('active');
-        }
-
-        function initPanel() {
-            database.ref('settings').once('value', snapshot => {
+        }}
+        function initPanel() {{
+            database.ref('settings').once('value', snapshot => {{
                 const s = snapshot.val();
-                if(s) {
-                    document.getElementById('set_title').value = s.title;
-                    document.getElementById('set_dateDisplay').value = s.dateDisplay;
-                    document.getElementById('set_targetDate').value = s.targetDate;
-                    document.getElementById('set_price').value = s.price;
-                    document.getElementById('set_location').value = s.location;
-                    document.getElementById('set_mapUrl').value = s.mapUrl;
-                    document.getElementById('set_eventList').value = s.eventList;
-                }
-            });
-
-            database.ref('registrations').on('value', snapshot => {
+                if(s) {{
+                    document.getElementById('set_title').value = s.title || "";
+                    document.getElementById('set_dateDisplay').value = s.dateDisplay || "";
+                    document.getElementById('set_targetDate').value = s.targetDate || "";
+                    document.getElementById('set_price').value = s.price || "";
+                    document.getElementById('set_location').value = s.location || "";
+                    document.getElementById('set_mapUrl').value = s.mapUrl || "";
+                    document.getElementById('set_eventList').value = s.eventList || "";
+                    document.getElementById('set_description').value = s.description || "";
+                }}
+            }});
+            database.ref('registrations').on('value', snapshot => {{
                 const body = document.getElementById('tableBody');
                 body.innerHTML = '';
-                snapshot.forEach(child => {
+                snapshot.forEach(child => {{
                     const d = child.val();
                     const key = child.key;
                     const row = body.insertRow();
-                    row.innerHTML = `
-                        <td>${d.date}</td>
-                        <td style="font-weight:600;">${d.firstName} ${d.lastName}</td>
-                        <td>${d.email}</td>
-                        <td>${d.event}</td>
-                        <td><span style="background:#eee; color:#333; padding:2px 5px; border-radius:3px;">${d.source || '-'}</span></td>
-                        <td><button class="status-btn ${d.paid ? 'paid' : 'unpaid'}" onclick="togglePaid('${key}', ${d.paid})">${d.paid ? 'TAK' : 'NIE'}</button></td>
-                        <td><button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button></td>
-                    `;
-                });
-            });
-        }
-
-        function saveSettings() {
-            const data = {
+                    row.innerHTML = `<td>${{d.date}}</td><td style="font-weight:600;">${{d.firstName}} ${{d.lastName}}</td><td>${{d.email}}</td><td>${{d.event}}</td><td><span class="source-tag">${{d.source || '-'}}</span></td><td><button class="status-btn ${{d.paid ? 'paid' : 'unpaid'}}" onclick="togglePaid('${{key}}', ${{d.paid}})">${{d.paid ? 'TAK' : 'NIE'}}</button></td><td><button class="delete-btn" onclick="deleteReg('${{key}}')">USUŃ</button></td>`;
+                }});
+            }});
+        }}
+        function saveSettings() {{
+            const data = {{
                 title: document.getElementById('set_title').value,
                 dateDisplay: document.getElementById('set_dateDisplay').value,
                 targetDate: document.getElementById('set_targetDate').value,
                 price: document.getElementById('set_price').value,
                 location: document.getElementById('set_location').value,
                 mapUrl: document.getElementById('set_mapUrl').value,
-                eventList: document.getElementById('set_eventList').value
-            };
-            database.ref('settings').set(data).then(() => alert('Zapisano!'));
-        }
-
-        function togglePaid(key, status) { database.ref('registrations/' + key).update({ paid: !status }); }
-        function deleteReg(key) { if(confirm('Usunąć?')) database.ref('registrations/' + key).remove(); }
+                eventList: document.getElementById('set_eventList').value,
+                description: document.getElementById('set_description').value
+            }};
+            database.ref('settings').set(data).then(() => alert('Ustawienia zapisane!'));
+        }}
+        function togglePaid(key, status) {{ database.ref('registrations/' + key).update({{ paid: !status }}); }}
+        function deleteReg(key) {{ if(confirm('Czy na pewno chcesz usunąć to zgłoszenie?')) database.ref('registrations/' + key).remove(); }}
     </script>
 </body>
 </html>
