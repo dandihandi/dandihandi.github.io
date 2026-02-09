@@ -4,38 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zapisy | Bogacka Heels</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root { --accent: #d4af37; --bg: #0a0a0a; --card-bg: #161616; --text-main: #ffffff; --text-dim: #b0b0b0; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 40px 20px; text-align: center; }
         .card { max-width: 500px; margin: 0 auto; background: var(--card-bg); padding: 40px; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.2); }
+        h2 { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: none; }
         .form-group { margin-bottom: 20px; text-align: left; }
         input, select { width: 100%; padding: 15px; background: #222; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
         button { width: 100%; padding: 18px; background: var(--accent); color: black; font-weight: 700; text-transform: uppercase; border: none; border-radius: 8px; cursor: pointer; }
-        .payment-box { background: rgba(0, 117, 235, 0.1); border: 1px solid #0075eb; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: left; }
-        .revolut-link { display: block; text-align: center; background: #0075eb; color: white; padding: 12px; border-radius: 25px; text-decoration: none; margin-top: 15px; font-weight: bold; }
         .back-link { display: inline-block; margin-bottom: 20px; color: var(--text-dim); text-decoration: none; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-bg); padding: 40px; border-radius: 20px; border: 1px solid var(--accent); max-width: 450px; width: 90%; }
+        .payment-box { background: rgba(0, 117, 235, 0.1); border: 1px solid #0075eb; padding: 25px; border-radius: 15px; margin-top: 25px; text-align: center; }
+        .revolut-link { display: block; text-align: center; background: #0075eb; color: white; padding: 15px; border-radius: 30px; text-decoration: none; margin-top: 20px; font-weight: bold; font-size: 1.1rem; }
     </style>
 </head>
 <body>
     <a href="index.html" class="back-link">← Wróć do informacji</a>
-    <div class="card">
+    <div class="card" id="regCard">
         <h2>Rejestracja na warsztaty</h2>
         <form id="regForm">
             <div class="form-group"><input type="text" id="fname" placeholder="Imię" required></div>
             <div class="form-group"><input type="text" id="lname" placeholder="Nazwisko" required></div>
             <div class="form-group"><input type="email" id="email" placeholder="E-mail" required></div>
-            <div class="form-group"><select id="event" required><option value="" disabled selected>Ładowanie eventów...</option></select></div>
+            <div class="form-group"><select id="event" required><option value="" disabled selected>Wybierz event</option></select></div>
             <div class="form-group"><input type="text" id="source" placeholder="Skąd o nas wiesz?" required></div>
-            <button type="submit" id="submitBtn">Wyślij zgłoszenie</button>
+            <button type="submit" id="submitBtn">Zapisz się</button>
         </form>
-        <div class="payment-box">
-            <p>Koszt warsztatów: <strong id="displayPrice">...</strong> PLN</p>
-            <a href="https://revolut.me/twoj-nick" class="revolut-link" target="_blank">Zapłać przez Revolut</a>
+    </div>
+
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent);">Zgłoszenie wysłane!</h2>
+            <p style="margin-top: 15px;">Dziękujemy za przesłanie formularza. Aby sfinalizować zapis i <strong>potwierdzić swoją obecność na liście</strong>, należy dokonać wpłaty pełnej kwoty.</p>
+
+            <div class="payment-box">
+                <p style="font-size: 1.2rem; margin: 0;">Koszt warsztatów: <strong><span id="displayPrice">...</span> PLN</strong></p>
+                <p style="font-size: 0.9rem; color: #aaa; margin-top: 10px;">W tytule przelewu podaj swój adres e-mail:<br>(<strong id="userEmailConfirm" style="color: var(--accent);"></strong>)</p>
+                <a href="https://revolut.me/twoj-nick" class="revolut-link" target="_blank">Opłać teraz przez Revolut</a>
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 20px;">Dopiero wpłata stanowi pełne potwierdzenie Twojego udziału w wydarzeniu.</p>
+            <button onclick="location.href='index.html'" style="background:none; color:var(--text-dim); border:none; margin-top:20px; cursor:pointer; text-decoration:underline;">Powrót do strony głównej</button>
         </div>
     </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
@@ -48,6 +65,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+
         database.ref('settings').on('value', snapshot => {
             const s = snapshot.val();
             if(s) {
@@ -59,19 +77,27 @@
                 document.getElementById('displayPrice').innerText = s.price || "...";
             }
         });
+
         document.getElementById('regForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn'); btn.disabled = true;
+            const btn = document.getElementById('submitBtn');
+            const emailValue = document.getElementById('email').value;
+            btn.disabled = true;
+
             const newReg = {
                 firstName: document.getElementById('fname').value,
                 lastName: document.getElementById('lname').value,
-                email: document.getElementById('email').value,
+                email: emailValue,
                 event: document.getElementById('event').value,
                 source: document.getElementById('source').value,
                 date: new Date().toLocaleString('pl-PL'),
                 paid: false
             };
-            database.ref('registrations').push(newReg).then(() => { alert('Zgłoszenie wysłane!'); this.reset(); }).finally(() => { btn.disabled = false; });
+
+            database.ref('registrations').push(newReg).then(() => {
+                document.getElementById('userEmailConfirm').innerText = emailValue;
+                document.getElementById('paymentModal').style.display = 'flex';
+            }).finally(() => { btn.disabled = false; });
         });
     </script>
 </body>
