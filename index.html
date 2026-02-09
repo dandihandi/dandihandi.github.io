@@ -54,7 +54,7 @@
         </div>
     </div>
     <script>
-        const firebaseConfig = {{
+        const firebaseConfig = {
             apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
             authDomain: "bogacka-heels.firebaseapp.com",
             databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
@@ -62,32 +62,32 @@
             storageBucket: "bogacka-heels.firebasestorage.app",
             messagingSenderId: "825219158791",
             appId: "1:825219158791:web:38acf635db61854739eba2"
-        }};
+        };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
         let targetTime = 0;
-        database.ref('settings').on('value', snapshot => {{
+        database.ref('settings').on('value', snapshot => {
             const s = snapshot.val();
-            if(s) {{
+            if(s) {
                 document.getElementById('mainTitle').innerText = s.title || "";
-                document.getElementById('mainDate').innerText = s.dateDisplay ? `(${{s.dateDisplay}})` : "";
+                document.getElementById('mainDate').innerText = s.dateDisplay ? `(${s.dateDisplay})` : "";
                 document.getElementById('mainPrice').innerText = s.price || "";
                 document.getElementById('mainLoc').innerText = s.location || "";
                 document.getElementById('mainMap').href = s.mapUrl || "#";
                 document.getElementById('mainDescription').innerText = s.description || "";
                 targetTime = new Date(s.targetDate).getTime();
-            }}
-        }});
-        setInterval(() => {{
+            }
+        });
+        setInterval(() => {
             const now = new Date().getTime();
             const diff = targetTime - now;
-            if (diff > 0) {{
+            if (diff > 0) {
                 document.getElementById('days').innerText = Math.floor(diff / (1000*60*60*24)).toString().padStart(2, '0');
                 document.getElementById('hours').innerText = Math.floor((diff % (1000*60*60*24)) / (1000*60*60)).toString().padStart(2, '0');
                 document.getElementById('mins').innerText = Math.floor((diff % (1000*60*60)) / (1000*60)).toString().padStart(2, '0');
                 document.getElementById('secs').innerText = Math.floor((diff % (1000*60)) / 1000).toString().padStart(2, '0');
-            }}
-        }}, 1000);
+            }
+        }, 1000);
     </script>
 </body>
 </html>

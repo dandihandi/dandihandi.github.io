@@ -27,21 +27,15 @@
             <div class="form-group"><input type="text" id="fname" placeholder="Imię" required></div>
             <div class="form-group"><input type="text" id="lname" placeholder="Nazwisko" required></div>
             <div class="form-group"><input type="email" id="email" placeholder="E-mail" required></div>
-            <div class="form-group">
-                <select id="event" required>
-                    <option value="" disabled selected>Ładowanie eventów...</option>
-                </select>
-            </div>
+            <div class="form-group"><select id="event" required><option value="" disabled selected>Ładowanie eventów...</option></select></div>
             <div class="form-group"><input type="text" id="source" placeholder="Skąd o nas wiesz?" required></div>
             <button type="submit" id="submitBtn">Wyślij zgłoszenie</button>
         </form>
         <div class="payment-box">
-            <p>Koszt warsztatów: <strong id="displayPrice">...</strong></p>
-            <p style="font-size: 0.85rem;">Aby potwierdzić rejestrację, dokonaj wpłaty. W tytule przelewu podaj swój <strong>adres e-mail</strong>.</p>
+            <p>Koszt warsztatów: <strong id="displayPrice">...</strong> PLN</p>
             <a href="https://revolut.me/twoj-nick" class="revolut-link" target="_blank">Zapłać przez Revolut</a>
         </div>
     </div>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
@@ -54,26 +48,20 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-
-        // Ładowanie dynamicznych danych (eventów i ceny)
         database.ref('settings').on('value', snapshot => {
-            const settings = snapshot.val();
-            if(settings) {
+            const s = snapshot.val();
+            if(s) {
                 const select = document.getElementById('event');
                 select.innerHTML = '<option value="" disabled selected>Wybierz event</option>';
-                const eventList = settings.eventList.split(',');
-                eventList.forEach(e => {
-                    select.innerHTML += `<option value="${e.trim()}">${e.trim()}</option>`;
+                (s.eventList || "").split(',').forEach(e => {
+                    if(e.trim()) select.innerHTML += `<option value="${e.trim()}">${e.trim()}</option>`;
                 });
-                document.getElementById('displayPrice').innerText = settings.price + ' PLN';
+                document.getElementById('displayPrice').innerText = s.price || "...";
             }
         });
-
         document.getElementById('regForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-
+            const btn = document.getElementById('submitBtn'); btn.disabled = true;
             const newReg = {
                 firstName: document.getElementById('fname').value,
                 lastName: document.getElementById('lname').value,
@@ -83,11 +71,7 @@
                 date: new Date().toLocaleString('pl-PL'),
                 paid: false
             };
-
-            database.ref('registrations').push(newReg).then(() => {
-                alert('Zgłoszenie wysłane!');
-                this.reset();
-            }).finally(() => { btn.disabled = false; });
+            database.ref('registrations').push(newReg).then(() => { alert('Zgłoszenie wysłane!'); this.reset(); }).finally(() => { btn.disabled = false; });
         });
     </script>
 </body>
