@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zapisy | Bogacka Heels</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        :root { --accent: #d4af37; --bg: #0a0a0a; --card-bg: #161616; --text-main: #ffffff; --text-dim: #b0b0b0; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 40px 20px; text-align: center; }
+        .card { max-width: 500px; margin: 0 auto; background: var(--card-bg); padding: 40px; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.2); }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        input, select { width: 100%; padding: 15px; background: #222; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 18px; background: var(--accent); color: black; font-weight: 700; text-transform: uppercase; border: none; border-radius: 8px; cursor: pointer; }
+        .payment-box { background: rgba(0, 117, 235, 0.1); border: 1px solid #0075eb; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: left; }
+        .revolut-link { display: block; text-align: center; background: #0075eb; color: white; padding: 12px; border-radius: 25px; text-decoration: none; margin-top: 15px; font-weight: bold; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--text-dim); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">← Wróć do informacji</a>
+    <div class="card">
+        <h2>Rejestracja na warsztaty</h2>
+        <form id="regForm">
+            <div class="form-group"><input type="text" id="fname" placeholder="Imię" required></div>
+            <div class="form-group"><input type="text" id="lname" placeholder="Nazwisko" required></div>
+            <div class="form-group"><input type="email" id="email" placeholder="E-mail" required></div>
+            <div class="form-group">
+                <select id="event" required>
+                    <option value="" disabled selected>Wybierz event</option>
+                    <option value="Heels on Fire vol. 4">Heels on Fire vol. 4 (07.03)</option>
+                    <option value="Warsztaty Basic">Warsztaty Basic (TBA)</option>
+                </select>
+            </div>
+            <div class="form-group"><input type="text" id="source" placeholder="Skąd o nas wiesz?" required></div>
+            <button type="submit" id="submitBtn">Wyślij zgłoszenie</button>
+        </form>
+        <div class="payment-box">
+            <p><strong>Płatność Revolut: 80 PLN</strong></p>
+            <p style="font-size: 0.85rem;">Aby potwierdzić rejestrację, dokonaj wpłaty. W tytule przelewu podaj swój <strong>adres e-mail</strong>.</p>
+            <a href="https://revolut.me/twoj-nick" class="revolut-link" target="_blank">Zapłać 80 PLN przez Revolut</a>
+        </div>
+    </div>
+
+    <script>
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
+            authDomain: "bogacka-heels.firebaseapp.com",
+            databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bogacka-heels",
+            storageBucket: "bogacka-heels.firebasestorage.app",
+            messagingSenderId: "825219158791",
+            appId: "1:825219158791:web:38acf635db61854739eba2"
+        };
+
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.getElementById('regForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = 'Wysyłanie...';
+
+            const newReg = {
+                firstName: document.getElementById('fname').value,
+                lastName: document.getElementById('lname').value,
+                email: document.getElementById('email').value,
+                event: document.getElementById('event').value,
+                source: document.getElementById('source').value,
+                date: new Date().toLocaleString('pl-PL'),
+                paid: false
+            };
+
+            database.ref('registrations').push(newReg)
+                .then(() => {
+                    alert('Zgłoszenie wysłane pomyślnie!');
+                    this.reset();
+                })
+                .catch(err => alert('Błąd: ' + err.message))
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerText = 'Wyślij zgłoszenie';
+                });
+        });
+    </script>
+</body>
+</html>
