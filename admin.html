@@ -2,75 +2,99 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Panel Sterowania | Bogacka Heels</title>
+    <title>Zarządzanie | Bogacka Heels</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        body { font-family: 'Montserrat', sans-serif; background: #0f0f0f; color: white; margin: 0; padding: 20px; }
         .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0a; display:flex; justify-content:center; align-items:center; z-index:9999; }
-        .container { max-width: 1200px; margin: 0 auto; display:none; }
-        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        h1, h2 { color: #1a1a1a; border-bottom: 2px solid #d4af37; padding-bottom: 10px; }
-        label { display: block; margin: 10px 0 5px; font-weight: 600; font-size: 0.85rem; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { cursor: pointer; border: none; border-radius: 6px; font-weight: 600; transition: 0.3s; }
-        .btn-save { background: #d4af37; color: black; width: 100%; padding: 15px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; }
-        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background: #1a1a1a; color: white; }
-        .status-btn { padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; color: white; }
-        .paid { background: #2ecc71; } .unpaid { background: #e74c3c; }
+        .container { max-width: 1300px; margin: 0 auto; display:none; }
+
+        /* Menu zakładek */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .tab-btn { background: #222; color: #888; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .tab-btn.active { background: #d4af37; color: black; }
+
+        .section { background: #161616; padding: 30px; border-radius: 15px; border: 1px solid #222; display: none; }
+        .section.active { display: block; }
+
+        h1 { color: #d4af37; margin-top: 0; }
+        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: #d4af37; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; background: #0a0a0a; color: white; margin-bottom: 10px; }
+
+        .btn-save { background: #d4af37; color: black; width: 100%; padding: 18px; margin-top: 10px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85rem; color: #ccc; }
+        th, td { padding: 15px; border-bottom: 1px solid #222; text-align: left; }
+        th { background: #0a0a0a; color: #d4af37; text-transform: uppercase; letter-spacing: 1px; }
+
+        .status-btn { padding: 6px 12px; border-radius: 5px; font-weight: bold; border: none; cursor: pointer; }
+        .paid { background: #2ecc71; color: white; }
+        .unpaid { background: #e74c3c; color: white; }
+        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .delete-btn:hover { background: #e74c3c; color: white; }
+
+        .source-tag { background: #333; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; color: #aaa; }
     </style>
 </head>
 <body>
     <div id="loginOverlay" class="login-overlay">
         <div style="background:#161616; padding:40px; border-radius:20px; border:1px solid #d4af37; text-align:center;">
-            <h2 style="color:#d4af37; border:none">ADMIN LOGIN</h2>
-            <input type="password" id="adminPass" placeholder="Hasło" style="background:#222; color:white; border:1px solid #333; margin-bottom:20px; text-align:center;"><br>
-            <button onclick="checkPass()" style="padding:10px 40px; background:#d4af37; color:black">Zaloguj</button>
+            <h2 style="color:#d4af37; margin-bottom:20px;">ADMIN PANEL</h2>
+            <input type="password" id="adminPass" placeholder="Hasło" style="text-align:center;"><br>
+            <button onclick="checkPass()" style="padding:12px 40px; background:#d4af37; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">ZALOGUJ</button>
         </div>
     </div>
 
     <div id="adminContent" class="container">
-        <h1>BOGACKA HEELS CONTROL PANEL</h1>
-        <div class="grid">
-            <div class="card">
-                <h2>Ustawienia Strony</h2>
-                <label>Nazwa Eventu</label>
-                <input type="text" id="set_title">
-                <label>Data wyświetlana (np. 7 marca 2026, 10:00)</label>
-                <input type="text" id="set_dateDisplay">
-                <label>Data dla licznika (ISO: RRRR-MM-DDTHH:MM)</label>
-                <input type="datetime-local" id="set_targetDate">
-                <label>Cena (PLN)</label>
-                <input type="number" id="set_price">
-                <label>Lokalizacja (Nazwa)</label>
-                <input type="text" id="set_location">
-                <label>Link Google Maps (URL)</label>
-                <input type="text" id="set_mapUrl">
-                <label>Lista eventów do zapisu (oddziel przecinkiem)</label>
-                <textarea id="set_eventList" rows="3"></textarea>
-                <button class="btn-save" onclick="saveSettings()">Zapisz i Publikuj</button>
-            </div>
+        <h1>BOGACKA HEELS | PANEL STEROWANIA</h1>
 
-            <div class="card">
-                <h2>Lista Uczestników</h2>
-                <div style="max-height: 600px; overflow-y: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Osoba</th>
-                                <th>Event</th>
-                                <th>Status</th>
-                                <th>Akcja</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('registrationsTab', this)">LISTA ZAPISÓW</button>
+            <button class="tab-btn" onclick="showTab('settingsTab', this)">USTAWIENIA STRONY</button>
+        </div>
+
+        <!-- Sekcja 1: Lista Zapisów -->
+        <div id="registrationsTab" class="section active">
+            <h2>Uczestnicy Warsztatów</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data i Godz.</th>
+                            <th>Osoba</th>
+                            <th>E-mail</th>
+                            <th>Event</th>
+                            <th>Źródło</th>
+                            <th>Płatność</th>
+                            <th>Akcja</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sekcja 2: Ustawienia -->
+        <div id="settingsTab" class="section">
+            <h2>Konfiguracja Treści</h2>
+            <div style="max-width: 600px;">
+                <label>Nazwa Eventu (np. Heels on Fire vol. 4)</label>
+                <input type="text" id="set_title">
+                <label>Data wyświetlana na stronie (np. 7 marca 2026, godz. 10:00)</label>
+                <input type="text" id="set_dateDisplay">
+                <label>Data dla licznika</label>
+                <input type="datetime-local" id="set_targetDate">
+                <label>Cena warsztatów (PLN)</label>
+                <input type="number" id="set_price">
+                <label>Lokalizacja (Nazwa studia)</label>
+                <input type="text" id="set_location">
+                <label>Link Google Maps (Pinezka)</label>
+                <input type="text" id="set_mapUrl">
+                <label>Lista eventów w rejestracji (oddziel przecinkami)</label>
+                <textarea id="set_eventList" rows="4"></textarea>
+                <button class="btn-save" onclick="saveSettings()">ZAPISZ ZMIANY NA STRONIE</button>
             </div>
         </div>
     </div>
@@ -78,8 +102,12 @@
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
+            authDomain: "bogacka-heels.firebaseapp.com",
             databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "bogacka-heels"
+            projectId: "bogacka-heels",
+            storageBucket: "bogacka-heels.firebasestorage.app",
+            messagingSenderId: "825219158791",
+            appId: "1:825219158791:web:38acf635db61854739eba2"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -92,8 +120,15 @@
             } else { alert('Błędne hasło!'); }
         }
 
+        function showTab(tabId, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
         function initPanel() {
-            // Pobierz aktualne ustawienia
+            // Ładowanie ustawień
             database.ref('settings').once('value', snapshot => {
                 const s = snapshot.val();
                 if(s) {
@@ -107,19 +142,28 @@
                 }
             });
 
-            // Słuchaj zapisów
+            // Ładowanie zapisów
             database.ref('registrations').on('value', snapshot => {
                 const body = document.getElementById('tableBody');
                 body.innerHTML = '';
                 snapshot.forEach(child => {
                     const d = child.val();
+                    const key = child.key;
                     const row = body.insertRow();
                     row.innerHTML = `
-                        <td>${d.date.split(',')[0]}</td>
-                        <td>${d.firstName} ${d.lastName}<br><small>${d.email}</small></td>
+                        <td>${d.date}</td>
+                        <td style="color:white; font-weight:600;">${d.firstName} ${d.lastName}</td>
+                        <td>${d.email}</td>
                         <td>${d.event}</td>
-                        <td><span class="status-btn ${d.paid ? 'paid' : 'unpaid'}">${d.paid ? 'TAK' : 'NIE'}</span></td>
-                        <td><button onclick="togglePaid('${child.key}', ${d.paid})">Zmień</button></td>
+                        <td><span class="source-tag">${d.source || '-'}</span></td>
+                        <td>
+                            <button class="status-btn ${d.paid ? 'paid' : 'unpaid'}" onclick="togglePaid('${key}', ${d.paid})">
+                                ${d.paid ? 'OPŁACONE' : 'NIEOPŁACONE'}
+                            </button>
+                        </td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button>
+                        </td>
                     `;
                 });
             });
@@ -135,11 +179,17 @@
                 mapUrl: document.getElementById('set_mapUrl').value,
                 eventList: document.getElementById('set_eventList').value
             };
-            database.ref('settings').set(data).then(() => alert('Ustawienia zaktualizowane!'));
+            database.ref('settings').set(data).then(() => alert('Strona została zaktualizowana!'));
         }
 
         function togglePaid(key, status) {
             database.ref('registrations/' + key).update({ paid: !status });
+        }
+
+        function deleteReg(key) {
+            if(confirm('Czy na pewno chcesz trwale usunąć to zgłoszenie?')) {
+                database.ref('registrations/' + key).remove();
+            }
         }
     </script>
 </body>
