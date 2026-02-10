@@ -14,21 +14,25 @@
         h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--accent); margin: 0; letter-spacing: 8px; text-transform: uppercase; }
         .container { max-width: 800px; margin: -50px auto 50px; padding: 0 20px; }
         .card { background: var(--card-bg); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); border: 1px solid rgba(212, 175, 55, 0.2); text-align: center; }
-        .event-header h2 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent); font-size: 2rem; }
 
-        /* Styl dla sekcji tekstowych startowych i informacyjnych */
+        .event-header h2 { margin: 0; font-family: 'Playfair Display', serif; color: var(--accent); font-size: 2.8rem; letter-spacing: 1px; }
+
         .section-header { font-size: 1.1rem; color: var(--text-main); margin: 15px 0 5px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
         .countdown { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
         .timer-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.1); }
         .timer-box span { font-size: 1.8rem; font-weight: 600; color: var(--accent); display: block; }
         .timer-box label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-dim); }
 
-        .description-box { margin: 15px 0 30px 0; font-size: 1rem; color: #ddd; font-weight: 300; line-height: 1.8; text-align: center; white-space: pre-wrap; }
+        /* Ujednolicony rozmiar czcionki dla treści (opis, cena, lokalizacja) */
+        .unified-text { font-size: 1.15rem; color: #ddd; font-weight: 300; line-height: 1.8; text-align: center; white-space: pre-wrap; margin: 15px 0 30px 0; }
 
         .info-grid { text-align: center; margin: 30px 0; border-top: 1px solid #333; padding-top: 20px; }
-        .info-grid p { margin: 10px 0; }
-        .btn-maps { display: inline-block; color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 10px 25px; border-radius: 30px; transition: 0.3s; }
+        .info-item { margin-bottom: 25px; }
+        .info-label { display: block; text-transform: uppercase; color: var(--text-main); font-weight: 600; font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px; }
+        .info-value { display: block; font-size: 1.15rem; font-weight: 300; color: #ddd; }
+
+        .btn-maps { display: inline-block; color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 10px 25px; border-radius: 30px; transition: 0.3s; margin-top: 10px; }
+        .btn-maps:hover { background: var(--accent); color: black; }
         .btn-main { display: block; width: 100%; padding: 20px; background: var(--accent); color: black; font-weight: 700; text-transform: uppercase; text-decoration: none; border-radius: 10px; margin-top: 30px; box-sizing: border-box; transition: 0.3s; }
     </style>
 </head>
@@ -51,13 +55,18 @@
                 <div class="timer-box"><span id="secs">00</span><label>Sek</label></div>
             </div>
 
-            <!-- Nowy nagłówek sekcji informacji -->
             <p class="section-header">INFORMACJE O WARSZTATACH:</p>
-            <div id="mainDescription" class="description-box">Ładowanie opisu...</div>
+            <div id="mainDescription" class="unified-text">Ładowanie opisu...</div>
 
             <div class="info-grid">
-                <p><strong>Cena:</strong> <span id="mainPrice">...</span> PLN</p>
-                <p><strong>Lokalizacja:</strong> <span id="mainLoc">...</span></p>
+                <div class="info-item">
+                    <span class="info-label">Cena</span>
+                    <span class="info-value"><span id="mainPrice">...</span> PLN</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Lokalizacja</span>
+                    <span id="mainLoc" class="info-value">...</span>
+                </div>
                 <a href="#" id="mainMap" target="_blank" class="btn-maps">📍 Zobacz na mapie</a>
             </div>
             <a href="register.html" class="btn-main">Przejdź do zapisów</a>
