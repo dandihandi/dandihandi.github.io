@@ -66,20 +66,41 @@
                 </table>
             </div>
         </div>
-        <div id="settingsTab" class="section">
-            <h2>Konfiguracja Warsztatów</h2>
-            <div style="max-width: 700px;">
-                <label>Nazwa Eventu</label><input type="text" id="set_title">
-                <label>Data wyświetlana</label><input type="text" id="set_dateDisplay">
-                <label>Data dla licznika</label><input type="datetime-local" id="set_targetDate">
-                <label>Opis warsztatów (pod licznikiem)</label><textarea id="set_description" rows="5"></textarea>
-                <label>Cena (PLN)</label><input type="number" id="set_price">
-                <label>Lokalizacja</label><input type="text" id="set_location">
-                <label>Link Google Maps</label><input type="text" id="set_mapUrl">
-                <label>Lista eventów (oddziel przecinkami)</label><textarea id="set_eventList" rows="3"></textarea>
-                <button class="btn-save" onclick="saveSettings()">Zapisz zmiany na stronie</button>
+        
+    <div id="settingsTab" class="section">
+        <h2>Konfiguracja Warsztatów</h2>
+        <div style="max-width: 700px">
+            <label>Nazwa Eventu</label>
+            <input type="text" id="settitle">
+
+            <label>Data wyświetlana</label>
+            <input type="text" id="setdateDisplay">
+
+            <label>Data dla licznika</label>
+            <input type="datetime-local" id="settargetDate">
+
+            <label>Opis warsztatów pod licznikiem</label>
+            <textarea id="setdescription" rows="5"></textarea>
+
+            <label>Cena PLN</label>
+            <input type="number" id="setprice">
+
+            <label>Lokalizacja</label>
+            <input type="text" id="setlocation">
+
+            <label>Link Google Maps</label>
+            <input type="text" id="setmapUrl">
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; margin-bottom:5px;">
+                <label style="margin:0;">Lista eventów (kliknij +, aby dodać)</label>
+                <button type="button" onclick="openEventModal()" style="background:var(--accent); border:none; border-radius:8px; width:45px; height:35px; cursor:pointer; font-weight:bold; font-size:1.4rem; display:flex; justify-content:center; align-items:center; color:#000;">+</button>
             </div>
+            <textarea id="seteventList" rows="5" placeholder="Dodaj eventy za pomocą przycisku + powyżej..."></textarea>
+
+            <button class="btn-save" onclick="saveSettings()">Zapisz zmiany na stronie</button>
         </div>
+    </div>
+
     </div>
     <script>
         const firebaseConfig = {
@@ -181,5 +202,73 @@
         function togglePaid(key, status) { database.ref('registrations/' + key).update({ paid: !status }); }
         function deleteReg(key) { if(confirm('Czy na pewno chcesz usunąć to zgłoszenie?')) database.ref('registrations/' + key).remove(); }
     </script>
+
+<div id="eventModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10001; justify-content:center; align-items:center; font-family: 'Montserrat', sans-serif;">
+    <div style="background:#1e1e1e; padding:30px; border-radius:15px; border:2px solid var(--accent); width:90%; max-width:400px; color:white; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);">
+        <h3 style="color:var(--accent); margin-top:0; text-align:center; text-transform:uppercase;">Dodaj nowy event</h3>
+
+        <label style="display:block; margin-top:15px; font-size:0.8rem; color:var(--accent);">NAZWA EVENTU:</label>
+        <input type="text" id="modalName" placeholder="np. Masterclass" style="width:100%; padding:12px; margin-top:5px; background:#2d2d2d; border:1px solid #444; color:white; border-radius:8px; box-sizing:border-box;">
+
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <div style="flex:1;">
+                <label style="display:block; font-size:0.8rem; color:var(--accent);">DATA:</label>
+                <input type="date" id="modalDate" style="width:100%; padding:12px; margin-top:5px; background:#2d2d2d; border:1px solid #444; color:white; border-radius:8px; box-sizing:border-box;">
+            </div>
+            <div style="flex:1;">
+                <label style="display:block; font-size:0.8rem; color:var(--accent);">GODZINA:</label>
+                <input type="time" id="modalTime" style="width:100%; padding:12px; margin-top:5px; background:#2d2d2d; border:1px solid #444; color:white; border-radius:8px; box-sizing:border-box;">
+            </div>
+        </div>
+
+        <label style="display:block; margin-top:15px; font-size:0.8rem; color:var(--accent);">POZIOM:</label>
+        <input type="text" id="modalLevel" placeholder="np. Open level" style="width:100%; padding:12px; margin-top:5px; background:#2d2d2d; border:1px solid #444; color:white; border-radius:8px; box-sizing:border-box;">
+
+        <div style="margin-top:25px; display:flex; gap:10px;">
+            <button onclick="addEventToList()" style="flex:1.5; padding:15px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:800; color:#000; text-transform:uppercase;">DODAJ</button>
+            <button onclick="closeModal()" style="flex:1; padding:15px; background:#444; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:600;">ANULUJ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEventModal() { document.getElementById('eventModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('eventModal').style.display = 'none'; }
+function addEventToList() {
+    const name = document.getElementById('modalName').value;
+    const date = document.getElementById('modalDate').value;
+    const time = document.getElementById('modalTime').value;
+    const level = document.getElementById('modalLevel').value;
+
+    if(!name || !date || !time) {
+        alert('Proszę wypełnić nazwę, datę i godzinę!');
+        return;
+    }
+
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    const dateStr = `${day}.${month}.${year}`;
+
+    const entry = `${dateStr} ${time} - ${name}${level ? ' (' + level + ')' : ''}`;
+    const area = document.getElementById('seteventList');
+
+    if (area.value.trim() === "") {
+        area.value = entry;
+    } else {
+        area.value = area.value.trim() + ", " + entry;
+    }
+
+    // Reset fields
+    document.getElementById('modalName').value = '';
+    document.getElementById('modalDate').value = '';
+    document.getElementById('modalTime').value = '';
+    document.getElementById('modalLevel').value = '';
+
+    closeModal();
+}
+</script>
 </body>
+
 </html>
