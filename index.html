@@ -5,8 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bogacka Heels | Official</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js">
+function formatDateDisplay(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.replace('T', ' ');
+}
+
+</script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js">
+function formatDateDisplay(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.replace('T', ' ');
+}
+
+</script>
     <style>
         :root { --accent: #d4af37; --bg: #0a0a0a; --card-bg: #161616; --text-main: #ffffff; --text-dim: #b0b0b0; }
         body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; line-height: 1.6; overflow-x: hidden; }
@@ -99,7 +111,7 @@
             const s = snapshot.val();
             if(s) {
                 document.getElementById('mainTitle').innerText = s.title || "";
-                document.getElementById('mainDate').innerText = s.dateDisplay ? `(${s.dateDisplay})` : "";
+                document.getElementById('mainDate').innerText = formatDateDisplay(s.dateDisplay ? `(${s.dateDisplay})` : "");
                 document.getElementById('mainPrice').innerText = s.price || "";
                 document.getElementById('mainLoc').innerText = s.location || "";
                 document.getElementById('mainMap').href = s.mapUrl || "#";
@@ -117,6 +129,12 @@
                 document.getElementById('secs').innerText = Math.floor((diff % (1000*60)) / 1000).toString().padStart(2, '0');
             }
         }, 1000);
-    </script>
+    
+function formatDateDisplay(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.replace('T', ' ');
+}
+
+</script>
 </body>
 </html>

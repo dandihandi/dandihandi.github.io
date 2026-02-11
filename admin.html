@@ -75,7 +75,7 @@
         <h2>Konfiguracja Warsztatów</h2>
         <div style="max-width: 700px;">
             <label>Nazwa Eventu</label><input type="text" id="set_title">
-            <label>Data wyświetlana</label><input type="text" id="set_dateDisplay">
+            
             <label>Data dla licznika</label><input type="datetime-local" id="set_targetDate">
             <label>Opis warsztatów</label><textarea id="set_description" rows="4"></textarea>
             <label>Cena PLN</label><input type="number" id="set_price">
@@ -170,7 +170,7 @@
             const s = snapshot.val();
             if(s) {
                 document.getElementById('set_title').value = s.title || '';
-                document.getElementById('set_dateDisplay').value = s.dateDisplay || '';
+                document.getElementById('set_targetDate').value = s.dateDisplay || '';
                 document.getElementById('set_targetDate').value = s.targetDate || '';
                 document.getElementById('set_price').value = s.price || '';
                 document.getElementById('set_location').value = s.location || '';
@@ -197,7 +197,7 @@
     function saveSettings() {
         const data = {
             title: document.getElementById('set_title').value,
-            dateDisplay: document.getElementById('set_dateDisplay').value,
+            dateDisplay: document.getElementById('set_targetDate').value,
             targetDate: document.getElementById('set_targetDate').value,
             price: document.getElementById('set_price').value,
             location: document.getElementById('set_location').value,
