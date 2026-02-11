@@ -3,191 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <title>Zarządzanie | Bogacka Heels</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #f8f9fa; --card: #ffffff; --text: #212529; --accent: #d4af37; --border: #dee2e6; --input-bg: #ffffff; --tag-bg: #e9ecef; --tag-text: #495057; }
-        body.dark-mode { --bg: #121212; --card: #1e1e1e; --text: #e9ecef; --accent: #d4af37; --border: #333333; --input-bg: #2d2d2d; --tag-bg: #333333; --tag-text: #adb5bd; }
+        :root { --bg: #f8f9fa; --card: #ffffff; --text: #212529; --accent: #d4af37; --border: #dee2e6; --input-bg: #ffffff; }
+        body.dark-mode { --bg: #121212; --card: #1e1e1e; --text: #e9ecef; --accent: #d4af37; --border: #333333; --input-bg: #2d2d2d; }
         body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
-        .login-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#0a0a0a; display:flex; justify-content:center; align-items:center; z-index:9999; }
-        .login-box { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align:center; color: white; }
-        .container { max-width: 1300px; margin: 0 auto; display:none; }
+        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align: center; color: white; width: 320px; }
+        .container { max-width: 1300px; margin: 0 auto; display: none; }
         .header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
         .tab-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
         .section { background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid var(--border); display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .section.active { display: block; }
-        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: var(--accent); }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--input-bg); color: var(--text); }
+        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--input-bg); color: var(--text); font-family: inherit; }
         .btn-save { background: var(--accent); color: #000; width: 100%; padding: 18px; margin-top: 20px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
         th { background: rgba(0,0,0,0.05); color: var(--text); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        body.dark-mode th { background: rgba(255,255,255,0.05); }
-        .status-btn { padding: 8px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.75rem; width: 130px; }
+        .status-btn { padding: 8px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.75rem; }
         .paid { background: #2ecc71; color: #fff; }
         .unpaid { background: #e74c3c; color: #fff; }
-        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
-        .source-tag { background: var(--tag-bg); color: var(--tag-text); padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
-        .theme-toggle { background: var(--accent); color: #000; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+        .plus-btn { background: var(--accent); border: none; border-radius: 8px; width: 40px; height: 35px; cursor: pointer; font-weight: 800; font-size: 1.2rem; color: #000; }
     </style>
 </head>
 <body>
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-box">
-            <h2 style="color:var(--accent);">ADMIN PANEL</h2>
-            <input type="password" id="adminPass" placeholder="Hasło" style="margin-bottom:10px; background:#333; border:1px solid #444; color:white; padding:12px; width:250px; border-radius:8px; text-align:center;"><br>
-            <div style="margin: 10px 0; font-size: 0.8rem; color: #888;"><input type="checkbox" id="rememberPass" checked> Zapamiętaj mnie</div>
-            <button onclick="checkPass()" style="padding:12px 40px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:250px;">ZALOGUJ</button>
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+        <h2 style="color:var(--accent); margin-bottom: 20px;">ADMIN PANEL</h2>
+        <input type="password" id="adminPass" placeholder="Hasło" style="margin-bottom:10px; background:#333; border:1px solid #444; color:white; text-align:center;">
+        <div style="margin: 10px 0; font-size: 0.8rem; color: #888;">
+            <input type="checkbox" id="rememberPass" checked> Zapamiętaj mnie
+        </div>
+        <button onclick="checkPass()" style="padding:12px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%;">ZALOGUJ</button>
+    </div>
+</div>
+
+<div id="adminContent" class="container">
+    <div class="header-tools">
+        <h1>BOGACKA HEELS</h1>
+        <div>
+            <button class="theme-toggle" onclick="toggleTheme()" style="padding:10px; border-radius:8px; cursor:pointer; background:var(--accent); border:none; font-weight:600;">ZMIEŃ MOTYW</button>
+            <button onclick="logout()" style="padding:10px; border-radius:8px; border:none; cursor:pointer; background:#6c757d; color:white; margin-left:10px; font-weight:600;">WYLOGUJ</button>
         </div>
     </div>
-    <div id="adminContent" class="container">
-        <div class="header-tools">
-            <h1>BOGACKA HEELS</h1>
-            <div>
-                <button class="theme-toggle" onclick="toggleTheme()">ZMIEŃ MOTYW</button>
-                <button onclick="logout()" style="padding:10px 20px; border-radius:8px; border:none; cursor:pointer; background:#6c757d; color:white; margin-left:10px; font-weight:600;">WYLOGUJ</button>
-            </div>
-        </div>
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('registrationsTab', this)">LISTA ZAPISÓW</button>
-            <button class="tab-btn" onclick="showTab('settingsTab', this)">USTAWIENIA STRONY</button>
-        </div>
-        <div id="registrationsTab" class="section active">
-            <h2>Uczestnicy Warsztatów</h2>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr><th>Data</th><th>Uczestnik</th><th>E-mail</th><th>Event</th><th>Źródło</th><th>Status</th><th>Akcja</th></tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
-        <div id="settingsTab" class="section">
-            <h2>Konfiguracja Warsztatów</h2>
-            <div style="max-width: 700px;">
-                <label>Nazwa Eventu</label><input type="text" id="set_title">
-                <label>Data wyświetlana</label><input type="text" id="set_dateDisplay">
-                <label>Data dla licznika</label><input type="datetime-local" id="set_targetDate">
-                <label>Opis warsztatów (pod licznikiem)</label><textarea id="set_description" rows="5"></textarea>
-                <label>Cena (PLN)</label><input type="number" id="set_price">
-                <label>Lokalizacja</label><input type="text" id="set_location">
-                <label>Link Google Maps</label><input type="text" id="set_mapUrl">
-                <label>Lista eventów (oddziel przecinkami)</label><textarea id="set_eventList" rows="3"></textarea>
-                <button class="btn-save" onclick="saveSettings()">Zapisz zmiany na stronie</button>
-            </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('registrationsTab', this)">LISTA ZAPISÓW</button>
+        <button class="tab-btn" onclick="showTab('settingsTab', this)">USTAWIENIA STRONY</button>
+    </div>
+
+    <div id="registrationsTab" class="section active">
+        <h2>Uczestnicy Warsztatów</h2>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr><th>Data</th><th>Uczestnik</th><th>E-mail</th><th>Event</th><th>Źródło</th><th>Status</th><th>Akcja</th></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
         </div>
     </div>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
-            authDomain: "bogacka-heels.firebaseapp.com",
-            databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "bogacka-heels",
-            storageBucket: "bogacka-heels.firebasestorage.app",
-            messagingSenderId: "825219158791",
-            appId: "1:825219158791:web:38acf635db61854739eba2"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
 
-        window.onload = function() {
-            const savedPass = localStorage.getItem('admin_password');
-            const savedTheme = localStorage.getItem('admin_theme');
-            if(savedTheme === 'dark') document.body.classList.add('dark-mode');
-            if(savedPass === 'DanielAdmin123!') { document.getElementById('adminPass').value = savedPass; checkPass(); }
-        };
+    <div id="settingsTab" class="section">
+        <h2>Konfiguracja Warsztatów</h2>
+        <div style="max-width: 700px;">
+            <label>Nazwa Eventu</label><input type="text" id="set_title">
+            <label>Data wyświetlana</label><input type="text" id="set_dateDisplay">
+            <label>Data dla licznika</label><input type="datetime-local" id="set_targetDate">
+            <label>Opis warsztatów</label><textarea id="set_description" rows="4"></textarea>
+            <label>Cena PLN</label><input type="number" id="set_price">
+            <label>Lokalizacja</label><input type="text" id="set_location">
+            <label>Link Google Maps</label><input type="text" id="set_mapUrl">
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            localStorage.setItem('admin_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; margin-bottom:5px;">
+                <label style="margin:0;">Lista eventów</label>
+                <button type="button" class="plus-btn" onclick="openEventModal()">+</button>
+            </div>
+            <textarea id="set_eventList" rows="5" placeholder="Użyj +, aby dodać event..."></textarea>
+
+            <button class="btn-save" onclick="saveSettings()">Zapisz zmiany na stronie</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="eventModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center;">
+    <div style="background:#1e1e1e; padding:30px; border-radius:15px; border:1px solid var(--accent); width:350px; color:white;">
+        <h3 style="color:var(--accent); margin-top:0;">DODAJ EVENT</h3>
+        <label>Nazwa:</label><input type="text" id="modalName" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
+        <label>Data:</label><input type="date" id="modalDate" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
+        <label>Godzina:</label><input type="time" id="modalTime" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
+        <label>Poziom:</label><input type="text" id="modalLevel" placeholder="np. Open" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
+        <div style="margin-top:20px; display:flex; gap:10px;">
+            <button onclick="addEventToList()" style="flex:1; padding:12px; background:var(--accent); border:none; border-radius:5px; font-weight:bold; cursor:pointer;">DODAJ</button>
+            <button onclick="closeModal()" style="flex:1; padding:12px; background:#444; color:white; border:none; border-radius:5px; cursor:pointer;">ANULUJ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDssqjSqhRHJ2BhzqgspuX-q2KP2ydqs",
+        authDomain: "bogacka-heels.firebaseapp.com",
+        databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "bogacka-heels",
+        storageBucket: "bogacka-heels.firebasestorage.app",
+        messagingSenderId: "825219158791",
+        appId: "1:825219158791:web:38acf635db61854739eba2"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    window.onload = function() {
+        const savedPass = localStorage.getItem('admin_password');
+        if(savedPass === 'DanielAdmin123!') {
+            document.getElementById('adminPass').value = savedPass;
+            checkPass();
         }
-
-        function checkPass() {
-            const pass = document.getElementById('adminPass').value;
-            if(pass === 'DanielAdmin123!') {
-                if(document.getElementById('rememberPass').checked) localStorage.setItem('admin_password', pass);
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                initPanel();
-            } else { alert('Błędne hasło!'); }
-        }
-
-        function logout() { localStorage.removeItem('admin_password'); location.reload(); }
-
-        function showTab(tabId, btn) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('active');
-        }
-
-        
-function initPanel() {
-    database.ref('settings').once('value', (snapshot) => {
-        const s = snapshot.val();
-        if(s) {
-            if(document.getElementById('set_title')) document.getElementById('set_title').value = s.title || '';
-            if(document.getElementById('set_dateDisplay')) document.getElementById('set_dateDisplay').value = s.dateDisplay || '';
-            if(document.getElementById('set_targetDate')) document.getElementById('set_targetDate').value = s.targetDate || '';
-            if(document.getElementById('set_price')) document.getElementById('set_price').value = s.price || '';
-            if(document.getElementById('set_location')) document.getElementById('set_location').value = s.location || '';
-            if(document.getElementById('set_mapUrl')) document.getElementById('set_mapUrl').value = s.mapUrl || '';
-            if(document.getElementById('set_eventList')) document.getElementById('set_eventList').value = s.eventList || '';
-            if(document.getElementById('set_description')) document.getElementById('set_description').value = s.description || '';
-        }
-    });
-
-            });
-
-            database.ref('registrations').on('value', snapshot => {
-                const body = document.getElementById('tableBody');
-                body.innerHTML = '';
-                snapshot.forEach(child => {
-                    const d = child.val();
-                    const key = child.key;
-                    const row = body.insertRow();
-                    row.innerHTML = `
-                        <td>${d.date}</td>
-                        <td style="font-weight:600;">${d.firstName} ${d.lastName}</td>
-                        <td>${d.email}</td>
-                        <td>${d.event}</td>
-                        <td><span class="source-tag">${d.source || '-'}</span></td>
-                        <td>
-                            <button class="status-btn ${d.paid ? 'paid' : 'unpaid'}" onclick="togglePaid('${key}', ${d.paid})">
-                                ${d.paid ? 'OPŁACONE' : 'NIEOPŁACONE'}
-                            </button>
-                        </td>
-                        <td><button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button></td>
-                    `;
-                });
-            });
-        }
-
-        
-function saveSettings() {
-    const data = {
-        title: document.getElementById('set_title').value,
-        dateDisplay: document.getElementById('set_dateDisplay').value,
-        targetDate: document.getElementById('set_targetDate').value,
-        price: document.getElementById('set_price').value,
-        location: document.getElementById('set_location').value,
-        mapUrl: document.getElementById('set_mapUrl').value,
-        eventList: document.getElementById('set_eventList').value,
-        description: document.getElementById('set_description').value
     };
 
-    database.ref('settings').set(data)
-        .then(() => alert('Ustawienia zapisane pomyślnie!'))
-        .catch((error) => alert('Błąd zapisu: ' + error.message));
-}
+    function checkPass() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass === 'DanielAdmin123!') {
+            if(document.getElementById('rememberPass').checked) localStorage.setItem('admin_password', pass);
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('adminContent').style.display = 'block';
+            initPanel();
+        } else {
+            alert('Błędne hasło!');
+        }
+    }
 
+    function logout() { localStorage.removeItem('admin_password'); location.reload(); }
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
 
-        function togglePaid(key, status) { database.ref('registrations/' + key).update({ paid: !status }); }
-        function deleteReg(key) { if(confirm('Czy na pewno chcesz usunąć to zgłoszenie?')) database.ref('registrations/' + key).remove(); }
-    </script>
+    function openEventModal() { document.getElementById('eventModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('eventModal').style.display = 'none'; }
+    function addEventToList() {
+        const name = document.getElementById('modalName').value;
+        const date = document.getElementById('modalDate').value;
+        const time = document.getElementById('modalTime').value;
+        const level = document.getElementById('modalLevel').value;
+        if(!name || !date || !time) return alert('Wypełnij pola!');
+        const d = new Date(date);
+        const entry = `${d.toLocaleDateString('pl-PL')} ${time} - ${name}${level ? ' ('+level+')' : ''}`;
+        const area = document.getElementById('set_eventList');
+        area.value = area.value ? area.value + ', ' + entry : entry;
+        closeModal();
+    }
+
+    function initPanel() {
+        database.ref('settings').on('value', (snapshot) => {
+            const s = snapshot.val();
+            if(s) {
+                document.getElementById('set_title').value = s.title || '';
+                document.getElementById('set_dateDisplay').value = s.dateDisplay || '';
+                document.getElementById('set_targetDate').value = s.targetDate || '';
+                document.getElementById('set_price').value = s.price || '';
+                document.getElementById('set_location').value = s.location || '';
+                document.getElementById('set_mapUrl').value = s.mapUrl || '';
+                document.getElementById('set_eventList').value = s.eventList || '';
+                document.getElementById('set_description').value = s.description || '';
+            }
+        });
+        database.ref('registrations').on('value', (snapshot) => {
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+            snapshot.forEach(child => {
+                const d = child.val();
+                const key = child.key;
+                const row = body.insertRow();
+                row.innerHTML = `<td>${d.date}</td><td style="font-weight:600">${d.firstName} ${d.lastName}</td><td>${d.email}</td><td>${d.event}</td>
+                <td><span class="source-tag">${d.source || '-'}</span></td>
+                <td><button class="status-btn ${d.paid?'paid':'unpaid'}" onclick="togglePaid('${key}',${d.paid})">${d.paid?'OPŁACONE':'NIEOPŁACONE'}</button></td>
+                <td><button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button></td>`;
+            });
+        });
+    }
+
+    function saveSettings() {
+        const data = {
+            title: document.getElementById('set_title').value,
+            dateDisplay: document.getElementById('set_dateDisplay').value,
+            targetDate: document.getElementById('set_targetDate').value,
+            price: document.getElementById('set_price').value,
+            location: document.getElementById('set_location').value,
+            mapUrl: document.getElementById('set_mapUrl').value,
+            eventList: document.getElementById('set_eventList').value,
+            description: document.getElementById('set_description').value
+        };
+        database.ref('settings').set(data).then(() => alert('Zapisano!'));
+    }
+
+    function togglePaid(key, status) { database.ref('registrations/' + key).update({ paid: !status }); }
+    function deleteReg(key) { if(confirm('Usunąć?')) database.ref('registrations/' + key).remove(); }
+</script>
 </body>
 </html>
