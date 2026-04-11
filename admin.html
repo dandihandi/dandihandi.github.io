@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>>Barbara Bogacka | Admin</title>
+    <title>Admin | BarbaraBogacka</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet"/>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -288,7 +288,7 @@
             border-top: 1px solid var(--border);
         }
 
-        /* DODANE STYLE DLA POWIADOMIEŃ */
+        /* POWIADOMIENIA */
         .notif-wrapper {
             position: relative;
             display: inline-block;
@@ -449,7 +449,7 @@
             <div class="card">
                 <div class="card-header-flex">
                     <h2 style="margin:0">Zapisy na Lekcje Indywidualne</h2>
-                    <button class="btn btn-outline" onclick="exportToICS()" style="font-size: 0.8rem; border-color: var(--border);">
+                    <button class="btn btn-outline" onclick="exportToAppleCalendar()" style="font-size: 0.8rem; border-color: var(--border);">
                         EKSPORTUJ DO KALENDARZA
                     </button>
                 </div>
@@ -539,8 +539,6 @@
 
     let currentCalDate = new Date();
     let selectedDateStr = "";
-    let notifications = [];
-
     const fullDaysOfWeek = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
 
     function checkPass() {
@@ -563,46 +561,43 @@
         if(tabId === 'lessonsTab') renderAdminCalendar();
     }
 
-    // SYSTEM POWIADOMIEŃ
+    // SYSTEM POWIADOMIEŃ (NAPRAWIONY - TYLKO JEDEN RAZ)
     function initNotifications() {
-        const updateNotifs = () => {
-            const list = document.getElementById('notifList');
-            const badge = document.getElementById('notifBadge');
-            list.innerHTML = '';
-            
-            let combined = [];
+        const list = document.getElementById('notifList');
+        const badge = document.getElementById('notifBadge');
 
-            // Warsztaty (nieopłacone = nowe)
-            db.ref('registrations').once('value', snap => {
-                snap.forEach(child => {
+        const fetchAndRender = () => {
+            let combined = [];
+            
+            // Pobieramy dane z obu gałęzi raz przy każdej zmianie
+            db.ref('registrations').once('value', regSnap => {
+                regSnap.forEach(child => {
                     const d = child.val();
                     if(!d.paid) {
                         combined.push({
                             title: `Nowy zapis: ${d.firstName} ${d.lastName}`,
                             desc: `Warsztaty: ${d.event}`,
-                            tab: 'registrationsTab',
-                            type: 'workshop'
+                            tab: 'registrationsTab'
                         });
                     }
                 });
 
-                // Lekcje (niepotwierdzone = nowe)
-                db.ref('privateLessons').once('value', lSnap => {
-                    lSnap.forEach(dayChild => {
+                db.ref('privateLessons').once('value', lessonSnap => {
+                    lessonSnap.forEach(dayChild => {
                         dayChild.forEach(slotChild => {
                             const s = slotChild.val();
                             if(s.isBooked && !s.confirmed) {
                                 combined.push({
                                     title: `Nowa lekcja: ${s.studentName}`,
                                     desc: `${s.danceType || 'Lekcja'} - ${dayChild.key} o ${s.time}`,
-                                    tab: 'lessonsListTab',
-                                    type: 'lesson'
+                                    tab: 'lessonsListTab'
                                 });
                             }
                         });
                     });
 
-                    // Renderowanie
+                    // Renderowanie listy
+                    list.innerHTML = '';
                     if(combined.length > 0) {
                         badge.innerText = combined.length;
                         badge.style.display = 'block';
@@ -624,9 +619,9 @@
             });
         };
 
-        // Nasłuchiwanie zmian
-        db.ref('registrations').on('value', updateNotifs);
-        db.ref('privateLessons').on('value', updateNotifs);
+        // Nasłuchiwanie zmian bez duplikowania listenerów
+        db.ref('registrations').on('value', fetchAndRender);
+        db.ref('privateLessons').on('value', fetchAndRender);
     }
 
     function toggleNotifications() {
@@ -634,7 +629,6 @@
         drop.style.display = drop.style.display === 'block' ? 'none' : 'block';
     }
 
-    // Zamknij powiadomienia przy kliknięciu poza nie
     window.onclick = function(event) {
         if (!event.target.closest('.notif-wrapper')) {
             document.getElementById('notifDropdown').style.display = 'none';
@@ -693,7 +687,7 @@
         });
     }
 
-    function exportToICS() {
+    function exportToAppleCalendar() {
         db.ref('privateLessons').once('value', snap => {
             let icsContent = [
                 "BEGIN:VCALENDAR",
@@ -712,12 +706,13 @@
                         count++;
                         const dateClean = dateStr.replace(/-/g, '');
                         const timeStart = s.time.replace(':', '') + "00";
-                        const endHour = (parseInt(s.time.split(':')[0]) + 1).toString().padStart(2, '0');
-                        const timeEnd = endHour + s.time.split(':')[1] + "00";
+                        const [hours, minutes] = s.time.split(':');
+                        const endHour = (parseInt(hours) + 1).toString().padStart(2, '0');
+                        const timeEnd = endHour + minutes + "00";
 
                         icsContent += "\r\nBEGIN:VEVENT";
                         icsContent += "\r\nUID:" + slotChild.key + "_" + dateClean + "@bbogacka";
-                        icsContent += "\r\nDTSTAMP:" + dateClean + "T" + timeStart;
+                        icsContent += "\r\nDTSTAMP:" + dateClean + "T" + timeStart + "Z";
                         icsContent += "\r\nDTSTART:" + dateClean + "T" + timeStart;
                         icsContent += "\r\nDTEND:" + dateClean + "T" + timeEnd;
                         icsContent += "\r\nSUMMARY:Lekcja: " + s.studentName + " (" + (s.danceType || 'Taniec') + ")";
@@ -728,14 +723,14 @@
             });
 
             icsContent += "\r\nEND:VCALENDAR";
-            if (count === 0) return;
-            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.setAttribute('download', 'lekcje_bogacka.ics');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            
+            if (count === 0) {
+                alert("Brak zapisanych lekcji do wyeksportowania.");
+                return;
+            }
+
+            const base64Ics = btoa(unescape(encodeURIComponent(icsContent)));
+            window.location.href = "webcal://data:text/calendar;base64," + base64Ics;
         });
     }
 
