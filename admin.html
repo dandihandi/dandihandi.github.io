@@ -1,110 +1,526 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <title>Zarządzanie | Bogacka Heels</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | BarbaraBogacka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet"/>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #f8f9fa; --card: #ffffff; --text: #212529; --accent: #d4af37; --border: #dee2e6; --input-bg: #ffffff; }
-        body.dark-mode { --bg: #121212; --card: #1e1e1e; --text: #e9ecef; --accent: #d4af37; --border: #333333; --input-bg: #2d2d2d; }
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; transition: 0.3s; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-box { background: #1a1a1a; padding: 40px; border-radius: 20px; border: 1px solid var(--accent); text-align: center; color: white; width: 320px; }
-        .container { max-width: 1300px; margin: 0 auto; display: none; }
-        .header-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
-        .tab-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .tab-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
-        .section { background: var(--card); padding: 30px; border-radius: 15px; border: 1px solid var(--border); display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        /* RESET I NAPRAWA WYMIARÓW */
+        * {
+            box-sizing: border-box; 
+        }
+
+        :root {
+            --primary: #d4af37;
+            --primary-hover: #b8962d;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #1a1d23;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+            --sidebar: #1e293b;
+            --logo-second: #000000;
+        }
+
+        body.dark-mode {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --logo-second: #ffffff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Login Screen */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #2d2d2d 0%, #000 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            text-align: center;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Layout */
+        .admin-wrapper { display: none; }
+        
+        header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .logo { font-weight: 800; letter-spacing: -1px; margin: 0; font-size: 1.5rem; }
+        .logo .part1 { color: var(--primary); }
+        .logo .part2 { color: var(--logo-second); }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            background: var(--bg);
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        /* Sections & Cards */
+        .section { display: none; animation: fadeIn 0.4s ease; }
         .section.active { display: block; }
-        label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 0.85rem; color: var(--accent); text-transform: uppercase; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; box-sizing: border-box; background: var(--input-bg); color: var(--text); font-family: inherit; }
-        .btn-save { background: var(--accent); color: #000; width: 100%; padding: 18px; margin-top: 20px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 15px; border-bottom: 1px solid var(--border); text-align: left; }
-        th { background: rgba(0,0,0,0.05); color: var(--text); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        .status-btn { padding: 8px 15px; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; font-size: 0.75rem; }
-        .paid { background: #2ecc71; color: #fff; }
-        .unpaid { background: #e74c3c; color: #fff; }
-        .delete-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
-        .plus-btn { background: var(--accent); border: none; border-radius: 8px; width: 40px; height: 35px; cursor: pointer; font-weight: 800; font-size: 1.2rem; color: #000; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 1.5rem; width: 100%; }
+        label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
+        
+        input, textarea, select {
+            width: 100%;
+            display: block;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+
+        #quickTime {
+            color-scheme: dark;
+        }
+
+        /* Tables */
+        .table-responsive { 
+            overflow-x: auto; 
+            border-radius: 12px; 
+            border: 1px solid var(--border);
+            margin-top: 15px;
+        }
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); min-width: 600px; }
+        th { background: var(--bg); padding: 16px; text-align: left; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+        td { padding: 16px; border-top: 1px solid var(--border); font-size: 0.9rem; }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-primary { background: var(--primary); color: #000; }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .calendar-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        
+        .cal-header-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .cal-header-day {
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid, .calendar-layout { grid-template-columns: 1fr; }
+            .container { margin: 1rem auto; }
+            .card { padding: 15px; }
+            header { padding: 1rem; justify-content: center; text-align: center; }
+            .card-header-flex { flex-direction: column; align-items: flex-start; }
+            .card-header-flex .btn { width: 100%; }
+        }
+
+        .cal-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            position: relative;
+            border: 2px solid transparent;
+            font-size: 0.9rem;
+        }
+        .cal-day.active { border-color: var(--primary); background: var(--card-bg); color: var(--primary); }
+        .cal-day.has-slots::after {
+            content: '';
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 6px; height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .recurring-box, .promo-box {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center; 
+            gap: 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: none;
+            color: var(--text-main);
+            font-weight: 600;
+            user-select: none;
+            margin: 0; 
+        }
+        .checkbox-label input { 
+            width: 18px; 
+            height: 18px; 
+            margin: 0; 
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+        
+        #recurringOptions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* DODANE STYLE DLA POWIADOMIEŃ */
+        .notif-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .notif-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 800;
+            display: none;
+        }
+        .notif-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 300px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1001;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .notif-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .notif-item:hover { background: var(--bg); }
+        .notif-item small { color: var(--text-muted); display: block; margin-top: 3px; }
+        .notif-header {
+            padding: 10px 16px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
-<div id="loginOverlay" class="login-overlay">
+<div class="login-overlay" id="loginOverlay">
     <div class="login-box">
-        <h2 style="color:var(--accent); margin-bottom: 20px;">ADMIN PANEL</h2>
-        <input type="password" id="adminPass" placeholder="Hasło" style="margin-bottom:10px; background:#333; border:1px solid #444; color:white; text-align:center;">
-        <div style="margin: 10px 0; font-size: 0.8rem; color: #888;">
-            <input type="checkbox" id="rememberPass" checked> Zapamiętaj mnie
-        </div>
-        <button onclick="checkPass()" style="padding:12px; background:var(--accent); border:none; border-radius:8px; cursor:pointer; font-weight:bold; width:100%;">ZALOGUJ</button>
+        <h2 class="logo" style="margin-bottom: 24px;">
+            <span class="part1">BARBARA</span><span class="part2">BOGACKA</span>
+            <br><span style="font-size: 0.8rem; color: white; opacity: 0.6; letter-spacing: 1px;">PANEL ADMINISTRATORA</span>
+        </h2>
+        <input id="adminPass" placeholder="Wprowadź hasło" type="password" style="margin-bottom: 15px; text-align: center;"/>
+        <button class="btn btn-primary" onclick="checkPass()" style="width: 100%;">ZALOGUJ SIĘ</button>
     </div>
 </div>
 
-<div id="adminContent" class="container">
-    <div class="header-tools">
-        <h1>BOGACKA HEELS</h1>
-        <div>
-            <button class="theme-toggle" onclick="toggleTheme()" style="padding:10px; border-radius:8px; cursor:pointer; background:var(--accent); border:none; font-weight:600;">ZMIEŃ MOTYW</button>
-            <button onclick="logout()" style="padding:10px; border-radius:8px; border:none; cursor:pointer; background:#6c757d; color:white; margin-left:10px; font-weight:600;">WYLOGUJ</button>
-        </div>
-    </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('registrationsTab', this)">LISTA ZAPISÓW</button>
-        <button class="tab-btn" onclick="showTab('settingsTab', this)">USTAWIENIA STRONY</button>
-    </div>
-
-    <div id="registrationsTab" class="section active">
-        <h2>Uczestnicy Warsztatów</h2>
-        <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr><th>Data</th><th>Uczestnik</th><th>E-mail</th><th>Event</th><th>Źródło</th><th>Status</th><th>Akcja</th></tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="settingsTab" class="section">
-        <h2>Konfiguracja Warsztatów</h2>
-        <div style="max-width: 700px;">
-            <label>Nazwa Eventu</label><input type="text" id="set_title">
-            
-            <label>Data dla licznika</label><input type="datetime-local" id="set_targetDate">
-            <label>Opis warsztatów</label><textarea id="set_description" rows="4"></textarea>
-            <label>Cena PLN</label><input type="number" id="set_price">
-            <label>Lokalizacja</label><input type="text" id="set_location">
-            <label>Link Google Maps</label><input type="text" id="set_mapUrl">
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; margin-bottom:5px;">
-                <label style="margin:0;">Lista eventów</label>
-                <button type="button" class="plus-btn" onclick="openEventModal()">+</button>
+<div class="admin-wrapper" id="adminContent">
+    <header>
+        <h1 class="logo"><span class="part1">BARBARA</span><span class="part2">BOGACKA</span></h1>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="notif-wrapper">
+                <button class="btn btn-outline" onclick="toggleNotifications()">🔔</button>
+                <span class="notif-badge" id="notifBadge">0</span>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">Nowe powiadomienia</div>
+                    <div id="notifList"></div>
+                </div>
             </div>
-            <textarea id="set_eventList" rows="5" placeholder="Użyj +, aby dodać event..."></textarea>
-
-            <button class="btn-save" onclick="saveSettings()">Zapisz zmiany na stronie</button>
+            <button class="btn btn-outline" onclick="toggleTheme()">🌓</button>
+            <button class="btn btn-danger" onclick="logout()">WYLOGUJ</button>
         </div>
-    </div>
-</div>
+    </header>
 
-<!-- Modal -->
-<div id="eventModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; justify-content:center; align-items:center;">
-    <div style="background:#1e1e1e; padding:30px; border-radius:15px; border:1px solid var(--accent); width:350px; color:white;">
-        <h3 style="color:var(--accent); margin-top:0;">DODAJ EVENT</h3>
-        <label>Nazwa:</label><input type="text" id="modalName" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
-        <label>Data:</label><input type="date" id="modalDate" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
-        <label>Godzina:</label><input type="time" id="modalTime" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
-        <label>Poziom:</label><input type="text" id="modalLevel" placeholder="np. Open" style="background:#2d2d2d; color:white; border:1px solid #444; padding:10px; width:100%; border-radius:5px; box-sizing:border-box;">
-        <div style="margin-top:20px; display:flex; gap:10px;">
-            <button onclick="addEventToList()" style="flex:1; padding:12px; background:var(--accent); border:none; border-radius:5px; font-weight:bold; cursor:pointer;">DODAJ</button>
-            <button onclick="closeModal()" style="flex:1; padding:12px; background:#444; color:white; border:none; border-radius:5px; cursor:pointer;">ANULUJ</button>
-        </div>
+    <div class="container">
+        <nav class="nav-tabs">
+            <button class="tab-btn active" id="tab-registrationsTab" onclick="showTab('registrationsTab', this)">WARSZTATY ZAPISY</button>
+            <button class="tab-btn" id="tab-settingsTab" onclick="showTab('settingsTab', this)">WARSZTATY USTAWIENIA</button>
+            <button class="tab-btn" id="tab-lessonsListTab" onclick="showTab('lessonsListTab', this)">LEKCJE ZAPISY</button>
+            <button class="tab-btn" id="tab-lessonsTab" onclick="showTab('lessonsTab', this)">KALENDARZ LEKCJI</button>
+        </nav>
+
+        <section class="section active" id="registrationsTab">
+            <div class="card">
+                <h2 style="margin-top:0">Lista uczestników warsztatów</h2>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th>Data</th><th>Uczestnik</th><th>E-mail</th><th>Event</th><th>Status</th><th>Akcje</th></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="settingsTab">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <h2>Konfiguracja Warsztatów</h2>
+                <div class="form-group">
+                    <label>Nazwa Wydarzenia</label>
+                    <input id="set_title" type="text" placeholder="np. Heels Workshop Vol. 10"/>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="form-group">
+                        <label>Cena Regularna (PLN)</label>
+                        <input id="set_price" type="number" placeholder="np. 200"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Data odliczania</label>
+                        <input id="set_targetDate" type="datetime-local"/>
+                    </div>
+                </div>
+
+                <div class="promo-box" style="background: transparent; border: none; padding: 0; margin-bottom: 1.5rem;">
+                    <div class="settings-grid">
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>Cena promocyjna (PLN)</label>
+                            <input id="set_promoPrice" type="number" placeholder="np. 150"/>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 12px;">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="set_promoActive">
+                                <span style="color: var(--text-main);">Włącz cenę promocyjną</span>
+                            </label>
+                        </div>
+                    </div>
+                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">* Jeśli włączone, cena promocyjna będzie widoczna jako główna, a stara zostanie przekreślona.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Opis / Treść sekcji</label>
+                    <textarea id="set_description" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Lokalizacja</label>
+                    <input id="set_location" type="text" placeholder="Nazwa studia" style="margin-bottom: 20px;"/>
+                    
+                    <label>Link Google Maps</label>
+                    <input id="set_mapUrl" type="text" placeholder="Wklej link do mapy"/>
+                </div>
+                <div class="form-group">
+                    <label>Dostępne tury (oddzielone przecinkiem)</label>
+                    <textarea id="set_eventList" placeholder="10:00-12:00 - Grupa Początkująca, ..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%; padding: 15px;">ZAPISZ WSZYSTKIE ZMIANY</button>
+            </div>
+        </section>
+
+        <section class="section" id="lessonsListTab">
+            <div class="card">
+                <div class="card-header-flex">
+                    <h2 style="margin:0">Zapisy na Lekcje Indywidualne</h2>
+                    <button class="btn btn-outline" onclick="exportToICS()" style="font-size: 0.8rem; border-color: var(--border);">
+                        EKSPORTUJ DO KALENDARZA
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th>Termin</th><th>Kursant</th><th>Rodzaj</th><th>Telefon</th><th>Status</th><th>Akcje</th></tr>
+                        </thead>
+                        <tbody id="lessonsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="lessonsTab">
+            <div class="calendar-layout">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <button class="btn btn-outline" onclick="changeMonth(-1)">❮</button>
+                        <h3 id="calMonthYear" style="margin:0">Marzec 2024</h3>
+                        <button class="btn btn-outline" onclick="changeMonth(1)">❯</button>
+                    </div>
+                    
+                    <div class="cal-header-days">
+                        <div class="cal-header-day">Pn</div>
+                        <div class="cal-header-day">Wt</div>
+                        <div class="cal-header-day">Śr</div>
+                        <div class="cal-header-day">Cz</div>
+                        <div class="cal-header-day">Pt</div>
+                        <div class="cal-header-day">So</div>
+                        <div class="cal-header-day">Nd</div>
+                    </div>
+                    
+                    <div class="cal-grid" id="adminCalGrid"></div>
+                </div>
+
+                <div class="card">
+                    <h3 id="selectedDayTitle">Wybierz dzień</h3>
+                    
+                    <div id="quickAddArea" style="display:none; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                        <label>Dodaj nową godzinę:</label>
+                        <div style="display: flex; gap: 5px;">
+                            <input id="quickTime" type="time" value="18:00" style="flex:1"/>
+                        </div>
+                        
+                        <div class="recurring-box">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="isRecurring" onchange="toggleRecurringOptions()"> 
+                                <span>Powtarzaj co tydzień</span>
+                            </label>
+                            
+                            <div id="recurringOptions" style="display: none;">
+                                <label>Przez ile tygodni?</label>
+                                <select id="recurringWeeks">
+                                    <option value="2">2 tygodnie</option>
+                                    <option value="4">4 tygodnie (miesiąc)</option>
+                                    <option value="8">8 tygodni</option>
+                                    <option value="12">12 tygodni</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="addSlotToSelectedDay()" style="margin-top:10px">DODAJ TERMIN(Y)</button>
+                    </div>
+
+                    <div id="slotsAdminContainer">
+                        <p style="color: var(--text-muted); text-align: center;">Brak wybranych terminów</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -119,97 +535,326 @@
         appId: "1:825219158791:web:38acf635db61854739eba2"
     };
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.database();
 
-    window.onload = function() {
-        const savedPass = localStorage.getItem('admin_password');
-        if(savedPass === 'DanielAdmin123!') {
-            document.getElementById('adminPass').value = savedPass;
-            checkPass();
-        }
-    };
+    let currentCalDate = new Date();
+    let selectedDateStr = "";
+    let notifications = [];
+
+    const fullDaysOfWeek = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
 
     function checkPass() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass === 'DanielAdmin123!') {
-            if(document.getElementById('rememberPass').checked) localStorage.setItem('admin_password', pass);
+        if(document.getElementById('adminPass').value === '123') {
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('adminContent').style.display = 'block';
             initPanel();
-        } else {
-            alert('Błędne hasło!');
-        }
+            initNotifications();
+        } else { alert('Błędne hasło!'); }
     }
 
-    function logout() { localStorage.removeItem('admin_password'); location.reload(); }
     function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+    function logout() { location.reload(); }
+
     function showTab(tabId, btn) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         btn.classList.add('active');
+        if(tabId === 'lessonsTab') renderAdminCalendar();
     }
 
-    function openEventModal() { document.getElementById('eventModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('eventModal').style.display = 'none'; }
-    function addEventToList() {
-        const name = document.getElementById('modalName').value;
-        const date = document.getElementById('modalDate').value;
-        const time = document.getElementById('modalTime').value;
-        const level = document.getElementById('modalLevel').value;
-        if(!name || !date || !time) return alert('Wypełnij pola!');
-        const d = new Date(date);
-        const entry = `${d.toLocaleDateString('pl-PL')} ${time} - ${name}${level ? ' ('+level+')' : ''}`;
-        const area = document.getElementById('set_eventList');
-        area.value = area.value ? area.value + ', ' + entry : entry;
-        closeModal();
+    // SYSTEM POWIADOMIEŃ
+    function initNotifications() {
+        const updateNotifs = () => {
+            const list = document.getElementById('notifList');
+            const badge = document.getElementById('notifBadge');
+            list.innerHTML = '';
+            
+            let combined = [];
+
+            // Warsztaty (nieopłacone = nowe)
+            db.ref('registrations').once('value', snap => {
+                snap.forEach(child => {
+                    const d = child.val();
+                    if(!d.paid) {
+                        combined.push({
+                            title: `Nowy zapis: ${d.firstName} ${d.lastName}`,
+                            desc: `Warsztaty: ${d.event}`,
+                            tab: 'registrationsTab',
+                            type: 'workshop'
+                        });
+                    }
+                });
+
+                // Lekcje (niepotwierdzone = nowe)
+                db.ref('privateLessons').once('value', lSnap => {
+                    lSnap.forEach(dayChild => {
+                        dayChild.forEach(slotChild => {
+                            const s = slotChild.val();
+                            if(s.isBooked && !s.confirmed) {
+                                combined.push({
+                                    title: `Nowa lekcja: ${s.studentName}`,
+                                    desc: `${s.danceType || 'Lekcja'} - ${dayChild.key} o ${s.time}`,
+                                    tab: 'lessonsListTab',
+                                    type: 'lesson'
+                                });
+                            }
+                        });
+                    });
+
+                    // Renderowanie
+                    if(combined.length > 0) {
+                        badge.innerText = combined.length;
+                        badge.style.display = 'block';
+                        combined.forEach(n => {
+                            const item = document.createElement('div');
+                            item.className = 'notif-item';
+                            item.innerHTML = `<strong>${n.title}</strong><small>${n.desc}</small>`;
+                            item.onclick = () => {
+                                showTab(n.tab, document.getElementById('tab-' + n.tab));
+                                toggleNotifications();
+                            };
+                            list.appendChild(item);
+                        });
+                    } else {
+                        badge.style.display = 'none';
+                        list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">Brak nowych powiadomień</div>';
+                    }
+                });
+            });
+        };
+
+        // Nasłuchiwanie zmian
+        db.ref('registrations').on('value', updateNotifs);
+        db.ref('privateLessons').on('value', updateNotifs);
+    }
+
+    function toggleNotifications() {
+        const drop = document.getElementById('notifDropdown');
+        drop.style.display = drop.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Zamknij powiadomienia przy kliknięciu poza nie
+    window.onclick = function(event) {
+        if (!event.target.closest('.notif-wrapper')) {
+            document.getElementById('notifDropdown').style.display = 'none';
+        }
     }
 
     function initPanel() {
-        database.ref('settings').on('value', (snapshot) => {
-            const s = snapshot.val();
-            if(s) {
+        db.ref('registrations').on('value', snap => {
+            const body = document.getElementById('tableBody'); body.innerHTML = '';
+            snap.forEach(child => {
+                const d = child.val();
+                const statusBadge = d.paid ? '<span class="badge" style="color:var(--success)">Opłacone</span>' : '<span class="badge" style="color:var(--danger)">Nieopłacone</span>';
+                const row = body.insertRow();
+                row.innerHTML = `<td>${d.date}</td><td><b>${d.firstName} ${d.lastName}</b></td><td>${d.email}</td><td>${d.event}</td>
+                <td><div style="cursor:pointer" onclick="togglePaid('${child.key}',${d.paid})">${statusBadge}</div></td>
+                <td><button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="deleteReg('${child.key}')">USUŃ</button></td>`;
+            });
+        });
+
+        db.ref('settings').on('value', snap => {
+            const s = snap.val(); if(s) {
                 document.getElementById('set_title').value = s.title || '';
-                document.getElementById('set_targetDate').value = s.dateDisplay || '';
                 document.getElementById('set_targetDate').value = s.targetDate || '';
                 document.getElementById('set_price').value = s.price || '';
                 document.getElementById('set_location').value = s.location || '';
                 document.getElementById('set_mapUrl').value = s.mapUrl || '';
                 document.getElementById('set_eventList').value = s.eventList || '';
                 document.getElementById('set_description').value = s.description || '';
+                document.getElementById('set_promoPrice').value = s.promoPrice || '';
+                document.getElementById('set_promoActive').checked = s.promoActive || false;
             }
         });
-        database.ref('registrations').on('value', (snapshot) => {
-            const body = document.getElementById('tableBody');
-            body.innerHTML = '';
-            snapshot.forEach(child => {
-                const d = child.val();
-                const key = child.key;
-                const row = body.insertRow();
-                row.innerHTML = `<td>${d.date}</td><td style="font-weight:600">${d.firstName} ${d.lastName}</td><td>${d.email}</td><td>${d.event}</td>
-                <td><span class="source-tag">${d.source || '-'}</span></td>
-                <td><button class="status-btn ${d.paid?'paid':'unpaid'}" onclick="togglePaid('${key}',${d.paid})">${d.paid?'OPŁACONE':'NIEOPŁACONE'}</button></td>
-                <td><button class="delete-btn" onclick="deleteReg('${key}')">USUŃ</button></td>`;
+
+        db.ref('privateLessons').on('value', snap => {
+            const body = document.getElementById('lessonsTableBody'); body.innerHTML = '';
+            snap.forEach(dayChild => {
+                const date = dayChild.key;
+                const dateObj = new Date(date);
+                const dayName = fullDaysOfWeek[dateObj.getDay()];
+
+                dayChild.forEach(slotChild => {
+                    const s = slotChild.val();
+                    if(s.isBooked) {
+                        const row = body.insertRow();
+                        const isConfirmed = s.confirmed || false;
+                        row.innerHTML = `<td>${date} (${dayName}) <br> <small>${s.time}</small></td>
+                        <td><b>${s.studentName}</b></td>
+                        <td><span class="badge" style="background:var(--bg); padding:4px 8px; border-radius:6px; font-size:0.75rem;">${s.danceType || 'Nie określono'}</span></td>
+                        <td>${s.studentPhone}</td>
+                        <td><button class="btn ${isConfirmed ? 'btn-primary' : 'btn-outline'}" style="font-size: 0.7rem" onclick="toggleLessonConfirm('${date}','${slotChild.key}',${isConfirmed})">${isConfirmed ? 'POTWIERDZONE' : 'POTWIERDŹ'}</button></td>
+                        <td><button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="cancelLessonBooking('${date}','${slotChild.key}')">ZWOLNIJ</button></td>`;
+                    }
+                });
+            });
+            renderAdminCalendar();
+        });
+    }
+
+    function exportToICS() {
+        db.ref('privateLessons').once('value', snap => {
+            let icsContent = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//Barbara Bogacka//Admin//PL",
+                "CALSCALE:GREGORIAN",
+                "METHOD:PUBLISH"
+            ].join("\r\n");
+
+            let count = 0;
+            snap.forEach(dayChild => {
+                const dateStr = dayChild.key; 
+                dayChild.forEach(slotChild => {
+                    const s = slotChild.val();
+                    if (s.isBooked) {
+                        count++;
+                        const dateClean = dateStr.replace(/-/g, '');
+                        const timeStart = s.time.replace(':', '') + "00";
+                        const endHour = (parseInt(s.time.split(':')[0]) + 1).toString().padStart(2, '0');
+                        const timeEnd = endHour + s.time.split(':')[1] + "00";
+
+                        icsContent += "\r\nBEGIN:VEVENT";
+                        icsContent += "\r\nUID:" + slotChild.key + "_" + dateClean + "@bbogacka";
+                        icsContent += "\r\nDTSTAMP:" + dateClean + "T" + timeStart;
+                        icsContent += "\r\nDTSTART:" + dateClean + "T" + timeStart;
+                        icsContent += "\r\nDTEND:" + dateClean + "T" + timeEnd;
+                        icsContent += "\r\nSUMMARY:Lekcja: " + s.studentName + " (" + (s.danceType || 'Taniec') + ")";
+                        icsContent += "\r\nDESCRIPTION:Kursant: " + s.studentName + "\\nTel: " + s.studentPhone + "\\nRodzaj: " + (s.danceType || 'n/a');
+                        icsContent += "\r\nEND:VEVENT";
+                    }
+                });
+            });
+
+            icsContent += "\r\nEND:VCALENDAR";
+            if (count === 0) return;
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', 'lekcje_bogacka.ics');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+
+    function renderAdminCalendar() {
+        const grid = document.getElementById('adminCalGrid');
+        if(!grid) return;
+        grid.innerHTML = '';
+        const year = currentCalDate.getFullYear();
+        const month = currentCalDate.getMonth();
+        const monthNames = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+        document.getElementById('calMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let offset = firstDay === 0 ? 6 : firstDay - 1;
+
+        for(let i=0; i<offset; i++) grid.innerHTML += '<div class="cal-day" style="visibility:hidden"></div>';
+
+        db.ref('privateLessons').once('value', snapshot => {
+            const all = snapshot.val() || {};
+            for(let i=1; i<=daysInMonth; i++) {
+                const fDate = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'cal-day';
+                if(fDate === selectedDateStr) dayDiv.classList.add('active');
+                if(all[fDate]) dayDiv.classList.add('has-slots');
+                dayDiv.innerText = i;
+                dayDiv.onclick = () => {
+                    selectedDateStr = fDate;
+                    const dateObj = new Date(fDate);
+                    const dayName = fullDaysOfWeek[dateObj.getDay()];
+                    document.getElementById('selectedDayTitle').innerText = `Dzień: ${fDate} (${dayName})`;
+                    document.getElementById('quickAddArea').style.display = 'flex';
+                    renderAdminCalendar();
+                    loadAdminSlots(fDate);
+                };
+                grid.appendChild(dayDiv);
+            }
+        });
+    }
+
+    function loadAdminSlots(date) {
+        const container = document.getElementById('slotsAdminContainer');
+        db.ref('privateLessons/' + date).on('value', snap => {
+            container.innerHTML = '';
+            const slots = snap.val();
+            if(!slots) return container.innerHTML = '<p style="color:#888; text-align:center;">Brak terminów.</p>';
+            Object.keys(slots).sort().forEach(key => {
+                const s = slots[key];
+                const row = document.createElement('div');
+                row.style = "display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--border)";
+                const status = s.isBooked ? `<span style="color:var(--danger)">● Zajęty</span>` : `<span style="color:var(--success)">● Wolny</span>`;
+                row.innerHTML = `<div><b>${s.time}</b> <br> <small>${status}</small></div>
+                    <button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem" onclick="deleteSlot('${date}','${key}')">USUŃ</button>`;
+                container.appendChild(row);
             });
         });
     }
 
+    function toggleRecurringOptions() {
+        const isChecked = document.getElementById('isRecurring').checked;
+        document.getElementById('recurringOptions').style.display = isChecked ? 'block' : 'none';
+    }
+
+    function addSlotToSelectedDay() {
+        const time = document.getElementById('quickTime').value;
+        const isRecurring = document.getElementById('isRecurring').checked;
+        const weeks = parseInt(document.getElementById('recurringWeeks').value);
+        
+        if(!selectedDateStr) return;
+
+        const id = 'slot_' + time.replace(':','');
+        const slotData = {
+            time: time, isBooked: false, studentName: "", studentPhone: "", confirmed: false
+        };
+
+        if(isRecurring) {
+            let promises = [];
+            let startDate = new Date(selectedDateStr);
+            for(let i=0; i < weeks; i++) {
+                let nextDate = new Date(startDate);
+                nextDate.setDate(startDate.getDate() + (i * 7));
+                let y = nextDate.getFullYear();
+                let m = String(nextDate.getMonth() + 1).padStart(2, '0');
+                let d = String(nextDate.getDate()).padStart(2, '0');
+                let dateKey = `${y}-${m}-${d}`;
+                promises.push(db.ref(`privateLessons/${dateKey}/${id}`).set(slotData));
+            }
+            Promise.all(promises).then(() => {
+                document.getElementById('isRecurring').checked = false;
+                toggleRecurringOptions();
+            });
+        } else {
+            db.ref(`privateLessons/${selectedDateStr}/${id}`).set(slotData);
+        }
+    }
+
+    function changeMonth(dir) { currentCalDate.setMonth(currentCalDate.getMonth() + dir); renderAdminCalendar(); }
+    
     function saveSettings() {
         const data = {
             title: document.getElementById('set_title').value,
-            dateDisplay: document.getElementById('set_targetDate').value,
             targetDate: document.getElementById('set_targetDate').value,
             price: document.getElementById('set_price').value,
+            promoPrice: document.getElementById('set_promoPrice').value,
+            promoActive: document.getElementById('set_promoActive').checked,
             location: document.getElementById('set_location').value,
             mapUrl: document.getElementById('set_mapUrl').value,
             eventList: document.getElementById('set_eventList').value,
             description: document.getElementById('set_description').value
         };
-        database.ref('settings').set(data).then(() => alert('Zapisano!'));
+        db.ref('settings').set(data).then(() => alert('Zapisano ustawienia.'));
     }
 
-    function togglePaid(key, status) { database.ref('registrations/' + key).update({ paid: !status }); }
-    function deleteReg(key) { if(confirm('Usunąć?')) database.ref('registrations/' + key).remove(); }
+    function togglePaid(key, s) { db.ref('registrations/'+key).update({paid: !s}); }
+    function deleteReg(key) { db.ref('registrations/'+key).remove(); }
+    function toggleLessonConfirm(date, slotId, current) { db.ref(`privateLessons/${date}/${slotId}`).update({ confirmed: !current }); }
+    function cancelLessonBooking(d,k) { db.ref(`privateLessons/${d}/${k}`).update({isBooked:false, studentName:"", studentPhone:"", confirmed:false, danceType:""}); }
+    function deleteSlot(d,k) { db.ref(`privateLessons/${d}/${k}`).remove(); }
 </script>
 </body>
 </html>

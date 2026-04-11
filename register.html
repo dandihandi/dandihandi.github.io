@@ -1,55 +1,371 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zapisy | Bogacka Heels</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Zapisy | Barbara Bogacka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet"/>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root { --accent: #d4af37; --bg: #0a0a0a; --card-bg: #161616; --text-main: #ffffff; --text-dim: #b0b0b0; }
-        body { font-family: 'Montserrat', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 40px 20px; text-align: center; }
-        .card { max-width: 500px; margin: 0 auto; background: var(--card-bg); padding: 40px; border-radius: 20px; border: 1px solid rgba(212, 175, 55, 0.2); }
-        h2 { font-family: 'Montserrat', sans-serif; font-weight: 600; text-transform: none; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        input, select { width: 100%; padding: 15px; background: #222; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 18px; background: var(--accent); color: black; font-weight: 700; text-transform: uppercase; border: none; border-radius: 8px; cursor: pointer; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: var(--text-dim); text-decoration: none; }
+        :root { 
+            --accent: #d4af37; 
+            --bg: #0f0f0f; 
+            --card-bg: rgba(26, 26, 26, 0.8); 
+            --text: #ffffff; 
+            --text-dim: #a0a0a0;
+        }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); padding: 40px; border-radius: 20px; border: 1px solid var(--accent); max-width: 450px; width: 90%; }
-        .payment-box { background: rgba(0, 117, 235, 0.1); border: 1px solid #0075eb; padding: 25px; border-radius: 15px; margin-top: 25px; text-align: center; }
-        .revolut-link { display: block; text-align: center; background: #0075eb; color: white; padding: 15px; border-radius: 30px; text-decoration: none; margin-top: 20px; font-weight: bold; font-size: 1.1rem; }
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--bg);
+            color: var(--text); 
+            margin: 0; 
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% -20%, #2a2a2a 0%, #0a0a0a 100%);
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { top: -100px; left: -100px; }
+        .orb-2 { bottom: -100px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 50px); }
+        }
+
+        .back-link { 
+            display: inline-block; 
+            margin-bottom: 30px; 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .card { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: var(--card-bg); 
+            backdrop-filter: blur(10px); 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .tabs-container { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            margin-bottom: 35px; 
+        }
+        .tab-btn { 
+            flex: 1; 
+            padding: 12px; 
+            background: transparent; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 10px; 
+            color: var(--text-dim); 
+            cursor: pointer; 
+            font-weight: 500; 
+            text-transform: uppercase; 
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .tab-btn.active { 
+            background: var(--accent); 
+            color: #000; 
+            border-color: var(--accent);
+            font-weight: 600;
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-label {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 15px; 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: white; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0,0,0,0.4);
+        }
+
+        button.main-submit { 
+            width: 100%; 
+            padding: 20px; 
+            background: var(--accent); 
+            color: black; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        button.main-submit:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .calendar-wrapper { 
+            background: rgba(0,0,0,0.2); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+        }
+        .calendar-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        #monthYear { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .cal-nav-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .calendar-day { 
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03); 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.85rem; 
+            position: relative; 
+            transition: 0.2s;
+        }
+        .calendar-day:hover:not(.empty) { background: rgba(212, 175, 55, 0.2); }
+        .calendar-day.active { background: var(--accent); color: #000; font-weight: 600; }
+        .calendar-day.has-slots::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: 5px; 
+            width: 4px; 
+            height: 4px; 
+            background: var(--accent); 
+            border-radius: 50%; 
+        }
+        .calendar-day.active.has-slots::after { background: #000; }
+        .calendar-day.empty { visibility: hidden; }
+
+        #slotsContainer button {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #slotsContainer button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; }
+        .modal-content { 
+            background: #1a1a1a; 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 1px solid var(--accent); 
+            max-width: 400px; 
+            width: 90%; 
+            text-align: center;
+        }
+
+        .revolut-btn {
+            display: inline-block;
+            margin-top: 15px;
+            background: #ffffff;
+            color: #000000;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .revolut-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">← Wróć do informacji</a>
-    <div class="card" id="regCard">
-        <h2>REJESTRACJA NA WARSZTATY</h2>
-        <form id="regForm">
-            <div class="form-group"><input type="text" id="fname" placeholder="Imię" required></div>
-            <div class="form-group"><input type="text" id="lname" placeholder="Nazwisko" required></div>
-            <div class="form-group"><input type="email" id="email" placeholder="E-mail" required></div>
-            <div class="form-group"><select id="event" required><option value="" disabled selected>Wybierz event</option></select></div>
-            <div class="form-group"><input type="text" id="source" placeholder="Skąd o nas wiesz?" required></div>
-            <button type="submit" id="submitBtn">Zapisz się</button>
-        </form>
+
+    <div class="bg-glow">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
     </div>
 
-    <div id="paymentModal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent);">Zgłoszenie wysłane!</h2>
-            <p style="margin-top: 15px;">Dziękujemy za przesłanie formularza. Aby sfinalizować zapis i <strong>potwierdzić swoją obecność na liście</strong>, należy dokonać wpłaty pełnej kwoty.</p>
+    <a class="back-link" href="index2.html">← Wróć do strony głównej</a>
+    
+    <div class="card">
+        <div class="tabs-container">
+            <button class="tab-btn active" id="tabWorkshops" onclick="switchTab('workshops')">Warsztaty</button>
+            <button class="tab-btn" id="tabPrivates" onclick="switchTab('privates')">Lekcje Prywatne</button>
+        </div>
 
-            <div class="payment-box">
-                <p style="font-size: 1.2rem; margin: 0;">Koszt warsztatów: <strong><span id="displayPrice">...</span> PLN</strong></p>
-                <p style="font-size: 0.9rem; color: #aaa; margin-top: 10px;">W tytule przelewu podaj swój adres e-mail:<br>(<strong id="userEmailConfirm" style="color: var(--accent);"></strong>)</p>
-                <a href="https://revolut.me/twoj-nick" class="revolut-link" target="_blank">Opłać teraz przez Revolut</a>
+        <div id="workshopsSection">
+            <h2>Zapisz się na warsztaty</h2>
+            <form id="regForm">
+                <div class="form-group">
+                    <label class="form-label">Imię</label>
+                    <input id="fname" placeholder="np. Anna" required type="text"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nazwisko</label>
+                    <input id="lname" placeholder="np. Kowalska" required type="text"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Adres E-mail</label>
+                    <input id="email" placeholder="email@przykład.pl" required type="email"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Wybierz wydarzenie</label>
+                    <select id="event" required>
+                        <option value="" disabled selected>Ładowanie list...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Skąd o nas wiesz?</label>
+                    <input id="source" placeholder="np. Instagram, Facebook" required type="text"/>
+                </div>
+                <button id="submitBtn" class="main-submit" type="submit">Potwierdź zgłoszenie</button>
+            </form>
+        </div>
+
+        <div id="privatesSection" style="display: none;">
+            <h2>Zarezerwuj lekcję</h2>
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button class="cal-nav-btn" onclick="changeMonth(-1)">❮</button>
+                    <h3 id="monthYear"></h3>
+                    <button class="cal-nav-btn" onclick="changeMonth(1)">❯</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+            <div id="slotsContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                <p style="grid-column: 1/-1; color: var(--text-dim); font-size: 0.8rem;">Wybierz dzień z kropką, aby zobaczyć dostępne godziny.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <h2 style="color: var(--accent); font-family: 'Montserrat', sans-serif; font-size: 1.5rem;">Zgłoszenie wysłane!</h2>
+            <p style="font-size: 0.9rem; color: var(--text-dim);">Aby sfinalizować zapis, prosimy o płatność przez <strong>Revolut</strong>:</p>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);">
+                <p style="margin: 0 0 10px 0;">Kwota: <strong id="displayPrice" style="color: var(--accent); font-size: 1.2rem;">...</strong> PLN</p>
+                <p style="margin: 0; font-size: 0.85rem;">Tytuł: <strong id="userEmailConfirm" style="color: var(--text);"></strong></p>
+                
+                <a href="https://revolut.me/dandihandi" target="_blank" class="revolut-btn">Zapłać przez Revolut</a>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 20px;">Po dokonaniu płatności kliknij przycisk poniżej.</p>
+            <button class="main-submit" onclick="location.href='index2.html'">Gotowe</button>
+        </div>
+    </div>
+
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <h3 id="selectedTermInfo" style="font-family: 'Montserrat', sans-serif; margin-bottom: 20px; font-size: 1.1rem; color: var(--text);"></h3>
+            
+            <div class="form-group">
+                <label class="form-label">Imię i nazwisko</label>
+                <input id="plStudentName" placeholder="Imię i nazwisko" required type="text"/>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Numer telefonu</label>
+                <input id="plStudentPhone" placeholder="Numer telefonu (xxx-xxx-xxx)" required type="tel" maxlength="11"/>
             </div>
 
-            <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 20px;">Dopiero wpłata stanowi pełne potwierdzenie Twojego udziału w wydarzeniu.</p>
-            <button onclick="location.href='index.html'" style="background:none; color:var(--text-dim); border:none; margin-top:20px; cursor:pointer; text-decoration:underline;">Powrót do strony głównej</button>
+            <div class="form-group">
+                <label class="form-label">Wybierz rodzaj tańca</label>
+                <select id="plDanceType" required style="background: rgba(0,0,0,0.4); border-color: var(--accent);">
+                    <option value="Bachata">Bachata</option>
+                    <option value="Salsa">Salsa</option>
+                    <option value="High Heels">High Heels</option>
+                    <option value="Taniec Towarzyski">Taniec Towarzyski</option>
+                    <option value="Pierwszy Taniec">Pierwszy Taniec</option>
+                </select>
+            </div>
+            
+            <p style="font-size: 0.75rem; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                Lekcja zostanie potwierdzona wiadomością SMS
+            </p>
+
+            <button class="main-submit" onclick="confirmBooking()">Potwierdź rezerwację</button>
+            <button onclick="document.getElementById('bookingModal').classList.remove('active')" style="background:none; border:none; color:var(--text-dim); margin-top:15px; cursor:pointer; font-size: 0.8rem; text-transform: uppercase;">Anuluj</button>
         </div>
     </div>
 
@@ -64,9 +380,23 @@
             appId: "1:825219158791:web:38acf635db61854739eba2"
         };
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.database();
 
-        database.ref('settings').on('value', snapshot => {
+        // --- FORMATOWANIE NUMERU TELEFONU ---
+        document.getElementById('plStudentPhone').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); 
+            if (value.length > 9) value = value.slice(0, 9);
+            
+            let formattedValue = '';
+            if (value.length > 0) {
+                formattedValue = value.substring(0, 3);
+                if (value.length > 3) formattedValue += '-' + value.substring(3, 6);
+                if (value.length > 6) formattedValue += '-' + value.substring(6, 9);
+            }
+            e.target.value = formattedValue;
+        });
+
+        db.ref('settings').on('value', snapshot => {
             const s = snapshot.val();
             if(s) {
                 const select = document.getElementById('event');
@@ -80,10 +410,7 @@
 
         document.getElementById('regForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
             const emailValue = document.getElementById('email').value;
-            btn.disabled = true;
-
             const newReg = {
                 firstName: document.getElementById('fname').value,
                 lastName: document.getElementById('lname').value,
@@ -93,12 +420,107 @@
                 date: new Date().toLocaleString('pl-PL'),
                 paid: false
             };
-
-            database.ref('registrations').push(newReg).then(() => {
+            db.ref('registrations').push(newReg).then(() => {
                 document.getElementById('userEmailConfirm').innerText = emailValue;
-                document.getElementById('paymentModal').style.display = 'flex';
-            }).finally(() => { btn.disabled = false; });
+                document.getElementById('paymentModal').classList.add('active');
+            });
         });
+
+        let currentDate = new Date();
+        let selectedDate = "";
+        let selectedSlotId = "";
+
+        function switchTab(tab) {
+            document.getElementById('workshopsSection').style.display = tab === 'workshops' ? 'block' : 'none';
+            document.getElementById('privatesSection').style.display = tab === 'privates' ? 'block' : 'none';
+            document.getElementById('tabWorkshops').classList.toggle('active', tab === 'workshops');
+            document.getElementById('tabPrivates').classList.toggle('active', tab === 'privates');
+            if(tab === 'privates') renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const monthNames = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
+            document.getElementById('monthYear').innerText = `${monthNames[month]} ${year}`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
+            for(let i=0; i<startOffset; i++) grid.innerHTML += '<div class="calendar-day empty"></div>';
+            const monthPrefix = `${year}-${String(month+1).padStart(2,'0')}`;
+            db.ref('privateLessons').on('value', snapshot => {
+                const allData = snapshot.val() || {};
+                for(let i=1; i<=daysInMonth; i++) {
+                    const dStr = String(i).padStart(2, '0');
+                    const fullDate = `${monthPrefix}-${dStr}`;
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'calendar-day';
+                    dayDiv.innerText = i;
+                    if(allData[fullDate]) {
+                        const hasFree = Object.values(allData[fullDate]).some(s => !s.isBooked);
+                        if(hasFree) dayDiv.classList.add('has-slots');
+                    }
+                    dayDiv.onclick = () => {
+                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+                        dayDiv.classList.add('active');
+                        selectedDate = fullDate;
+                        loadSlots(fullDate);
+                    };
+                    grid.appendChild(dayDiv);
+                }
+            });
+        }
+
+        function loadSlots(date) {
+            const container = document.getElementById('slotsContainer');
+            container.innerHTML = 'Ładowanie...';
+            db.ref('privateLessons/' + date).get().then(snapshot => {
+                container.innerHTML = '';
+                const slots = snapshot.val();
+                if(!slots) return container.innerHTML = '<p style="grid-column:1/-1; font-size:0.8rem;">Brak wolnych terminów w tym dniu.</p>';
+                Object.keys(slots).forEach(id => {
+                    if(!slots[id].isBooked) {
+                        const btn = document.createElement('button');
+                        btn.innerText = slots[id].time;
+                        btn.onclick = () => {
+                            selectedSlotId = id;
+                            document.getElementById('selectedTermInfo').innerText = `Termin: ${date} o godz. ${slots[id].time}`;
+                            document.getElementById('bookingModal').classList.add('active');
+                        };
+                        container.appendChild(btn);
+                    }
+                });
+            });
+        }
+
+        function confirmBooking() {
+            const name = document.getElementById('plStudentName').value;
+            const phone = document.getElementById('plStudentPhone').value;
+            const danceType = document.getElementById('plDanceType').value;
+            
+            if(!name || phone.length < 11) return alert("Wpisz swoje dane oraz pełny numer telefonu!");
+            
+            db.ref(`privateLessons/${selectedDate}/${selectedSlotId}`).transaction(current => {
+                if(current && !current.isBooked) {
+                    current.isBooked = true;
+                    current.studentName = name;
+                    current.studentPhone = phone;
+                    current.danceType = danceType;
+                    return current;
+                }
+            }, (err, committed) => {
+                if(committed) {
+                    alert("Rezerwacja zakończona sukcesem! Lekcja zostanie potwierdzona wiadomością SMS.");
+                    location.reload();
+                } else {
+                    alert("Przepraszamy, ten termin został właśnie zajęty.");
+                }
+            });
+        }
+
+        function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); renderCalendar(); }
     </script>
 </body>
 </html>
