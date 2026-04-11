@@ -561,7 +561,7 @@
         if(tabId === 'lessonsTab') renderAdminCalendar();
     }
 
-    // SYSTEM POWIADOMIEŃ (NAPRAWIONY)
+    // SYSTEM POWIADOMIEŃ
     function initNotifications() {
         const list = document.getElementById('notifList');
         const badge = document.getElementById('notifBadge');
@@ -684,7 +684,7 @@
         });
     }
 
-    // NAPRAWIONY EKSPORT DLA IPHONE
+    // EKSPORT DO KALENDARZA (BEZ "Lekcja:")
     function exportToAppleCalendar() {
         db.ref('privateLessons').once('value', snap => {
             let icsContent = [
@@ -708,13 +708,17 @@
                         const endHour = (parseInt(hours) + 1).toString().padStart(2, '0');
                         const timeEnd = endHour + minutes + "00";
 
+                        const danceType = s.danceType || 'Taniec';
+                        // ZMIANA: Usunięty napis "Lekcja:"
+                        const summary = `${s.studentName} (${danceType})`;
+
                         icsContent += "\r\nBEGIN:VEVENT";
                         icsContent += "\r\nUID:" + slotChild.key + "_" + dateClean + "@bbogacka";
                         icsContent += "\r\nDTSTAMP:" + dateClean + "T" + timeStart + "Z";
                         icsContent += "\r\nDTSTART:" + dateClean + "T" + timeStart;
                         icsContent += "\r\nDTEND:" + dateClean + "T" + timeEnd;
-                        icsContent += "\r\nSUMMARY:Lekcja: " + s.studentName + " (" + (s.danceType || 'Taniec') + ")";
-                        icsContent += "\r\nDESCRIPTION:Kursant: " + s.studentName + "\\nTel: " + s.studentPhone + "\\nRodzaj: " + (s.danceType || 'n/a');
+                        icsContent += "\r\nSUMMARY:" + summary;
+                        icsContent += "\r\nDESCRIPTION:Kursant: " + s.studentName + "\\nTel: " + s.studentPhone + "\\nRodzaj: " + danceType;
                         icsContent += "\r\nEND:VEVENT";
                     }
                 });
