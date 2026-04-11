@@ -480,13 +480,27 @@
                 container.innerHTML = '';
                 const slots = snapshot.val();
                 if(!slots) return container.innerHTML = '<p style="grid-column:1/-1; font-size:0.8rem;">Brak wolnych terminów w tym dniu.</p>';
+                
+                const dateObj = new Date(date);
+                const options = { day: 'numeric', month: 'long', year: 'numeric' };
+                const formattedDate = dateObj.toLocaleDateString('pl-PL', options);
+                
+                const daysOfWeek = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
+                const dayName = daysOfWeek[dateObj.getDay()];
+
                 Object.keys(slots).forEach(id => {
                     if(!slots[id].isBooked) {
                         const btn = document.createElement('button');
                         btn.innerText = slots[id].time;
                         btn.onclick = () => {
                             selectedSlotId = id;
-                            document.getElementById('selectedTermInfo').innerText = `Termin: ${date} o godz. ${slots[id].time}`;
+                            document.getElementById('selectedTermInfo').innerHTML = `
+                                <span style="display:block; font-size: 0.75rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Wybrany termin:</span>
+                                <div style="font-size: 1.1rem; font-weight: 600; line-height: 1.4;">
+                                    ${formattedDate} o <span style="color: #ffffff;">${slots[id].time}</span>
+                                </div>
+                                <div style="color: var(--text-dim); font-size: 0.85rem; margin-top: 4px;">(${dayName})</div>
+                            `;
                             document.getElementById('bookingModal').classList.add('active');
                         };
                         container.appendChild(btn);

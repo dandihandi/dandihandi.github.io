@@ -38,7 +38,6 @@
             height: 100%;
             z-index: -1;
             background: radial-gradient(circle at 50% -20%, #2a2a2a 0%, #0a0a0a 100%);
-            overflow: hidden;
         }
 
         .orb {
@@ -60,18 +59,16 @@
         }
 
         .hero { 
-            height: 40vh; 
+            height: 35vh; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
             text-align: center;
             padding: 0 20px;
-            position: relative;
         }
 
         h1 { 
-            font-family: 'Montserrat', sans-serif;
             font-size: 2.8rem; 
             font-weight: 700;
             letter-spacing: 3px; 
@@ -111,161 +108,173 @@
             transition: 0.3s;
         }
 
-        .btn-nav::after {
+        .btn-nav.active, .btn-nav:hover { color: #fff; }
+        .btn-nav.active::after, .btn-nav:hover::after { 
             content: '';
             position: absolute;
             bottom: 5px;
             left: 0;
-            width: 0;
+            width: 100%;
             height: 1px;
             background: var(--accent);
-            transition: 0.3s;
         }
 
-        .btn-nav.active, .btn-nav:hover { color: #fff; }
-        .btn-nav.active::after, .btn-nav:hover::after { width: 100%; }
-
         .container { 
-            max-width: 700px; 
+            max-width: 900px; 
             margin: 0 auto 60px; 
             padding: 0 20px; 
-            position: relative;
-            flex: 1; /* Popycha stopkę do dołu */
+            flex: 1;
         }
 
         .card {
-            background: rgba(26, 26, 26, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(15px);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .workshop-layout {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .workshop-timer-side {
+            flex: 1;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding-right: 50px;
+        }
+
+        .workshop-info-side {
+            flex: 1.2;
         }
 
         .countdown-label {
             display: block;
-            text-align: center;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
             text-transform: uppercase;
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .countdown-label span {
             color: var(--accent);
-            margin-bottom: 15px;
-            font-weight: 600;
         }
 
         .countdown { 
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
-            margin-bottom: 40px;
         }
 
         .timer-item { 
             background: rgba(255,255,255,0.03);
-            padding: 15px 5px;
-            border-radius: 12px;
+            padding: 20px 10px;
+            border-radius: 15px;
             text-align: center; 
+            border: 1px solid rgba(255,255,255,0.05);
         }
+
         .timer-item span { 
             display: block; 
             font-size: 1.8rem; 
             font-weight: 600; 
             color: #ffffff; 
         }
+
         .timer-item label { 
             font-size: 0.6rem; 
             color: var(--text-dim); 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .event-info { text-align: center; }
         .event-title { 
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem; 
+            font-size: 2.2rem; 
             font-weight: 700;
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
+            line-height: 1.1;
         }
-        .description { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 35px; font-weight: 300; }
 
-        .info-grid {
+        .description { 
+            font-size: 0.9rem; 
+            color: var(--text-dim); 
+            margin-bottom: 30px; 
+            font-weight: 300; 
+        }
+
+        .info-grid-new {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .info-box {
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: left;
+        .info-box-new {
+            border-left: 2px solid var(--accent);
+            padding-left: 15px;
         }
 
-        .info-box .label {
+        .info-box-new .label {
             display: block;
-            font-size: 0.65rem;
-            color: var(--accent);
+            font-size: 0.6rem;
+            color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 5px;
-            font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .info-box .value { font-size: 1rem; font-weight: 400; }
+        .info-box-new .value { font-size: 0.95rem; font-weight: 500; }
 
-        .price-old {
-            text-decoration: line-through;
-            opacity: 0.5;
-            font-size: 0.85rem;
-            margin-right: 8px;
-        }
-        .price-promo {
-            color: #ffffff;
-            font-weight: 700;
-        }
-
-        .btn-map {
-            display: inline-block;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            text-decoration: underline;
-            margin-bottom: 30px;
-            transition: 0.3s;
-        }
-        .btn-map:hover { color: var(--accent); }
+        .price-old { text-decoration: line-through; opacity: 0.5; font-size: 0.8rem; margin-right: 5px; }
+        .price-promo { color: #fff; font-weight: 700; }
 
         .btn-main {
             display: block;
             background: var(--accent);
             color: #000;
             text-align: center;
-            padding: 20px;
+            padding: 18px;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 2px;
             transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
         }
 
-        .btn-main:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212,175,55,0.3); }
+
+        /* POPRAWIONY PRZYCISK MAPY */
+        .btn-map {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.65rem;
+            color: var(--accent);
+            text-decoration: none;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border: 1px solid var(--accent);
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            background: rgba(212, 175, 55, 0.05);
+            font-weight: 600;
         }
 
-        /* Sekcja braku warsztatów */
-        #noWorkshopArea {
-            display: none;
-            text-align: center;
-            padding: 20px 20px 40px;
+        .btn-map:hover {
+            background: var(--accent);
+            color: #000;
         }
-        #noWorkshopArea h2 { color: var(--accent); margin-bottom: 15px; text-transform: uppercase; }
-        #noWorkshopArea p { color: var(--text-dim); font-size: 0.9rem; }
 
-        /* Style Stopki */
+        #noWorkshopArea { text-align: center; display: none; }
+
         footer {
             padding: 40px 20px;
             text-align: center;
@@ -274,47 +283,16 @@
             margin-top: auto;
         }
 
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-bottom: 20px;
-        }
+        .social-links { display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; }
+        .social-item { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; transition: 0.3s; text-transform: uppercase; }
+        .social-item i { color: var(--accent); }
+        .copyright { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
 
-        .social-item {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .social-item i {
-            font-size: 1.2rem;
-            color: var(--accent);
-        }
-
-        .social-item:hover {
-            color: #fff;
-        }
-
-        .copyright {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.6;
-        }
-
-        @media (max-width: 500px) {
-            .info-grid { grid-template-columns: 1fr; }
-            h1 { font-size: 2.2rem; }
-            .nav-container { gap: 15px; padding: 5px 20px; }
-            .social-links { flex-direction: column; gap: 15px; }
+        @media (max-width: 768px) {
+            .workshop-layout { flex-direction: column; text-align: center; gap: 30px; }
+            .workshop-timer-side { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 30px; width: 100%; }
+            .countdown { grid-template-columns: repeat(4, 1fr); }
+            .info-grid-new { text-align: left; }
         }
     </style>
 </head>
@@ -337,63 +315,59 @@
 
     <div class="container">
         <div class="card" id="workshopActiveArea">
-            <span class="countdown-label">Do warsztatów pozostało</span>
-            
-            <div class="countdown">
-                <div class="timer-item"><span id="days">00</span><label>Dni</label></div>
-                <div class="timer-item"><span id="hours">00</span><label>Godz</label></div>
-                <div class="timer-item"><span id="mins">00</span><label>Min</label></div>
-                <div class="timer-item"><span id="secs">00</span><label>Sek</label></div>
-            </div>
-
-            <div class="event-info">
-                <div class="event-title" id="mainTitle">...</div>
-                <div class="description" id="mainDescription">Ładowanie opisu...</div>
-
-                <div class="info-grid">
-                    <div class="info-box">
-                        <span class="label">Kiedy</span>
-                        <span class="value" id="mainDate">Ładowanie...</span>
-                    </div>
-                    <div class="info-box">
-                        <span class="label">Cena</span>
-                        <span class="value" id="priceContainer">
-                            <span id="mainPrice">...</span> PLN
-                        </span>
-                    </div>
-                    <div class="info-box" style="grid-column: span 2;">
-                        <span class="label">Miejsce</span>
-                        <span class="value" id="mainLoc">...</span>
+            <div class="workshop-layout">
+                
+                <div class="workshop-timer-side">
+                    <span class="countdown-label">Do <span>warsztatów</span> zostało:</span>
+                    <div class="countdown">
+                        <div class="timer-item"><span id="days">00</span><label>Dni</label></div>
+                        <div class="timer-item"><span id="hours">00</span><label>Godz</label></div>
+                        <div class="timer-item"><span id="mins">00</span><label>Min</label></div>
+                        <div class="timer-item"><span id="secs">00</span><label>Sek</label></div>
                     </div>
                 </div>
-                
-                <a href="#" id="mainMap" target="_blank" class="btn-map">Otwórz lokalizację w Mapach Google</a>
 
-                <a href="register.html" class="btn-main">Zarezerwuj swoje miejsce</a>
+                <div class="workshop-info-side">
+                    <div class="event-title" id="mainTitle">...</div>
+                    <div class="description" id="mainDescription">Ładowanie szczegółów...</div>
+
+                    <div class="info-grid-new">
+                        <div class="info-box-new">
+                            <span class="label">Kiedy</span>
+                            <span class="value" id="mainDate">...</span>
+                        </div>
+                        <div class="info-box-new">
+                            <span class="label">Cena</span>
+                            <span class="value" id="priceContainer">...</span>
+                        </div>
+                        <div class="info-box-new" style="grid-column: span 2;">
+                            <span class="label">Lokalizacja</span>
+                            <span class="value" id="mainLoc">...</span>
+                            <a href="#" id="mainMap" target="_blank" class="btn-map">
+                                <i class="fas fa-map-marker-alt"></i> Zobacz trasę w Google Maps
+                            </a>
+                        </div>
+                    </div>
+
+                    <a href="register.html" class="btn-main">Zarezerwuj swoje miejsce</a>
+                </div>
+
             </div>
         </div>
 
         <div class="card" id="noWorkshopArea">
-            <h2>AKTUALNIE BRAK ZAPLANOWANYCH WARSZTATÓW</h2>
-            <p>Sprawdź ponownie wkrótce lub śledź moje social media, aby być na bieżąco z nowymi terminami!</p>
-            <div style="margin-top: 30px;">
-                <a href="register.html" class="btn-main">umów sie na lekcje prywatną</a>
-            </div>
+            <h2 style="color: var(--accent); text-transform: uppercase;">Aktualnie brak zaplanowanych warsztatów</h2>
+            <p style="color: var(--text-dim); margin-bottom: 30px;">Zapisz się na lekcję prywatną lub śledź social media!</p>
+            <a href="register.html" class="btn-main" style="max-width: 300px; margin: 0 auto;">Umów lekcję prywatną</a>
         </div>
     </div>
 
     <footer>
         <div class="social-links">
-            <a href="https://instagram.com/twoj_profil" target="_blank" class="social-item">
-                <i class="fab fa-instagram"></i> @barbarabogacka
-            </a>
-            <a href="https://facebook.com/twoj_profil" target="_blank" class="social-item">
-                <i class="fab fa-facebook-f"></i> Barbara Bogacka
-            </a>
+            <a href="#" target="_blank" class="social-item"><i class="fab fa-instagram"></i> @barbarabogacka</a>
+            <a href="#" target="_blank" class="social-item"><i class="fab fa-facebook-f"></i> Barbara Bogacka</a>
         </div>
-        <div class="copyright">
-            &copy; Barbara Bogacka 2026
-        </div>
+        <div class="copyright">&copy; Barbara Bogacka 2026</div>
     </footer>
 
     <script>
@@ -425,21 +399,17 @@
                     
                     const priceContainer = document.getElementById('priceContainer');
                     if (s.promoActive && s.promoPrice) {
-                        priceContainer.innerHTML = `
-                            <span class="price-old">${s.price} PLN</span>
-                            <span class="price-promo">${s.promoPrice} PLN</span>
-                        `;
+                        priceContainer.innerHTML = `<span class="price-old">${s.price} PLN</span> <span class="price-promo">${s.promoPrice} PLN</span>`;
                     } else {
-                        priceContainer.innerHTML = `<span id="mainPrice">${s.price || "..."}</span> PLN`;
+                        priceContainer.innerHTML = `<span>${s.price || "..."}</span> PLN`;
                     }
                     
                     if(s.targetDate) {
                         targetTime = new Date(s.targetDate).getTime();
                         const d = new Date(s.targetDate);
-                        const formatted = d.toLocaleDateString('pl-PL', {
-                            day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                        document.getElementById('mainDate').innerText = d.toLocaleDateString('pl-PL', {
+                            day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit'
                         });
-                        document.getElementById('mainDate').innerText = formatted;
                     }
                 }
             }
@@ -453,11 +423,6 @@
                 document.getElementById('hours').innerText = Math.floor((diff % (1000*60*60*24)) / (1000*60*60)).toString().padStart(2, '0');
                 document.getElementById('mins').innerText = Math.floor((diff % (1000*60*60)) / (1000*60)).toString().padStart(2, '0');
                 document.getElementById('secs').innerText = Math.floor((diff % (1000*60)) / 1000).toString().padStart(2, '0');
-            } else {
-                document.getElementById('days').innerText = "00";
-                document.getElementById('hours').innerText = "00";
-                document.getElementById('mins').innerText = "00";
-                document.getElementById('secs').innerText = "00";
             }
         }, 1000);
     </script>
