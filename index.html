@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbara Bogacka | Official</title>
+    <title>Strona Główna | Barbara Bogacka</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -57,7 +57,7 @@
         }
 
         .hero { 
-            height: 35vh; 
+            height: 40vh; 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -82,14 +82,20 @@
             letter-spacing: 5px; 
             color: var(--text); 
             margin-top: 10px; 
+            margin-bottom: 30px;
             text-transform: uppercase;
             opacity: 0.8;
         }
 
-        .nav { 
+        /* --- NOWY PASEK NAWIGACJI --- */
+        .nav-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            padding: 5px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex; 
-            gap: 30px; 
-            margin-top: 40px; 
+            gap: 30px;
         }
 
         .btn-nav { 
@@ -98,7 +104,7 @@
             letter-spacing: 2px; 
             color: var(--text-dim); 
             text-decoration: none; 
-            padding: 8px 0;
+            padding: 12px 0;
             position: relative;
             transition: 0.3s;
         }
@@ -106,7 +112,7 @@
         .btn-nav::after {
             content: '';
             position: absolute;
-            bottom: 0;
+            bottom: 5px;
             left: 0;
             width: 0;
             height: 1px;
@@ -116,6 +122,7 @@
 
         .btn-nav.active, .btn-nav:hover { color: #fff; }
         .btn-nav.active::after, .btn-nav:hover::after { width: 100%; }
+        /* --------------------------- */
 
         .container { 
             max-width: 700px; 
@@ -250,6 +257,7 @@
         @media (max-width: 500px) {
             .info-grid { grid-template-columns: 1fr; }
             h1 { font-size: 2.2rem; }
+            .nav-container { gap: 15px; padding: 5px 20px; }
         }
     </style>
 </head>
@@ -264,7 +272,7 @@
         <h1>Barbara Bogacka</h1>
         <div class="tagline">Najlepsza tancerka w Polsce</div>
         
-        <div class="nav">
+        <div class="nav-container">
             <a href="index.html" class="btn-nav active">Warsztaty</a>
             <a href="register.html" class="btn-nav">Lekcje Prywatne</a>
         </div>
