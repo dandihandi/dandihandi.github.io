@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strona Główna | Barbara Bogacka</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -23,6 +24,8 @@
             margin: 0; 
             line-height: 1.6;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
             position: relative;
         }
@@ -87,7 +90,6 @@
             opacity: 0.8;
         }
 
-        /* --- NOWY PASEK NAWIGACJI --- */
         .nav-container {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(5px);
@@ -122,13 +124,13 @@
 
         .btn-nav.active, .btn-nav:hover { color: #fff; }
         .btn-nav.active::after, .btn-nav:hover::after { width: 100%; }
-        /* --------------------------- */
 
         .container { 
             max-width: 700px; 
             margin: 0 auto 60px; 
             padding: 0 20px; 
             position: relative;
+            flex: 1; /* Popycha stopkę do dołu */
         }
 
         .card {
@@ -254,10 +256,65 @@
             box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
         }
 
+        /* Sekcja braku warsztatów */
+        #noWorkshopArea {
+            display: none;
+            text-align: center;
+            padding: 20px 20px 40px;
+        }
+        #noWorkshopArea h2 { color: var(--accent); margin-bottom: 15px; text-transform: uppercase; }
+        #noWorkshopArea p { color: var(--text-dim); font-size: 0.9rem; }
+
+        /* Style Stopki */
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: auto;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .social-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .social-item i {
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .social-item:hover {
+            color: #fff;
+        }
+
+        .copyright {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.6;
+        }
+
         @media (max-width: 500px) {
             .info-grid { grid-template-columns: 1fr; }
             h1 { font-size: 2.2rem; }
             .nav-container { gap: 15px; padding: 5px 20px; }
+            .social-links { flex-direction: column; gap: 15px; }
         }
     </style>
 </head>
@@ -279,7 +336,7 @@
     </div>
 
     <div class="container">
-        <div class="card">
+        <div class="card" id="workshopActiveArea">
             <span class="countdown-label">Do warsztatów pozostało</span>
             
             <div class="countdown">
@@ -315,7 +372,29 @@
                 <a href="register.html" class="btn-main">Zarezerwuj swoje miejsce</a>
             </div>
         </div>
+
+        <div class="card" id="noWorkshopArea">
+            <h2>AKTUALNIE BRAK ZAPLANOWANYCH WARSZTATÓW</h2>
+            <p>Sprawdź ponownie wkrótce lub śledź moje social media, aby być na bieżąco z nowymi terminami!</p>
+            <div style="margin-top: 30px;">
+                <a href="register.html" class="btn-main">umów sie na lekcje prywatną</a>
+            </div>
+        </div>
     </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://instagram.com/twoj_profil" target="_blank" class="social-item">
+                <i class="fab fa-instagram"></i> @barbarabogacka
+            </a>
+            <a href="https://facebook.com/twoj_profil" target="_blank" class="social-item">
+                <i class="fab fa-facebook-f"></i> Barbara Bogacka
+            </a>
+        </div>
+        <div class="copyright">
+            &copy; Barbara Bogacka 2026
+        </div>
+    </footer>
 
     <script>
         const firebaseConfig = {
@@ -334,28 +413,34 @@
         database.ref('settings').on('value', snapshot => {
             const s = snapshot.val();
             if(s) {
-                document.getElementById('mainTitle').innerText = s.title || "";
-                document.getElementById('mainLoc').innerText = s.location || "";
-                document.getElementById('mainMap').href = s.mapUrl || "#";
-                document.getElementById('mainDescription').innerText = s.description || "";
-                
-                const priceContainer = document.getElementById('priceContainer');
-                if (s.promoActive && s.promoPrice) {
-                    priceContainer.innerHTML = `
-                        <span class="price-old">${s.price} PLN</span>
-                        <span class="price-promo">${s.promoPrice} PLN</span>
-                    `;
-                } else {
-                    priceContainer.innerHTML = `<span id="mainPrice">${s.price || "..."}</span> PLN`;
-                }
-                
-                if(s.targetDate) {
-                    targetTime = new Date(s.targetDate).getTime();
-                    const d = new Date(s.targetDate);
-                    const formatted = d.toLocaleDateString('pl-PL', {
-                        day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                    });
-                    document.getElementById('mainDate').innerText = formatted;
+                const active = s.workshopActive !== false; 
+                document.getElementById('workshopActiveArea').style.display = active ? 'block' : 'none';
+                document.getElementById('noWorkshopArea').style.display = active ? 'none' : 'block';
+
+                if(active) {
+                    document.getElementById('mainTitle').innerText = s.title || "";
+                    document.getElementById('mainLoc').innerText = s.location || "";
+                    document.getElementById('mainMap').href = s.mapUrl || "#";
+                    document.getElementById('mainDescription').innerText = s.description || "";
+                    
+                    const priceContainer = document.getElementById('priceContainer');
+                    if (s.promoActive && s.promoPrice) {
+                        priceContainer.innerHTML = `
+                            <span class="price-old">${s.price} PLN</span>
+                            <span class="price-promo">${s.promoPrice} PLN</span>
+                        `;
+                    } else {
+                        priceContainer.innerHTML = `<span id="mainPrice">${s.price || "..."}</span> PLN`;
+                    }
+                    
+                    if(s.targetDate) {
+                        targetTime = new Date(s.targetDate).getTime();
+                        const d = new Date(s.targetDate);
+                        const formatted = d.toLocaleDateString('pl-PL', {
+                            day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                        });
+                        document.getElementById('mainDate').innerText = formatted;
+                    }
                 }
             }
         });

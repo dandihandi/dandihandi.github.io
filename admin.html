@@ -394,6 +394,14 @@
         <section class="section" id="settingsTab">
             <div class="card" style="max-width: 800px; margin: 0 auto;">
                 <h2>Konfiguracja Warsztatów</h2>
+                
+                <div style="margin-bottom: 25px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="set_workshopActive">
+                        <span style="color: #ffffff; font-size: 1rem;">Warsztaty aktywne (widoczne na stronie)</span>
+                    </label>
+                </div>
+
                 <div class="form-group">
                     <label>Nazwa Wydarzenia</label>
                     <input id="set_title" type="text" placeholder="np. Heels Workshop Vol. 10"/>
@@ -656,6 +664,7 @@
                 document.getElementById('set_description').value = s.description || '';
                 document.getElementById('set_promoPrice').value = s.promoPrice || '';
                 document.getElementById('set_promoActive').checked = s.promoActive || false;
+                document.getElementById('set_workshopActive').checked = s.workshopActive !== false; // default true
             }
         });
 
@@ -852,12 +861,13 @@
             price: document.getElementById('set_price').value,
             promoPrice: document.getElementById('set_promoPrice').value,
             promoActive: document.getElementById('set_promoActive').checked,
+            workshopActive: document.getElementById('set_workshopActive').checked,
             location: document.getElementById('set_location').value,
             mapUrl: document.getElementById('set_mapUrl').value,
             eventList: document.getElementById('set_eventList').value,
             description: document.getElementById('set_description').value
         };
-        db.ref('settings').set(data).then(() => alert('Zapisano ustawienia.'));
+        db.ref('settings').set(data);
     }
 
     function togglePaid(key, s) { db.ref('registrations/'+key).update({paid: !s}); }
