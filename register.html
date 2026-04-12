@@ -164,67 +164,12 @@
             box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
         }
 
-        .calendar-wrapper { 
-            background: rgba(0,0,0,0.2); 
-            padding: 20px; 
-            border-radius: 15px; 
-            margin-bottom: 25px; 
-        }
-        .calendar-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 20px; 
-        }
-        #monthYear { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-        .cal-nav-btn {
-            background: none;
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .calendar-day { 
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.03); 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 0.85rem; 
-            position: relative; 
-            transition: 0.2s;
-        }
-        .calendar-day:hover:not(.empty) { background: rgba(212, 175, 55, 0.2); }
-        .calendar-day.active { background: var(--accent); color: #000; font-weight: 600; }
-        .calendar-day.has-slots::after { 
-            content: ''; 
-            position: absolute; 
-            bottom: 5px; 
-            width: 4px; 
-            height: 4px; 
-            background: var(--accent); 
-            border-radius: 50%; 
-        }
-        .calendar-day.active.has-slots::after { background: #000; }
-        .calendar-day.empty { visibility: hidden; }
-
-        #slotsContainer button {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        #slotsContainer button:hover {
-            border-color: var(--accent);
-            color: var(--accent);
+        .info-note {
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-align: center;
+            line-height: 1.4;
         }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; backdrop-filter: blur(5px); }
@@ -252,10 +197,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: 0.3s;
-        }
-        .revolut-btn:hover {
-            background: #f0f0f0;
-            transform: scale(1.05);
         }
     </style>
 </head>
@@ -305,17 +246,45 @@
 
         <div id="privatesSection" style="display: none;">
             <h2>Zarezerwuj lekcję</h2>
-            <div class="calendar-wrapper">
-                <div class="calendar-header">
-                    <button class="cal-nav-btn" onclick="changeMonth(-1)">❮</button>
-                    <h3 id="monthYear"></h3>
-                    <button class="cal-nav-btn" onclick="changeMonth(1)">❯</button>
+            <form id="privateForm">
+                <div class="form-group">
+                    <label class="form-label">Imię i Nazwisko</label>
+                    <input id="plFullName" placeholder="np. Anna Kowalska" required type="text"/>
                 </div>
-                <div class="calendar-grid" id="calendarGrid"></div>
-            </div>
-            <div id="slotsContainer" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-                <p style="grid-column: 1/-1; color: var(--text-dim); font-size: 0.8rem;">Wybierz dzień z kropką, aby zobaczyć dostępne godziny.</p>
-            </div>
+                <div class="form-group">
+                    <label class="form-label">Numer telefonu</label>
+                    <input id="plPhone" placeholder="xxx-xxx-xxx" required type="tel" maxlength="11"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Wybierz rodzaj tańca</label>
+                    <select id="plDanceType" required>
+                        <option value="Bachata (150 zł)">Bachata (150 zł)</option>
+                        <option value="Salsa (150 zł)">Salsa (150 zł)</option>
+                        <option value="High Heels (150 zł)">High Heels (150 zł)</option>
+                        <option value="Taniec Towarzyski (150 zł)">Taniec Towarzyski (150 zł)</option>
+                        <option value="Pierwszy Taniec (150 zł)">Pierwszy Taniec (150 zł)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sugerowane terminy</label>
+                    <input id="plDates" placeholder="np. Przyszły wtorek lub 15.03" required type="text"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sugerowane godziny</label>
+                    <select id="plHours" required onchange="toggleCustomHour(this.value)">
+                        <option value="po 16">Po 16:00</option>
+                        <option value="przed 16">Przed 16:00</option>
+                        <option value="obojętnie">Obojętnie</option>
+                        <option value="wpiszę własną">Chcę wpisać konkretną godzinę...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customHourGroup" style="display: none;">
+                    <label class="form-label">Wpisz godzinę</label>
+                    <input id="plCustomHour" placeholder="np. 14:30 - 15:30" type="text"/>
+                </div>
+                <button class="main-submit" type="submit">Wyślij zapytanie</button>
+                <p class="info-note">* Po wysłaniu zapytania, potwierdzenie terminu oraz szczegóły płatności zostaną wysłane <strong>wiadomością SMS</strong>.</p>
+            </form>
         </div>
     </div>
 
@@ -323,49 +292,12 @@
         <div class="modal-content">
             <h2 style="color: var(--accent); font-family: 'Montserrat', sans-serif; font-size: 1.5rem;">Zgłoszenie wysłane!</h2>
             <p style="font-size: 0.9rem; color: var(--text-dim);">Aby sfinalizować zapis, prosimy o płatność przez <strong>Revolut</strong>:</p>
-            
             <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);">
                 <p style="margin: 0 0 10px 0;">Kwota: <strong id="displayPrice" style="color: var(--accent); font-size: 1.2rem;">...</strong> PLN</p>
                 <p style="margin: 0; font-size: 0.85rem;">Tytuł: <strong id="userEmailConfirm" style="color: var(--text);"></strong></p>
-                
                 <a href="https://revolut.me/dandihandi" target="_blank" class="revolut-btn">Zapłać przez Revolut</a>
             </div>
-            
-            <p style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 20px;">Po dokonaniu płatności kliknij przycisk poniżej.</p>
             <button class="main-submit" onclick="location.href='index.html'">Gotowe</button>
-        </div>
-    </div>
-
-    <div class="modal" id="bookingModal">
-        <div class="modal-content">
-            <h3 id="selectedTermInfo" style="font-family: 'Montserrat', sans-serif; margin-bottom: 20px; font-size: 1.1rem; color: var(--text);"></h3>
-            
-            <div class="form-group">
-                <label class="form-label">Imię i nazwisko</label>
-                <input id="plStudentName" placeholder="Imię i nazwisko" required type="text"/>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Numer telefonu</label>
-                <input id="plStudentPhone" placeholder="Numer telefonu (xxx-xxx-xxx)" required type="tel" maxlength="11"/>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Wybierz rodzaj tańca</label>
-                <select id="plDanceType" required style="background: rgba(0,0,0,0.4); border-color: var(--accent);">
-                    <option value="Bachata (150 zł)">Bachata (150 zł)</option>
-                    <option value="Salsa (150 zł)">Salsa (150 zł)</option>
-                    <option value="High Heels (150 zł)">High Heels (150 zł)</option>
-                    <option value="Taniec Towarzyski (150 zł)">Taniec Towarzyski (150 zł)</option>
-                    <option value="Pierwszy Taniec (150 zł)">Pierwszy Taniec (150 zł)</option>
-                </select>
-            </div>
-            
-            <p style="font-size: 0.75rem; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                Lekcja zostanie potwierdzona wiadomością SMS
-            </p>
-
-            <button class="main-submit" onclick="confirmBooking()">Potwierdź rezerwację</button>
-            <button onclick="document.getElementById('bookingModal').classList.remove('active')" style="background:none; border:none; color:var(--text-dim); margin-top:15px; cursor:pointer; font-size: 0.8rem; text-transform: uppercase;">Anuluj</button>
         </div>
     </div>
 
@@ -382,19 +314,24 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- FORMATOWANIE NUMERU TELEFONU ---
-        document.getElementById('plStudentPhone').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/\D/g, ''); 
-            if (value.length > 9) value = value.slice(0, 9);
-            
-            let formattedValue = '';
-            if (value.length > 0) {
-                formattedValue = value.substring(0, 3);
-                if (value.length > 3) formattedValue += '-' + value.substring(3, 6);
-                if (value.length > 6) formattedValue += '-' + value.substring(6, 9);
-            }
-            e.target.value = formattedValue;
-        });
+        function setupPhoneFormatting(id) {
+            document.getElementById(id).addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, ''); 
+                if (value.length > 9) value = value.slice(0, 9);
+                let formattedValue = '';
+                if (value.length > 0) {
+                    formattedValue = value.substring(0, 3);
+                    if (value.length > 3) formattedValue += '-' + value.substring(3, 6);
+                    if (value.length > 6) formattedValue += '-' + value.substring(6, 9);
+                }
+                e.target.value = formattedValue;
+            });
+        }
+        setupPhoneFormatting('plPhone');
+
+        function toggleCustomHour(val) {
+            document.getElementById('customHourGroup').style.display = val === 'wpiszę własną' ? 'block' : 'none';
+        }
 
         db.ref('settings').on('value', snapshot => {
             const s = snapshot.val();
@@ -418,7 +355,7 @@
                 event: document.getElementById('event').value,
                 source: document.getElementById('source').value,
                 date: new Date().toLocaleString('pl-PL'),
-                paid: false
+                type: 'Workshop'
             };
             db.ref('registrations').push(newReg).then(() => {
                 document.getElementById('userEmailConfirm').innerText = emailValue;
@@ -426,115 +363,33 @@
             });
         });
 
-        let currentDate = new Date();
-        let selectedDate = "";
-        let selectedSlotId = "";
+        document.getElementById('privateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const hoursVal = document.getElementById('plHours').value;
+            const finalHours = hoursVal === 'wpiszę własną' ? document.getElementById('plCustomHour').value : hoursVal;
+
+            const inquiry = {
+                fullName: document.getElementById('plFullName').value,
+                phone: document.getElementById('plPhone').value,
+                danceType: document.getElementById('plDanceType').value,
+                suggestedDates: document.getElementById('plDates').value,
+                suggestedHours: finalHours,
+                dateAdded: new Date().toLocaleString('pl-PL'),
+                type: 'Private Lesson Inquiry'
+            };
+
+            db.ref('privateInquiries').push(inquiry).then(() => {
+                alert("Dziękujemy! Twoje zapytanie zostało wysłane. Potwierdzenie terminu otrzymasz od nas wiadomością SMS.");
+                location.href = 'index.html';
+            });
+        });
 
         function switchTab(tab) {
             document.getElementById('workshopsSection').style.display = tab === 'workshops' ? 'block' : 'none';
             document.getElementById('privatesSection').style.display = tab === 'privates' ? 'block' : 'none';
             document.getElementById('tabWorkshops').classList.toggle('active', tab === 'workshops');
             document.getElementById('tabPrivates').classList.toggle('active', tab === 'privates');
-            if(tab === 'privates') renderCalendar();
         }
-
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = '';
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            const monthNames = ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"];
-            document.getElementById('monthYear').innerText = `${monthNames[month]} ${year}`;
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            let startOffset = firstDay === 0 ? 6 : firstDay - 1;
-            for(let i=0; i<startOffset; i++) grid.innerHTML += '<div class="calendar-day empty"></div>';
-            const monthPrefix = `${year}-${String(month+1).padStart(2,'0')}`;
-            db.ref('privateLessons').on('value', snapshot => {
-                const allData = snapshot.val() || {};
-                for(let i=1; i<=daysInMonth; i++) {
-                    const dStr = String(i).padStart(2, '0');
-                    const fullDate = `${monthPrefix}-${dStr}`;
-                    const dayDiv = document.createElement('div');
-                    dayDiv.className = 'calendar-day';
-                    dayDiv.innerText = i;
-                    if(allData[fullDate]) {
-                        const hasFree = Object.values(allData[fullDate]).some(s => !s.isBooked);
-                        if(hasFree) dayDiv.classList.add('has-slots');
-                    }
-                    dayDiv.onclick = () => {
-                        document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
-                        dayDiv.classList.add('active');
-                        selectedDate = fullDate;
-                        loadSlots(fullDate);
-                    };
-                    grid.appendChild(dayDiv);
-                }
-            });
-        }
-
-        function loadSlots(date) {
-            const container = document.getElementById('slotsContainer');
-            container.innerHTML = 'Ładowanie...';
-            db.ref('privateLessons/' + date).get().then(snapshot => {
-                container.innerHTML = '';
-                const slots = snapshot.val();
-                if(!slots) return container.innerHTML = '<p style="grid-column:1/-1; font-size:0.8rem;">Brak wolnych terminów w tym dniu.</p>';
-                
-                const dateObj = new Date(date);
-                const options = { day: 'numeric', month: 'long', year: 'numeric' };
-                const formattedDate = dateObj.toLocaleDateString('pl-PL', options);
-                
-                const daysOfWeek = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
-                const dayName = daysOfWeek[dateObj.getDay()];
-
-                Object.keys(slots).forEach(id => {
-                    if(!slots[id].isBooked) {
-                        const btn = document.createElement('button');
-                        btn.innerText = slots[id].time;
-                        btn.onclick = () => {
-                            selectedSlotId = id;
-                            document.getElementById('selectedTermInfo').innerHTML = `
-                                <span style="display:block; font-size: 0.75rem; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Wybrany termin:</span>
-                                <div style="font-size: 1.1rem; font-weight: 600; line-height: 1.4;">
-                                    ${formattedDate} o <span style="color: #ffffff;">${slots[id].time}</span>
-                                </div>
-                                <div style="color: var(--text-dim); font-size: 0.85rem; margin-top: 4px;">(${dayName})</div>
-                            `;
-                            document.getElementById('bookingModal').classList.add('active');
-                        };
-                        container.appendChild(btn);
-                    }
-                });
-            });
-        }
-
-        function confirmBooking() {
-            const name = document.getElementById('plStudentName').value;
-            const phone = document.getElementById('plStudentPhone').value;
-            const danceType = document.getElementById('plDanceType').value;
-            
-            if(!name || phone.length < 11) return alert("Wpisz swoje dane oraz pełny numer telefonu!");
-            
-            db.ref(`privateLessons/${selectedDate}/${selectedSlotId}`).transaction(current => {
-                if(current && !current.isBooked) {
-                    current.isBooked = true;
-                    current.studentName = name;
-                    current.studentPhone = phone;
-                    current.danceType = danceType;
-                    return current;
-                }
-            }, (err, committed) => {
-                if(committed) {
-                    alert("Rezerwacja zakończona sukcesem! Lekcja zostanie potwierdzona wiadomością SMS.");
-                    location.reload();
-                } else {
-                    alert("Przepraszamy, ten termin został właśnie zajęty.");
-                }
-            });
-        }
-
-        function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); renderCalendar(); }
     </script>
 </body>
 </html>
