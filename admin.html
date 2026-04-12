@@ -96,9 +96,10 @@
         .logo .part1 { color: var(--primary); }
         .logo .part2 { color: var(--logo-second); }
 
-        /* Navigation */
+        /* Navigation - CENTERED */
         .nav-tabs {
             display: flex;
+            justify-content: center; /* Wyśrodkowanie przycisków */
             gap: 8px;
             background: var(--bg);
             padding: 5px;
@@ -209,6 +210,7 @@
             header { padding: 1rem; justify-content: center; text-align: center; }
             .card-header-flex { flex-direction: column; align-items: flex-start; }
             .card-header-flex .btn { width: 100%; }
+            .nav-tabs { justify-content: flex-start; } /* Na mobile zostawiamy przewijanie od lewej */
         }
 
         .promo-box {
@@ -368,19 +370,19 @@
                 </div>
 
                 <div class="promo-box" style="background: transparent; border: none; padding: 0; margin-bottom: 1.5rem;">
-                    <div class="settings-grid">
-                        <div class="form-group" style="margin-bottom: 10px;">
+                    <div class="settings-grid" style="align-items: flex-end;">
+                        <div class="form-group" style="margin-bottom: 0;">
                             <label>Cena promocyjna (PLN)</label>
                             <input id="set_promoPrice" type="number" placeholder="np. 150"/>
                         </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end; padding-bottom: 12px;">
+                        <div class="form-group" style="margin-bottom: 0; padding-bottom: 12px;">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="set_promoActive">
                                 <span style="color: var(--text-main);">Włącz cenę promocyjną</span>
                             </label>
                         </div>
                     </div>
-                    <small style="color: var(--text-muted); display: block; margin-top: 5px;">* Jeśli włączone, cena promocyjna będzie widoczna jako główna, a stara zostanie przekreślona.</small>
+                    <small style="color: var(--text-muted); display: block; margin-top: 10px;">* Jeśli włączone, cena promocyjna będzie widoczna jako główna, a stara zostanie przekreślona.</small>
                 </div>
 
                 <div class="form-group">

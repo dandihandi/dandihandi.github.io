@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warsztaty | Barbara Bogacka</title>
+    <title>Lekcje Prywatne | Barbara Bogacka</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -151,45 +151,34 @@
             flex: 1.2;
         }
 
-        .countdown-label {
+        .feature-label {
             display: block;
             font-size: 0.65rem;
             letter-spacing: 4px;
             text-transform: uppercase;
-            color: #ffffff;
-            margin-bottom: 25px;
+            color: var(--accent);
+            margin-bottom: 20px;
             font-weight: 700;
         }
 
-        .countdown-label span {
+        .priv-feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .priv-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .priv-feature-item i {
             color: var(--accent);
-        }
-
-        .countdown { 
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .timer-item { 
-            background: rgba(255,255,255,0.03);
-            padding: 20px 10px;
-            border-radius: 15px;
-            text-align: center; 
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .timer-item span { 
-            display: block; 
-            font-size: 1.8rem; 
-            font-weight: 600; 
-            color: #ffffff; 
-        }
-
-        .timer-item label { 
-            font-size: 0.6rem; 
-            color: var(--text-dim); 
-            text-transform: uppercase;
+            font-size: 0.9rem;
         }
 
         .event-title { 
@@ -229,9 +218,6 @@
 
         .info-box-new .value { font-size: 0.95rem; font-weight: 500; }
 
-        .price-old { text-decoration: line-through; opacity: 0.5; font-size: 0.8rem; margin-right: 5px; }
-        .price-promo { color: #fff; font-weight: 700; }
-
         .btn-main {
             display: block;
             background: var(--accent);
@@ -249,32 +235,6 @@
 
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212,175,55,0.3); }
 
-        /* POPRAWIONY PRZYCISK MAPY */
-        .btn-map {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.65rem;
-            color: var(--accent);
-            text-decoration: none;
-            margin-top: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border: 1px solid var(--accent);
-            padding: 8px 15px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            background: rgba(212, 175, 55, 0.05);
-            font-weight: 600;
-        }
-
-        .btn-map:hover {
-            background: var(--accent);
-            color: #000;
-        }
-
-        #noWorkshopArea { text-align: center; display: none; }
-
         footer {
             padding: 40px 20px;
             text-align: center;
@@ -291,8 +251,8 @@
         @media (max-width: 768px) {
             .workshop-layout { flex-direction: column; text-align: center; gap: 30px; }
             .workshop-timer-side { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-right: 0; padding-bottom: 30px; width: 100%; }
-            .countdown { grid-template-columns: repeat(4, 1fr); }
             .info-grid-new { text-align: left; }
+            .priv-feature-item { justify-content: center; }
         }
     </style>
 </head>
@@ -308,58 +268,49 @@
         <div class="tagline">Najlepsza tancerka w Polsce</div>
         
         <div class="nav-container">
-            <a href="index.html" class="btn-nav active">Warsztaty</a>
-            <a href="priv.html" class="btn-nav">Lekcje Prywatne</a>
+            <a href="index.html" class="btn-nav">Warsztaty</a>
+            <a href="priv.html" class="btn-nav active">Lekcje Prywatne</a>
             <a href="me.html" class="btn-nav">O Mnie</a>
         </div>
     </div>
 
     <div class="container">
-        <div class="card" id="workshopActiveArea">
+        <div class="card">
             <div class="workshop-layout">
                 
                 <div class="workshop-timer-side">
-                    <span class="countdown-label">Do <span>warsztatów</span> zostało:</span>
-                    <div class="countdown">
-                        <div class="timer-item"><span id="days">00</span><label>Dni</label></div>
-                        <div class="timer-item"><span id="hours">00</span><label>Godz</label></div>
-                        <div class="timer-item"><span id="mins">00</span><label>Min</label></div>
-                        <div class="timer-item"><span id="secs">00</span><label>Sek</label></div>
-                    </div>
+                    <span class="feature-label">Dlaczego <span>lekcja</span> prywatna?</span>
+                    <ul class="priv-feature-list">
+                        <li class="priv-feature-item"><i class="fas fa-check-circle"></i> Program pod Twoje cele</li>
+                        <li class="priv-feature-item"><i class="fas fa-check-circle"></i> Korekta techniki 1-na-1</li>
+                        <li class="priv-feature-item"><i class="fas fa-check-circle"></i> Praca nad stylem i flow</li>
+                        <li class="priv-feature-item"><i class="fas fa-check-circle"></i> Pełna uwaga instruktora</li>
+                    </ul>
                 </div>
 
                 <div class="workshop-info-side">
-                    <div class="event-title" id="mainTitle">...</div>
-                    <div class="description" id="mainDescription">Ładowanie szczegółów...</div>
+                    <div class="event-title">LEKCJA 1 NA 1</div>
+                    <div class="description">Idealne rozwiązanie, jeśli chcesz szybko poprawić technikę High Heels lub przygotować się do występu pod okiem profesjonalistki.</div>
 
                     <div class="info-grid-new">
                         <div class="info-box-new">
-                            <span class="label">Kiedy</span>
-                            <span class="value" id="mainDate">...</span>
+                            <span class="label">Czas trwania</span>
+                            <span class="value">60 minut</span>
                         </div>
                         <div class="info-box-new">
                             <span class="label">Cena</span>
-                            <span class="value" id="priceContainer">...</span>
+                            <span class="value">200 PLN</span>
                         </div>
                         <div class="info-box-new" style="grid-column: span 2;">
                             <span class="label">Lokalizacja</span>
-                            <span class="value" id="mainLoc">...</span>
-                            <a href="#" id="mainMap" target="_blank" class="btn-map">
-                                <i class="fas fa-map-marker-alt"></i> Zobacz trasę w Google Maps
-                            </a>
+                            <span class="value">Warszawa / Online</span>
                         </div>
                     </div>
 
-                    <a href="register.html" class="btn-main">Zarezerwuj swoje miejsce</a>
+                    <a href="register.html" class="btn-main">Umów na lekcję prywatną</a>
                 </div>
 
             </div>
-        </div>
-
-        <div class="card" id="noWorkshopArea">
-            <h2 style="color: #ffffff; text-transform: uppercase;">Aktualnie brak zaplanowanych warsztatów</h2>
-            <p style="color: var(--text-dim); margin-bottom: 30px;">Zapisz się na lekcję prywatną lub śledź social media!</p>
-            <a href="register.html" class="btn-main" style="max-width: 300px; margin: 0 auto;">Umów na lekcję prywatną</a>
         </div>
     </div>
 
@@ -371,61 +322,5 @@
         <div class="copyright">&copy; Barbara Bogacka 2026</div>
     </footer>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
-            authDomain: "bogacka-heels.firebaseapp.com",
-            databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "bogacka-heels",
-            storageBucket: "bogacka-heels.firebasestorage.app",
-            messagingSenderId: "825219158791",
-            appId: "1:825219158791:web:38acf635db61854739eba2"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        let targetTime = 0;
-
-        database.ref('settings').on('value', snapshot => {
-            const s = snapshot.val();
-            if(s) {
-                const active = s.workshopActive !== false; 
-                document.getElementById('workshopActiveArea').style.display = active ? 'block' : 'none';
-                document.getElementById('noWorkshopArea').style.display = active ? 'none' : 'block';
-
-                if(active) {
-                    document.getElementById('mainTitle').innerText = s.title || "";
-                    document.getElementById('mainLoc').innerText = s.location || "";
-                    document.getElementById('mainMap').href = s.mapUrl || "#";
-                    document.getElementById('mainDescription').innerText = s.description || "";
-                    
-                    const priceContainer = document.getElementById('priceContainer');
-                    if (s.promoActive && s.promoPrice) {
-                        priceContainer.innerHTML = `<span class="price-old">${s.price} PLN</span> <span class="price-promo">${s.promoPrice} PLN</span>`;
-                    } else {
-                        priceContainer.innerHTML = `<span>${s.price || "..."}</span> PLN`;
-                    }
-                    
-                    if(s.targetDate) {
-                        targetTime = new Date(s.targetDate).getTime();
-                        const d = new Date(s.targetDate);
-                        document.getElementById('mainDate').innerText = d.toLocaleDateString('pl-PL', {
-                            day: '2-digit', month: 'long', hour: '2-digit', minute: '2-digit'
-                        });
-                    }
-                }
-            }
-        });
-
-        setInterval(() => {
-            const now = new Date().getTime();
-            const diff = targetTime - now;
-            if (diff > 0) {
-                document.getElementById('days').innerText = Math.floor(diff / (1000*60*60*24)).toString().padStart(2, '0');
-                document.getElementById('hours').innerText = Math.floor((diff % (1000*60*60*24)) / (1000*60*60)).toString().padStart(2, '0');
-                document.getElementById('mins').innerText = Math.floor((diff % (1000*60*60)) / (1000*60)).toString().padStart(2, '0');
-                document.getElementById('secs').innerText = Math.floor((diff % (1000*60)) / 1000).toString().padStart(2, '0');
-            }
-        }, 1000);
-    </script>
 </body>
 </html>

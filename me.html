@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O mnie | Barbara Bogacka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { 
+            --accent: #d4af37; 
+            --bg: #0f0f0f; 
+            --card-bg: #1a1a1a;
+            --text: #ffffff; 
+            --text-dim: #a0a0a0;
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--bg);
+            color: var(--text); 
+            margin: 0; 
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% -20%, #2a2a2a 0%, #0a0a0a 100%);
+        }
+
+        .orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { top: -100px; left: -100px; }
+        .orb-2 { bottom: -100px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 50px); }
+        }
+
+        .hero { 
+            height: 35vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        h1 { 
+            font-size: 2.8rem; 
+            font-weight: 700;
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            color: var(--accent);
+            margin: 0; 
+        }
+
+        .tagline { 
+            font-size: 0.8rem; 
+            letter-spacing: 5px; 
+            color: var(--text); 
+            margin-top: 10px; 
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .nav-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            padding: 5px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex; 
+            gap: 30px;
+        }
+
+        .btn-nav { 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            padding: 12px 0;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .btn-nav.active, .btn-nav:hover { color: #fff; }
+        .btn-nav.active::after, .btn-nav:hover::after { 
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto 60px; 
+            padding: 0 20px; 
+            flex: 1;
+        }
+
+        .card {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .about-intro {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .about-photo {
+            flex: 0 0 260px;
+            max-width: 260px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.5),
+                0 0 20px rgba(212, 175, 55, 0.1);
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .about-photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: grayscale(20%);
+        }
+
+        .about-photo:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.6),
+                0 0 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .about-photo:hover img {
+            transform: scale(1.08);
+            filter: grayscale(0%);
+        }
+
+        .about-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        .about-text p {
+            margin: 0 0 20px 0;
+        }
+
+        .about-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-box {
+            background: rgba(255,255,255,0.03);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .feature-box:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .feature-box i {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-box h4 {
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        footer {
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: auto;
+        }
+
+        .social-links { display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; }
+        .social-item { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; transition: 0.3s; text-transform: uppercase; }
+        .social-item i { color: var(--accent); }
+        .copyright { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .nav-container { gap: 15px; padding: 5px 20px; }
+            .btn-nav { font-size: 0.65rem; }
+            .about-intro {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .about-photo {
+                margin-bottom: 25px;
+                flex: 0 0 auto;
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="hero">
+        <h1>Barbara Bogacka</h1>
+        <div class="tagline">Najlepsza tancerka w Polsce</div>
+        
+        <div class="nav-container">
+            <a href="index.html" class="btn-nav">Warsztaty</a>
+            <a href="priv.html" class="btn-nav">Lekcje Prywatne</a>
+            <a href="me.html" class="btn-nav active">O mnie</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card" id="about-section">
+            <div class="section-title">Poznajmy się</div>
+            
+            <div class="about-intro">
+                <div class="about-photo">
+                    <img src="https://i.ibb.co/6JgzJSMm/582329924-18490715878072484-3185753874435560784-n.jpg" alt="Barbara Bogacka">
+                </div>
+                <div class="about-text">
+                    <p>Jestem tancerką i instruktorką, która wierzy, że ruch jest najczystszą formą ekspresji. Moja podróż z tańcem zaczęła się od marzenia, a dziś dzielę się tą pasją z setkami kobiet w całej Polsce.</p>
+                    <p>Specjalizuję się w stylu High Heels, kładąc ogromny nacisk nie tylko na technikę, ale przede wszystkim na budowanie pewności siebie i odkrywanie własnej kobiecości. Na moich zajęciach tworzymy społeczność, która wspiera się na każdym kroku.</p>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-box">
+                    <i class="fas fa-gem"></i>
+                    <h4>Unikalny Styl</h4>
+                    <p>Łączę precyzję techniczną z emocjonalnym przekazem w każdej choreografii.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fas fa-users"></i>
+                    <h4>Energia</h4>
+                    <p>Warsztaty to nie tylko nauka, to wymiana niesamowitej energii i motywacji.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fas fa-trophy"></i>
+                    <h4>Doświadczenie</h4>
+                    <p>Lata spędzone na scenie i sali treningowej przekładam na jakość Twojej nauki.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.instagram.com/basia_bogacka/" target="_blank" class="social-item"><i class="fab fa-instagram"></i> @basia_bogacka</a>
+            <a href="https://www.facebook.com/basia.bogacka.566" target="_blank" class="social-item"><i class="fab fa-facebook-f"></i> Barbara Bogacka</a>
+        </div>
+        <div class="copyright">&copy; Barbara Bogacka 2026</div>
+    </footer>
+
+    <script>
+        // Skrypt przewijający do sekcji "Poznajmy się" na środek ekranu po załadowaniu
+        window.addEventListener('load', function() {
+            const section = document.getElementById('about-section');
+            section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+
+</body>
+</html>
