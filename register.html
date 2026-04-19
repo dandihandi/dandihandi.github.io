@@ -87,6 +87,7 @@
             margin-bottom: 25px;
             color: var(--text);
             font-weight: 600;
+            text-align: center;
         }
 
         .tabs-container { 
@@ -96,7 +97,8 @@
             margin-bottom: 35px; 
         }
         .tab-btn { 
-            flex: 1; 
+            flex: 1;
+            max-width: 200px; /* Dodano, by przyciski nie rozciągały się na całą szerokość */
             padding: 12px; 
             background: transparent; 
             border: 1px solid rgba(255,255,255,0.1); 
@@ -108,6 +110,7 @@
             font-size: 0.75rem;
             letter-spacing: 1px;
             transition: 0.3s;
+            text-align: center;
         }
         .tab-btn.active { 
             background: var(--accent); 
@@ -162,14 +165,6 @@
         .main-submit:hover { 
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
-        }
-
-        .info-note {
-            margin-top: 15px;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            text-align: center;
-            line-height: 1.4;
         }
 
         .conf-item {
@@ -231,15 +226,11 @@
             </div>
 
             <div id="workshopsSection">
-                <h2>Zapisz się na warsztaty</h2>
+                <h2>ZAPISZ SIĘ NA WARSZTATY</h2>
                 <form id="regForm">
                     <div class="form-group">
-                        <label class="form-label">Imię</label>
-                        <input id="fname" placeholder="np. Anna" required type="text"/>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nazwisko</label>
-                        <input id="lname" placeholder="np. Kowalska" required type="text"/>
+                        <label class="form-label">Imię i Nazwisko</label>
+                        <input id="fullName" placeholder="np. Anna Kowalska" required type="text"/>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Adres E-mail</label>
@@ -255,12 +246,12 @@
                         <label class="form-label">Skąd o nas wiesz?</label>
                         <input id="source" placeholder="np. Instagram, Facebook" required type="text"/>
                     </div>
-                    <button class="main-submit" type="submit">Potwierdź zgłoszenie</button>
+                    <button class="main-submit" type="submit">ZAPISZ SIĘ</button>
                 </form>
             </div>
 
             <div id="privatesSection" style="display: none;">
-                <h2>Zarezerwuj lekcję</h2>
+                <h2>ZAPISZ SIĘ NA LEKCJĘ PRYWATNĄ</h2>
                 <form id="privateForm">
                     <div class="form-group">
                         <label class="form-label">Imię i Nazwisko</label>
@@ -305,13 +296,13 @@
                         <label class="form-label">Wpisz godzinę</label>
                         <input id="plCustomHour" placeholder="np. 14:30 - 15:30" type="text"/>
                     </div>
-                    <button class="main-submit" type="submit">Wyślij zapytanie</button>
+                    <button class="main-submit" type="submit">ZAPISZ SIĘ</button>
                 </form>
             </div>
         </div>
 
         <div id="confirmationView" style="display: none;">
-            <h2 id="confTitle">Zgłoszenie wysłane!</h2>
+            <h2 id="confTitle">PODSUMOWANIE ZAPISU</h2>
             <div id="confSummary"></div>
             
             <div id="paymentInstructions" style="margin-top: 25px; text-align: center;"></div>
@@ -337,17 +328,20 @@
         let globalPrice = "...";
 
         function setupPhoneFormatting(id) {
-            document.getElementById(id).addEventListener('input', function (e) {
-                let value = e.target.value.replace(/\D/g, ''); 
-                if (value.length > 9) value = value.slice(0, 9);
-                let formattedValue = '';
-                if (value.length > 0) {
-                    formattedValue = value.substring(0, 3);
-                    if (value.length > 3) formattedValue += '-' + value.substring(3, 6);
-                    if (value.length > 6) formattedValue += '-' + value.substring(6, 9);
-                }
-                e.target.value = formattedValue;
-            });
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('input', function (e) {
+                    let value = e.target.value.replace(/\D/g, ''); 
+                    if (value.length > 9) value = value.slice(0, 9);
+                    let formattedValue = '';
+                    if (value.length > 0) {
+                        formattedValue = value.substring(0, 3);
+                        if (value.length > 3) formattedValue += '-' + value.substring(3, 6);
+                        if (value.length > 6) formattedValue += '-' + value.substring(6, 9);
+                    }
+                    e.target.value = formattedValue;
+                });
+            }
         }
         setupPhoneFormatting('plPhone');
 
@@ -358,6 +352,15 @@
         db.ref('settings').on('value', snapshot => {
             const s = snapshot.val();
             if(s) {
+                // LOGIKA UKRYWANIA I WYŚRODKOWANIA
+                const workshopTab = document.getElementById('tabWorkshops');
+                if(s.workshopActive === false) {
+                    workshopTab.style.display = 'none';
+                    switchTab('privates');
+                } else {
+                    workshopTab.style.display = 'block'; // Zmieniono na block, by trzymało styl flex item
+                }
+
                 const select = document.getElementById('event');
                 select.innerHTML = '<option value="" disabled selected>Wybierz event</option>';
                 (s.eventList || "").split(',').forEach(e => {
@@ -375,33 +378,34 @@
             const instructions = document.getElementById('paymentInstructions');
             summary.innerHTML = '';
 
+            document.getElementById('confTitle').innerText = "PODSUMOWANIE ZAPISU";
+
             if(type === 'workshop') {
-                document.getElementById('confTitle').innerText = "Potwierdzenie zapisu na warsztaty";
                 summary.innerHTML = `
-                    <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.firstName} ${data.lastName}</span></div>
+                    <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.fullName}</span></div>
                     <div class="conf-item"><span class="conf-label">Wydarzenie</span><span class="conf-value">${data.event}</span></div>
                     <div class="conf-item"><span class="conf-label">E-mail</span><span class="conf-value">${data.email}</span></div>
                     <div class="conf-item"><span class="conf-label">Data zapisu</span><span class="conf-value">${data.date}</span></div>
                 `;
                 instructions.innerHTML = `
                     <p style="font-size: 0.9rem; color: var(--text-dim);">Aby sfinalizować zapis, prosimy o płatność przez <strong>Revolut</strong>:</p>
-                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid var(--accent);">
                         <p style="margin: 0 0 10px 0;">Kwota: <strong style="color: var(--accent); font-size: 1.2rem;">${globalPrice}</strong> PLN</p>
                         <p style="margin: 0; font-size: 0.85rem;">Tytuł: <strong style="color: var(--text);">${data.email}</strong></p>
                         <a href="https://revolut.me/dandihandi" target="_blank" class="revolut-btn">Zapłać przez Revolut</a>
                     </div>
                 `;
             } else {
-                document.getElementById('confTitle').innerText = "Zapytanie o lekcję wysłane";
                 summary.innerHTML = `
                     <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.fullName}</span></div>
+                    <div class="conf-item"><span class="conf-label">Telefon</span><span class="conf-value">${data.phone}</span></div>
                     <div class="conf-item"><span class="conf-label">Rodzaj tańca</span><span class="conf-value">${data.danceType}</span></div>
                     <div class="conf-item"><span class="conf-label">Proponowany termin</span><span class="conf-value">${data.suggestedDates}</span></div>
                     <div class="conf-item"><span class="conf-label">Godzina</span><span class="conf-value">${data.suggestedHours}</span></div>
                 `;
                 instructions.innerHTML = `
                     <div style="background: rgba(212,175,55,0.1); padding: 20px; border-radius: 15px; border: 1px solid var(--accent);">
-                        <p style="margin: 0; font-size: 0.95rem; color: #fff;">Zapytanie zostało wysłane. Skontaktujemy się z Tobą w celu potwierdzenia terminu.</p>
+                        <p style="margin: 0; font-size: 0.95rem; color: #fff;">Dziękuję za zapisanie! Lekcja zostanie potwierdzona wiadomością SMS.</p>
                     </div>
                 `;
             }
@@ -410,8 +414,7 @@
         document.getElementById('regForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const newReg = {
-                firstName: document.getElementById('fname').value,
-                lastName: document.getElementById('lname').value,
+                fullName: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
                 event: document.getElementById('event').value,
                 source: document.getElementById('source').value,

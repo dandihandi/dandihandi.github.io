@@ -44,7 +44,6 @@
             overflow-x: hidden;
         }
 
-        /* STYLIZACJA IKONY KALENDARZA NA BIAŁO */
         input[type="datetime-local"]::-webkit-calendar-picker-indicator {
             filter: invert(1);
             cursor: pointer;
@@ -206,6 +205,10 @@
         th { background: var(--bg); padding: 16px; text-align: left; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
         td { padding: 16px; border-top: 1px solid var(--border); font-size: 0.9rem; }
 
+        .uppercase-table td {
+            text-transform: uppercase;
+        }
+
         .btn {
             padding: 10px 18px;
             border-radius: 10px;
@@ -217,6 +220,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            text-transform: uppercase;
         }
         .btn-primary { background: var(--primary); color: #000; }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
@@ -224,6 +228,14 @@
         .btn-outline:hover { background: var(--bg); }
         .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
         .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        
+        /* UJEDNOLICONA STYLIZACJA STATUSU */
+        .btn-status {
+            min-width: 120px;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+        }
 
         .settings-grid {
             display: grid;
@@ -247,14 +259,6 @@
             .card-header-flex { flex-direction: column; align-items: flex-start; }
             .card-header-flex .btn { width: 100%; }
             .nav-tabs { justify-content: flex-start; }
-        }
-
-        .promo-box {
-            background: var(--bg);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            margin-top: 10px;
         }
 
         .notif-wrapper {
@@ -293,6 +297,7 @@
             font-size: 0.85rem;
             cursor: pointer;
             transition: background 0.2s;
+            text-transform: uppercase;
         }
         .notif-item:hover { background: var(--bg); }
         .notif-item small { color: var(--text-muted); display: block; margin-top: 3px; }
@@ -315,7 +320,7 @@
             <span class="part1">BARBARA</span><span class="part2">BOGACKA</span>
             <br><span style="font-size: 0.8rem; color: white; opacity: 0.6; letter-spacing: 1px;">PANEL ADMINISTRATORA</span>
         </h2>
-        <input id="adminPass" placeholder="Wprowadź hasło" type="password" style="margin-bottom: 15px; text-align: center;"/>
+        <input id="adminPass" placeholder="WPROWADŹ HASŁO" type="password" style="margin-bottom: 15px; text-align: center; text-transform: uppercase;"/>
         <button class="btn btn-primary" onclick="checkPass()" style="width: 100%;">ZALOGUJ SIĘ</button>
     </div>
 </div>
@@ -328,7 +333,7 @@
                 <button class="btn btn-outline" onclick="toggleNotifications()">🔔</button>
                 <span class="notif-badge" id="notifBadge">0</span>
                 <div class="notif-dropdown" id="notifDropdown">
-                    <div class="notif-header">Nowe powiadomienia</div>
+                    <div class="notif-header">NOWE POWIADOMIENIA</div>
                     <div id="notifList"></div>
                 </div>
             </div>
@@ -348,9 +353,9 @@
             <div class="card">
                 <h2 style="margin-top:0">LISTA UCZESTNIKÓW WARSZTATÓW</h2>
                 <div class="table-responsive">
-                    <table>
+                    <table class="uppercase-table">
                         <thead>
-                            <tr><th>Data zapisu</th><th>Uczestnik</th><th>E-mail</th><th>Wydarzenie</th><th>Status</th><th>Akcje</th></tr>
+                            <tr><th>DATA ZAPISU</th><th>UCZESTNIK</th><th>E-MAIL</th><th>WYDARZENIE</th><th>STATUS</th><th>AKCJE</th></tr>
                         </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
@@ -360,11 +365,11 @@
 
         <section class="section" id="settingsTab">
             <div class="card" style="max-width: 800px; margin: 0 auto;">
-                <h2>KONFIGURACJA WARSZTATÓW</h2>
+                <h2 style="text-transform: uppercase;">Konfiguracja warsztatów</h2>
                 
                 <div style="margin-bottom: 25px;">
                     <label class="switch-wrapper" for="set_workshopActive">
-                        <span class="switch-label-text">Warsztaty aktywne (widoczne na stronie)</span>
+                        <span class="switch-label-text">WARSZTATY AKTYWNE</span>
                         <div class="switch">
                             <input type="checkbox" id="set_workshopActive">
                             <span class="slider"></span>
@@ -373,17 +378,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Nazwa Wydarzenia</label>
-                    <input id="set_title" type="text" placeholder="np. Heels Workshop Vol. 10"/>
+                    <label>NAZWA WYDARZENIA</label>
+                    <input id="set_title" type="text" placeholder="NP. HEELS WORKSHOP VOL. 10" style="text-transform: uppercase;"/>
                 </div>
                 
                 <div class="settings-grid">
                     <div class="form-group">
-                        <label>Cena Regularna (PLN)</label>
-                        <input id="set_price" type="number" placeholder="np. 200"/>
+                        <label>CENA REGULARNA (PLN)</label>
+                        <input id="set_price" type="number" placeholder="200"/>
                     </div>
                     <div class="form-group">
-                        <label>Data odliczania</label>
+                        <label>DATA ODLICZANIA</label>
                         <input id="set_targetDate" type="datetime-local"/>
                     </div>
                 </div>
@@ -391,12 +396,12 @@
                 <div class="promo-box" style="background: transparent; border: none; padding: 0; margin-bottom: 1.5rem;">
                     <div class="settings-grid" style="align-items: flex-end;">
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label>Cena promocyjna (PLN)</label>
-                            <input id="set_promoPrice" type="number" placeholder="np. 150"/>
+                            <label>CENA PROMOCYJNA (PLN)</label>
+                            <input id="set_promoPrice" type="number" placeholder="150"/>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
                             <label class="switch-wrapper" for="set_promoActive" style="height: 45px; margin-bottom: 0;">
-                                <span class="switch-label-text" style="font-size: 0.85rem;">Włącz cenę promocyjną</span>
+                                <span class="switch-label-text" style="font-size: 0.85rem;">WŁĄCZ CENĘ PROMOCYJNĄ</span>
                                 <div class="switch">
                                     <input type="checkbox" id="set_promoActive">
                                     <span class="slider"></span>
@@ -404,23 +409,23 @@
                             </label>
                         </div>
                     </div>
-                    <small style="color: var(--text-muted); display: block; margin-top: 10px;">* Jeśli włączone, cena promocyjna będzie widoczna jako główna, a stara zostanie przekreślona.</small>
+                    <small style="color: var(--text-muted); display: block; margin-top: 10px; text-transform: uppercase;">* JEŚLI WŁĄCZONE, CENA PROMOCYJNA BĘDZIE WIDOCZNA JAKO GŁÓWNA, A STARA ZOSTANIE PRZEKREŚLONA.</small>
                 </div>
 
                 <div class="form-group">
-                    <label>Opis / Treść sekcji</label>
-                    <textarea id="set_description" rows="5"></textarea>
+                    <label>OPIS / TREŚĆ SEKCJI</label>
+                    <textarea id="set_description" rows="5" style="text-transform: uppercase;"></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Lokalizacja</label>
-                    <input id="set_location" type="text" placeholder="Nazwa studia" style="margin-bottom: 20px;"/>
+                    <label>LOKALIZACJA</label>
+                    <input id="set_location" type="text" placeholder="NAZWA STUDIA" style="margin-bottom: 20px; text-transform: uppercase;"/>
                     
-                    <label>Link Google Maps</label>
-                    <input id="set_mapUrl" type="text" placeholder="Wklej link do mapy"/>
+                    <label>LINK GOOGLE MAPS</label>
+                    <input id="set_mapUrl" type="text" placeholder="WKLEJ LINK DO MAPY"/>
                 </div>
                 <div class="form-group">
-                    <label>Dostępne tury (oddzielone przecinkiem)</label>
-                    <textarea id="set_eventList" placeholder="10:00-12:00 - Grupa Początkująca, ..."></textarea>
+                    <label>DOSTĘPNE TURY (ODDZIELONE PRZECINKIEM)</label>
+                    <textarea id="set_eventList" placeholder="10:00-12:00 - GRUPA POCZĄTKUJĄCA, ..." style="text-transform: uppercase;"></textarea>
                 </div>
                 <button class="btn btn-primary" onclick="saveSettings()" style="width: 100%; padding: 15px;">ZAPISZ WSZYSTKIE ZMIANY</button>
             </div>
@@ -435,9 +440,9 @@
                     </button>
                 </div>
                 <div class="table-responsive">
-                    <table>
+                    <table class="uppercase-table">
                         <thead>
-                            <tr><th>Data zgłoszenia</th><th>Kursant</th><th>Rodzaj Tańca</th><th>Poziom</th><th>Sugerowany termin</th><th>Telefon</th><th>Status</th><th>Akcje</th></tr>
+                            <tr><th>DATA ZGŁOSZENIA</th><th>KURSANT</th><th>RODZAJ TAŃCA</th><th>POZIOM</th><th>SUGEROWANY TERMIN</th><th>TELEFON</th><th>STATUS</th><th>AKCJE</th></tr>
                         </thead>
                         <tbody id="lessonsInquiriesBody"></tbody>
                     </table>
@@ -466,7 +471,7 @@
             document.getElementById('adminContent').style.display = 'block';
             initPanel();
             initNotifications();
-        } else { alert('Błędne hasło!'); }
+        } else { alert('BŁĘDNE HASŁO!'); }
     }
 
     function toggleTheme() { document.body.classList.toggle('dark-mode'); }
@@ -506,7 +511,7 @@
                         timeEnd = endHour + minutes + "00";
                     }
 
-                    const summary = `${s.fullName} (${s.danceType || 'Lekcja'})`;
+                    const summary = `${(s.fullName || 'UCZESTNIK').toUpperCase()} (${(s.danceType || 'LEKCJA').toUpperCase()})`;
 
                     icsContent += "\r\nBEGIN:VEVENT";
                     icsContent += "\r\nUID:" + child.key + "@bbogacka";
@@ -514,7 +519,7 @@
                     icsContent += "\r\nDTSTART:" + dateClean + "T" + timeStart;
                     icsContent += "\r\nDTEND:" + dateClean + "T" + timeEnd;
                     icsContent += "\r\nSUMMARY:" + summary;
-                    icsContent += "\r\nDESCRIPTION:Kursant: " + s.fullName + "\\nPoziom: " + (s.level || 'Nie podano') + "\\nTel: " + (s.phone || 'Brak') + "\\nRodzaj: " + (s.danceType || 'Taniec');
+                    icsContent += "\r\nDESCRIPTION:KURSANT: " + (s.fullName || 'BRAK').toUpperCase() + "\\nPOZIOM: " + (s.level || 'NIE PODANO').toUpperCase() + "\\nTEL: " + (s.phone || 'BRAK') + "\\nRODZAJ: " + (s.danceType || 'TANIEC').toUpperCase();
                     icsContent += "\r\nEND:VEVENT";
                 }
             });
@@ -522,7 +527,7 @@
             icsContent += "\r\nEND:VCALENDAR";
             
             if (count === 0) {
-                alert("Brak potwierdzonych lekcji do wyeksportowania.");
+                alert("BRAK POTWIERDZONYCH LEKCJI DO WYEKSPORTOWANIA.");
                 return;
             }
 
@@ -534,7 +539,7 @@
             } else {
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'lekcje_bogacka.ics');
+                link.setAttribute('download', 'LEKCJE_BOGACKA.ics');
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -555,8 +560,8 @@
                     const d = child.val();
                     if(!d.paid) {
                         combined.push({
-                            title: `Nowy zapis: ${d.firstName} ${d.lastName}`,
-                            desc: `Warsztaty: ${d.event}`,
+                            title: `NOWY ZAPIS: ${d.fullName || (d.firstName + ' ' + d.lastName)}`,
+                            desc: `WARSZTATY: ${d.event}`,
                             tab: 'registrationsTab'
                         });
                     }
@@ -567,8 +572,8 @@
                         const s = child.val();
                         if(!s.confirmed) {
                             combined.push({
-                                title: `Nowe zapytanie o lekcję: ${s.fullName}`,
-                                desc: `${s.danceType} (${s.level || ''}) - Termin: ${s.suggestedDates}`,
+                                title: `NOWE ZAPYTANIE O LEKCJĘ: ${s.fullName}`,
+                                desc: `${s.danceType} (${s.level || ''}) - TERMIN: ${s.suggestedDates}`,
                                 tab: 'lessonsListTab'
                             });
                         }
@@ -590,7 +595,7 @@
                         });
                     } else {
                         badge.style.display = 'none';
-                        list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">Brak nowych powiadomień</div>';
+                        list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">BRAK NOWYCH POWIADOMIEŃ</div>';
                     }
                 });
             });
@@ -615,23 +620,29 @@
             const body = document.getElementById('tableBody'); body.innerHTML = '';
             snap.forEach(child => {
                 const d = child.val();
-                const statusBadge = d.paid ? '<span class="badge" style="color:var(--success)">Opłacone</span>' : '<span class="badge" style="color:var(--danger)">Nieopłacone</span>';
+                
+                const name = d.fullName ? d.fullName : (d.firstName + ' ' + d.lastName);
+                
                 const row = body.insertRow();
-                row.innerHTML = `<td>${d.date}</td><td><b>${d.firstName} ${d.lastName}</b></td><td>${d.email}</td><td>${d.event}</td>
-                <td><div style="cursor:pointer" onclick="togglePaid('${child.key}',${d.paid})">${statusBadge}</div></td>
-                <td><button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="deleteReg('${child.key}')">USUŃ</button></td>`;
+                row.innerHTML = `<td>${d.date}</td><td>${name}</td><td>${d.email}</td><td>${d.event}</td>
+                <td>
+                    <button class="btn btn-status ${d.paid ? 'btn-success' : 'btn-danger'}" onclick="togglePaid('${child.key}',${d.paid})">
+                        ${d.paid ? 'OPŁACONE' : 'NIEOPŁACONE'}
+                    </button>
+                </td>
+                <td><button id="del-reg-${child.key}" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="deleteReg('${child.key}')">USUŃ</button></td>`;
             });
         });
 
         db.ref('settings').on('value', snap => {
             const s = snap.val(); if(s) {
-                document.getElementById('set_title').value = s.title || '';
+                document.getElementById('set_title').value = (s.title || '').toUpperCase();
                 document.getElementById('set_targetDate').value = s.targetDate || '';
                 document.getElementById('set_price').value = s.price || '';
-                document.getElementById('set_location').value = s.location || '';
+                document.getElementById('set_location').value = (s.location || '').toUpperCase();
                 document.getElementById('set_mapUrl').value = s.mapUrl || '';
-                document.getElementById('set_eventList').value = s.eventList || '';
-                document.getElementById('set_description').value = s.description || '';
+                document.getElementById('set_eventList').value = (s.eventList || '').toUpperCase();
+                document.getElementById('set_description').value = (s.description || '').toUpperCase();
                 document.getElementById('set_promoPrice').value = s.promoPrice || '';
                 document.getElementById('set_promoActive').checked = s.promoActive || false;
                 document.getElementById('set_workshopActive').checked = s.workshopActive !== false;
@@ -646,18 +657,18 @@
                 const isConfirmed = s.confirmed || false;
                 row.innerHTML = `
                     <td>${s.dateAdded}</td>
-                    <td><b>${s.fullName}</b></td>
-                    <td><span class="badge" style="background:var(--bg); padding:4px 8px; border-radius:6px; font-size:0.75rem;">${s.danceType}</span></td>
-                    <td><span style="font-size:0.8rem; color:var(--text-muted)">${s.level || '-'}</span></td>
-                    <td>${s.suggestedDates}<br><small>Godz: ${s.suggestedHours}</small></td>
+                    <td>${s.fullName}</td>
+                    <td>${s.danceType}</td>
+                    <td>${s.level || '-'}</td>
+                    <td>${s.suggestedDates}<br><small style="color:var(--text-main)">GODZ: ${s.suggestedHours}</small></td>
                     <td>${s.phone}</td>
                     <td>
-                        <button class="btn ${isConfirmed ? 'btn-success' : 'btn-outline'}" style="padding: 5px 10px; font-size: 0.7rem;" onclick="toggleInquiryConfirm('${child.key}', ${isConfirmed})">
-                            ${isConfirmed ? 'POTWIERDZONE' : 'POTWIERDŹ'}
+                        <button class="btn btn-status ${isConfirmed ? 'btn-success' : 'btn-danger'}" onclick="toggleInquiryConfirm('${child.key}', ${isConfirmed})">
+                            ${isConfirmed ? 'POTWIERDZONE' : 'NIEPOTWIERDZONE'}
                         </button>
                     </td>
                     <td>
-                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="deleteInquiry('${child.key}')">USUŃ</button>
+                        <button id="del-inq-${child.key}" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.7rem;" onclick="deleteInquiry('${child.key}')">USUŃ</button>
                     </td>`;
             });
         });
@@ -665,24 +676,53 @@
 
     function saveSettings() {
         const data = {
-            title: document.getElementById('set_title').value,
+            title: document.getElementById('set_title').value.toUpperCase(),
             targetDate: document.getElementById('set_targetDate').value,
             price: document.getElementById('set_price').value,
             promoPrice: document.getElementById('set_promoPrice').value,
             promoActive: document.getElementById('set_promoActive').checked,
             workshopActive: document.getElementById('set_workshopActive').checked,
-            location: document.getElementById('set_location').value,
+            location: document.getElementById('set_location').value.toUpperCase(),
             mapUrl: document.getElementById('set_mapUrl').value,
-            eventList: document.getElementById('set_eventList').value,
-            description: document.getElementById('set_description').value
+            eventList: document.getElementById('set_eventList').value.toUpperCase(),
+            description: document.getElementById('set_description').value.toUpperCase()
         };
         db.ref('settings').set(data);
     }
 
     function togglePaid(key, s) { db.ref('registrations/'+key).update({paid: !s}); }
     function toggleInquiryConfirm(key, current) { db.ref('privateInquiries/'+key).update({confirmed: !current}); }
-    function deleteReg(key) { if(confirm('Usunąć ten zapis?')) db.ref('registrations/'+key).remove(); }
-    function deleteInquiry(key) { if(confirm('Usunąć to zapytanie?')) db.ref('privateInquiries/'+key).remove(); }
+    
+    const deleteStates = {
+        reg: {},
+        inq: {}
+    };
+
+    function deleteReg(key) { 
+        const btn = document.getElementById('del-reg-' + key);
+        if (!deleteStates.reg[key]) {
+            deleteStates.reg[key] = true;
+            btn.innerText = "NA PEWNO?";
+            btn.style.background = "var(--danger)";
+            btn.style.color = "white";
+        } else {
+            db.ref('registrations/'+key).remove(); 
+            delete deleteStates.reg[key];
+        }
+    }
+    
+    function deleteInquiry(key) { 
+        const btn = document.getElementById('del-inq-' + key);
+        if (!deleteStates.inq[key]) {
+            deleteStates.inq[key] = true;
+            btn.innerText = "NA PEWNO?";
+            btn.style.background = "var(--danger)";
+            btn.style.color = "white";
+        } else {
+            db.ref('privateInquiries/'+key).remove(); 
+            delete deleteStates.inq[key];
+        }
+    }
 </script>
 </body>
 </html>
