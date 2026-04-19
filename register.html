@@ -120,7 +120,7 @@
         .form-label {
             display: block;
             font-size: 0.65rem;
-            color: var(--accent);
+            color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 8px;
@@ -144,7 +144,7 @@
             background: rgba(0,0,0,0.4);
         }
 
-        button.main-submit { 
+        .main-submit { 
             width: 100%; 
             padding: 20px; 
             background: var(--accent); 
@@ -159,7 +159,7 @@
             transition: 0.3s;
             margin-top: 10px;
         }
-        button.main-submit:hover { 
+        .main-submit:hover { 
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
         }
@@ -172,21 +172,21 @@
             line-height: 1.4;
         }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal.active { display: flex; }
-        .modal-content { 
-            background: #1a1a1a; 
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 1px solid var(--accent); 
-            max-width: 400px; 
-            width: 90%; 
-            text-align: center;
+        .conf-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+        .conf-label { color: var(--accent); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        .conf-value { color: white; font-weight: 500; text-align: right; }
 
         .revolut-btn {
             display: inline-block;
-            margin-top: 15px;
+            margin-top: 10px;
             background: #ffffff;
             color: #000000;
             padding: 12px 25px;
@@ -197,6 +197,20 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: 0.3s;
+        }
+
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            .bg-glow, .back-link, .tabs-container, .main-submit, .revolut-btn { display: none !important; }
+            .card { 
+                box-shadow: none !important; 
+                border: 1px solid #ccc !important; 
+                background: white !important; 
+                color: black !important; 
+                margin: 0 auto !important; 
+            }
+            .conf-item { border: 1px solid #eee !important; background: transparent !important; }
+            .conf-label, .conf-value, h2 { color: black !important; }
         }
     </style>
 </head>
@@ -209,95 +223,101 @@
 
     <a class="back-link" href="index.html">← Wróć do strony głównej</a>
     
-    <div class="card">
-        <div class="tabs-container">
-            <button class="tab-btn active" id="tabWorkshops" onclick="switchTab('workshops')">Warsztaty</button>
-            <button class="tab-btn" id="tabPrivates" onclick="switchTab('privates')">Lekcje Prywatne</button>
-        </div>
-
-        <div id="workshopsSection">
-            <h2>Zapisz się na warsztaty</h2>
-            <form id="regForm">
-                <div class="form-group">
-                    <label class="form-label">Imię</label>
-                    <input id="fname" placeholder="np. Anna" required type="text"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Nazwisko</label>
-                    <input id="lname" placeholder="np. Kowalska" required type="text"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Adres E-mail</label>
-                    <input id="email" placeholder="email@przykład.pl" required type="email"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Wybierz wydarzenie</label>
-                    <select id="event" required>
-                        <option value="" disabled selected>Ładowanie list...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Skąd o nas wiesz?</label>
-                    <input id="source" placeholder="np. Instagram, Facebook" required type="text"/>
-                </div>
-                <button id="submitBtn" class="main-submit" type="submit">Potwierdź zgłoszenie</button>
-            </form>
-        </div>
-
-        <div id="privatesSection" style="display: none;">
-            <h2>Zarezerwuj lekcję</h2>
-            <form id="privateForm">
-                <div class="form-group">
-                    <label class="form-label">Imię i Nazwisko</label>
-                    <input id="plFullName" placeholder="np. Anna Kowalska" required type="text"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Numer telefonu</label>
-                    <input id="plPhone" placeholder="xxx-xxx-xxx" required type="tel" maxlength="11"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Wybierz rodzaj tańca</label>
-                    <select id="plDanceType" required>
-                        <option value="Bachata (150 zł)">Bachata (150 zł)</option>
-                        <option value="Salsa (150 zł)">Salsa (150 zł)</option>
-                        <option value="High Heels (150 zł)">High Heels (150 zł)</option>
-                        <option value="Taniec Towarzyski (150 zł)">Taniec Towarzyski (150 zł)</option>
-                        <option value="Pierwszy Taniec (150 zł)">Pierwszy Taniec (150 zł)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sugerowane terminy</label>
-                    <input id="plDates" placeholder="np. Przyszły wtorek lub 15.03" required type="text"/>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Sugerowane godziny</label>
-                    <select id="plHours" required onchange="toggleCustomHour(this.value)">
-                        <option value="po 16">Po 16:00</option>
-                        <option value="przed 16">Przed 16:00</option>
-                        <option value="obojętnie">Obojętnie</option>
-                        <option value="wpiszę własną">Chcę wpisać konkretną godzinę...</option>
-                    </select>
-                </div>
-                <div class="form-group" id="customHourGroup" style="display: none;">
-                    <label class="form-label">Wpisz godzinę</label>
-                    <input id="plCustomHour" placeholder="np. 14:30 - 15:30" type="text"/>
-                </div>
-                <button class="main-submit" type="submit">Wyślij zapytanie</button>
-                <p class="info-note">* Po wysłaniu zapytania, potwierdzenie terminu oraz szczegóły płatności zostaną wysłane <strong>wiadomością SMS</strong>.</p>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="paymentModal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent); font-family: 'Montserrat', sans-serif; font-size: 1.5rem;">Zgłoszenie wysłane!</h2>
-            <p style="font-size: 0.9rem; color: var(--text-dim);">Aby sfinalizować zapis, prosimy o płatność przez <strong>Revolut</strong>:</p>
-            <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);">
-                <p style="margin: 0 0 10px 0;">Kwota: <strong id="displayPrice" style="color: var(--accent); font-size: 1.2rem;">...</strong> PLN</p>
-                <p style="margin: 0; font-size: 0.85rem;">Tytuł: <strong id="userEmailConfirm" style="color: var(--text);"></strong></p>
-                <a href="https://revolut.me/dandihandi" target="_blank" class="revolut-btn">Zapłać przez Revolut</a>
+    <div class="card" id="formCard">
+        <div id="formView">
+            <div class="tabs-container">
+                <button class="tab-btn active" id="tabWorkshops" onclick="switchTab('workshops')">Warsztaty</button>
+                <button class="tab-btn" id="tabPrivates" onclick="switchTab('privates')">Lekcje Prywatne</button>
             </div>
-            <button class="main-submit" onclick="location.href='index.html'">Gotowe</button>
+
+            <div id="workshopsSection">
+                <h2>Zapisz się na warsztaty</h2>
+                <form id="regForm">
+                    <div class="form-group">
+                        <label class="form-label">Imię</label>
+                        <input id="fname" placeholder="np. Anna" required type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nazwisko</label>
+                        <input id="lname" placeholder="np. Kowalska" required type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Adres E-mail</label>
+                        <input id="email" placeholder="email@przykład.pl" required type="email"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Wybierz wydarzenie</label>
+                        <select id="event" required>
+                            <option value="" disabled selected>Ładowanie list...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Skąd o nas wiesz?</label>
+                        <input id="source" placeholder="np. Instagram, Facebook" required type="text"/>
+                    </div>
+                    <button class="main-submit" type="submit">Potwierdź zgłoszenie</button>
+                </form>
+            </div>
+
+            <div id="privatesSection" style="display: none;">
+                <h2>Zarezerwuj lekcję</h2>
+                <form id="privateForm">
+                    <div class="form-group">
+                        <label class="form-label">Imię i Nazwisko</label>
+                        <input id="plFullName" placeholder="np. Anna Kowalska" required type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Numer telefonu</label>
+                        <input id="plPhone" placeholder="xxx-xxx-xxx" required type="tel" maxlength="11"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Wybierz rodzaj tańca</label>
+                        <select id="plDanceType" required>
+                            <option value="Bachata (150 zł)">Bachata (150 zł)</option>
+                            <option value="Salsa (150 zł)">Salsa (150 zł)</option>
+                            <option value="High Heels (150 zł)">High Heels (150 zł)</option>
+                            <option value="Taniec Towarzyski (150 zł)">Taniec Towarzyski (150 zł)</option>
+                            <option value="Pierwszy Taniec (150 zł)">Pierwszy Taniec (150 zł)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Poziom zaawansowania</label>
+                        <select id="plLevel" required>
+                            <option value="od podstaw">Od podstaw</option>
+                            <option value="średnio zaawansowany">Średnio zaawansowany</option>
+                            <option value="zaawansowany">Zaawansowany</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sugerowane terminy</label>
+                        <input id="plDates" placeholder="np. Przyszły wtorek lub 15.03" required type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sugerowane godziny</label>
+                        <select id="plHours" required onchange="toggleCustomHour(this.value)">
+                            <option value="po 16">Po 16:00</option>
+                            <option value="przed 16">Przed 16:00</option>
+                            <option value="obojętnie">Obojętnie</option>
+                            <option value="wpiszę własną">Chcę wpisać konkretną godzinę...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customHourGroup" style="display: none;">
+                        <label class="form-label">Wpisz godzinę</label>
+                        <input id="plCustomHour" placeholder="np. 14:30 - 15:30" type="text"/>
+                    </div>
+                    <button class="main-submit" type="submit">Wyślij zapytanie</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="confirmationView" style="display: none;">
+            <h2 id="confTitle">Zgłoszenie wysłane!</h2>
+            <div id="confSummary"></div>
+            
+            <div id="paymentInstructions" style="margin-top: 25px; text-align: center;"></div>
+
+            <button class="main-submit" onclick="window.print()" style="margin-top: 20px; background: white; color: black;">Zapisz jako PDF / Drukuj</button>
+            <button class="main-submit" onclick="location.href='index.html'" style="background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1);">Wróć na stronę główną</button>
         </div>
     </div>
 
@@ -313,6 +333,8 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        let globalPrice = "...";
 
         function setupPhoneFormatting(id) {
             document.getElementById(id).addEventListener('input', function (e) {
@@ -341,25 +363,63 @@
                 (s.eventList || "").split(',').forEach(e => {
                     if(e.trim()) select.innerHTML += `<option value="${e.trim()}">${e.trim()}</option>`;
                 });
-                document.getElementById('displayPrice').innerText = s.price || "...";
+                globalPrice = s.price || "...";
             }
         });
 
+        function showConfirmation(type, data) {
+            document.getElementById('formView').style.display = 'none';
+            document.getElementById('confirmationView').style.display = 'block';
+            
+            const summary = document.getElementById('confSummary');
+            const instructions = document.getElementById('paymentInstructions');
+            summary.innerHTML = '';
+
+            if(type === 'workshop') {
+                document.getElementById('confTitle').innerText = "Potwierdzenie zapisu na warsztaty";
+                summary.innerHTML = `
+                    <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.firstName} ${data.lastName}</span></div>
+                    <div class="conf-item"><span class="conf-label">Wydarzenie</span><span class="conf-value">${data.event}</span></div>
+                    <div class="conf-item"><span class="conf-label">E-mail</span><span class="conf-value">${data.email}</span></div>
+                    <div class="conf-item"><span class="conf-label">Data zapisu</span><span class="conf-value">${data.date}</span></div>
+                `;
+                instructions.innerHTML = `
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">Aby sfinalizować zapis, prosimy o płatność przez <strong>Revolut</strong>:</p>
+                    <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);">
+                        <p style="margin: 0 0 10px 0;">Kwota: <strong style="color: var(--accent); font-size: 1.2rem;">${globalPrice}</strong> PLN</p>
+                        <p style="margin: 0; font-size: 0.85rem;">Tytuł: <strong style="color: var(--text);">${data.email}</strong></p>
+                        <a href="https://revolut.me/dandihandi" target="_blank" class="revolut-btn">Zapłać przez Revolut</a>
+                    </div>
+                `;
+            } else {
+                document.getElementById('confTitle').innerText = "Zapytanie o lekcję wysłane";
+                summary.innerHTML = `
+                    <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.fullName}</span></div>
+                    <div class="conf-item"><span class="conf-label">Rodzaj tańca</span><span class="conf-value">${data.danceType}</span></div>
+                    <div class="conf-item"><span class="conf-label">Proponowany termin</span><span class="conf-value">${data.suggestedDates}</span></div>
+                    <div class="conf-item"><span class="conf-label">Godzina</span><span class="conf-value">${data.suggestedHours}</span></div>
+                `;
+                instructions.innerHTML = `
+                    <div style="background: rgba(212,175,55,0.1); padding: 20px; border-radius: 15px; border: 1px solid var(--accent);">
+                        <p style="margin: 0; font-size: 0.95rem; color: #fff;">Zapytanie zostało wysłane. Skontaktujemy się z Tobą w celu potwierdzenia terminu.</p>
+                    </div>
+                `;
+            }
+        }
+
         document.getElementById('regForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const emailValue = document.getElementById('email').value;
             const newReg = {
                 firstName: document.getElementById('fname').value,
                 lastName: document.getElementById('lname').value,
-                email: emailValue,
+                email: document.getElementById('email').value,
                 event: document.getElementById('event').value,
                 source: document.getElementById('source').value,
                 date: new Date().toLocaleString('pl-PL'),
                 type: 'Workshop'
             };
             db.ref('registrations').push(newReg).then(() => {
-                document.getElementById('userEmailConfirm').innerText = emailValue;
-                document.getElementById('paymentModal').classList.add('active');
+                showConfirmation('workshop', newReg);
             });
         });
 
@@ -372,6 +432,7 @@
                 fullName: document.getElementById('plFullName').value,
                 phone: document.getElementById('plPhone').value,
                 danceType: document.getElementById('plDanceType').value,
+                level: document.getElementById('plLevel').value,
                 suggestedDates: document.getElementById('plDates').value,
                 suggestedHours: finalHours,
                 dateAdded: new Date().toLocaleString('pl-PL'),
@@ -379,8 +440,7 @@
             };
 
             db.ref('privateInquiries').push(inquiry).then(() => {
-                alert("Dziękujemy! Twoje zapytanie zostało wysłane. Potwierdzenie terminu otrzymasz od nas wiadomością SMS.");
-                location.href = 'index.html';
+                showConfirmation('private', inquiry);
             });
         });
 

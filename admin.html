@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        /* RESET I NAPRAWA WYMIARÓW */
         * {
             box-sizing: border-box; 
         }
@@ -45,7 +44,12 @@
             overflow-x: hidden;
         }
 
-        /* Login Screen */
+        /* STYLIZACJA IKONY KALENDARZA NA BIAŁO */
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
         .login-overlay {
             position: fixed;
             inset: 0;
@@ -69,7 +73,6 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        /* Layout */
         .admin-wrapper { display: none; }
         
         header {
@@ -96,10 +99,9 @@
         .logo .part1 { color: var(--primary); }
         .logo .part2 { color: var(--logo-second); }
 
-        /* Navigation - CENTERED */
         .nav-tabs {
             display: flex;
-            justify-content: center; /* Wyśrodkowanie przycisków */
+            justify-content: center;
             gap: 8px;
             background: var(--bg);
             padding: 5px;
@@ -127,7 +129,6 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
 
-        /* Sections & Cards */
         .section { display: none; animation: fadeIn 0.4s ease; }
         .section.active { display: block; }
 
@@ -142,7 +143,6 @@
             width: 100%;
         }
 
-        /* Form Elements */
         .form-group { margin-bottom: 1.5rem; width: 100%; }
         label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: block; }
         
@@ -159,7 +159,43 @@
         }
         input:focus { outline: none; border-color: var(--primary); }
 
-        /* Tables */
+        .switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .switch-wrapper:hover { border-color: var(--primary); }
+        .switch-label-text { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
         .table-responsive { 
             overflow-x: auto; 
             border-radius: 12px; 
@@ -210,7 +246,7 @@
             header { padding: 1rem; justify-content: center; text-align: center; }
             .card-header-flex { flex-direction: column; align-items: flex-start; }
             .card-header-flex .btn { width: 100%; }
-            .nav-tabs { justify-content: flex-start; } /* Na mobile zostawiamy przewijanie od lewej */
+            .nav-tabs { justify-content: flex-start; }
         }
 
         .promo-box {
@@ -220,27 +256,7 @@
             border: 1px solid var(--border);
             margin-top: 10px;
         }
-        .checkbox-label {
-            display: flex;
-            align-items: center; 
-            gap: 12px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            text-transform: none;
-            color: var(--text-main);
-            font-weight: 600;
-            user-select: none;
-            margin: 0; 
-        }
-        .checkbox-label input { 
-            width: 18px; 
-            height: 18px; 
-            margin: 0; 
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
 
-        /* POWIADOMIENIA */
         .notif-wrapper {
             position: relative;
             display: inline-block;
@@ -347,9 +363,12 @@
                 <h2>KONFIGURACJA WARSZTATÓW</h2>
                 
                 <div style="margin-bottom: 25px;">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="set_workshopActive">
-                        <span style="color: #ffffff; font-size: 1rem;">Warsztaty aktywne (widoczne na stronie)</span>
+                    <label class="switch-wrapper" for="set_workshopActive">
+                        <span class="switch-label-text">Warsztaty aktywne (widoczne na stronie)</span>
+                        <div class="switch">
+                            <input type="checkbox" id="set_workshopActive">
+                            <span class="slider"></span>
+                        </div>
                     </label>
                 </div>
 
@@ -375,10 +394,13 @@
                             <label>Cena promocyjna (PLN)</label>
                             <input id="set_promoPrice" type="number" placeholder="np. 150"/>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0; padding-bottom: 12px;">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="set_promoActive">
-                                <span style="color: var(--text-main);">Włącz cenę promocyjną</span>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="switch-wrapper" for="set_promoActive" style="height: 45px; margin-bottom: 0;">
+                                <span class="switch-label-text" style="font-size: 0.85rem;">Włącz cenę promocyjną</span>
+                                <div class="switch">
+                                    <input type="checkbox" id="set_promoActive">
+                                    <span class="slider"></span>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -415,7 +437,7 @@
                 <div class="table-responsive">
                     <table>
                         <thead>
-                            <tr><th>Data zgłoszenia</th><th>Kursant</th><th>Rodzaj Tańca</th><th>Sugerowany termin</th><th>Telefon</th><th>Status</th><th>Akcje</th></tr>
+                            <tr><th>Data zgłoszenia</th><th>Kursant</th><th>Rodzaj Tańca</th><th>Poziom</th><th>Sugerowany termin</th><th>Telefon</th><th>Status</th><th>Akcje</th></tr>
                         </thead>
                         <tbody id="lessonsInquiriesBody"></tbody>
                     </table>
@@ -492,7 +514,7 @@
                     icsContent += "\r\nDTSTART:" + dateClean + "T" + timeStart;
                     icsContent += "\r\nDTEND:" + dateClean + "T" + timeEnd;
                     icsContent += "\r\nSUMMARY:" + summary;
-                    icsContent += "\r\nDESCRIPTION:Kursant: " + s.fullName + "\\nTel: " + (s.phone || 'Brak') + "\\nRodzaj: " + (s.danceType || 'Taniec');
+                    icsContent += "\r\nDESCRIPTION:Kursant: " + s.fullName + "\\nPoziom: " + (s.level || 'Nie podano') + "\\nTel: " + (s.phone || 'Brak') + "\\nRodzaj: " + (s.danceType || 'Taniec');
                     icsContent += "\r\nEND:VEVENT";
                 }
             });
@@ -546,7 +568,7 @@
                         if(!s.confirmed) {
                             combined.push({
                                 title: `Nowe zapytanie o lekcję: ${s.fullName}`,
-                                desc: `${s.danceType} - Termin: ${s.suggestedDates}`,
+                                desc: `${s.danceType} (${s.level || ''}) - Termin: ${s.suggestedDates}`,
                                 tab: 'lessonsListTab'
                             });
                         }
@@ -626,6 +648,7 @@
                     <td>${s.dateAdded}</td>
                     <td><b>${s.fullName}</b></td>
                     <td><span class="badge" style="background:var(--bg); padding:4px 8px; border-radius:6px; font-size:0.75rem;">${s.danceType}</span></td>
+                    <td><span style="font-size:0.8rem; color:var(--text-muted)">${s.level || '-'}</span></td>
                     <td>${s.suggestedDates}<br><small>Godz: ${s.suggestedHours}</small></td>
                     <td>${s.phone}</td>
                     <td>
