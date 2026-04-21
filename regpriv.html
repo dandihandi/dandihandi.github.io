@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Zapisy | Barbara Bogacka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        :root { 
+            --accent: #d4af37; 
+            --bg: #0f0f0f; 
+            --card-bg: rgba(26, 26, 26, 0.8); 
+            --text: #ffffff; 
+            --text-dim: #a0a0a0;
+        }
+
+        body { 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--bg);
+            color: var(--text); 
+            margin: 0; 
+            padding: 40px 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% -20%, #2a2a2a 0%, #0a0a0a 100%);
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { top: -100px; left: -100px; }
+        .orb-2 { bottom: -100px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 50px); }
+        }
+
+        .back-link { 
+            display: inline-block; 
+            margin-bottom: 30px; 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            position: relative;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .card { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: var(--card-bg); 
+            backdrop-filter: blur(10px); 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--text);
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-label {
+            display: block;
+            font-size: 0.65rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 15px; 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            color: white; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0,0,0,0.4);
+        }
+
+        .main-submit { 
+            width: 100%; 
+            padding: 20px; 
+            background: var(--accent); 
+            color: black; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .main-submit:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .conf-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .conf-label { color: var(--accent); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+        .conf-value { color: white; font-weight: 500; text-align: right; }
+
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            .bg-glow, .back-link, .main-submit { display: none !important; }
+            .card { 
+                box-shadow: none !important; 
+                border: 1px solid #ccc !important; 
+                background: white !important; 
+                color: black !important; 
+                margin: 0 auto !important; 
+            }
+            .conf-item { border: 1px solid #eee !important; background: transparent !important; }
+            .conf-label, .conf-value, h2 { color: black !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <a class="back-link" href="index.html">← Wróć do strony głównej</a>
+    
+    <div class="card" id="formCard">
+        <div id="formView">
+            <div id="privatesSection">
+                <h2>ZAPISZ SIĘ NA LEKCJĘ PRYWATNĄ</h2>
+                <form id="privateForm">
+                    <div class="form-group">
+                        <label class="form-label">Imię i Nazwisko</label>
+                        <input id="plFullName" placeholder="np. Anna Kowalska" required type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Numer telefonu</label>
+                        <input id="plPhone" placeholder="xxx-xxx-xxx" required type="tel" maxlength="11"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Wybierz rodzaj tańca</label>
+                        <select id="plDanceType" required>
+                            <option value="Bachata (150 zł)">Bachata (150 zł)</option>
+                            <option value="Salsa (150 zł)">Salsa (150 zł)</option>
+                            <option value="High Heels (150 zł)">High Heels (150 zł)</option>
+                            <option value="Taniec Towarzyski (150 zł)">Taniec Towarzyski (150 zł)</option>
+                            <option value="Pierwszy Taniec (150 zł)">Pierwszy Taniec (150 zł)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Poziom zaawansowania</label>
+                        <select id="plLevel" required>
+                            <option value="od podstaw">Od podstaw</option>
+                            <option value="średnio zaawansowany">Średnio zaawansowany</option>
+                            <option value="zaawansowany">Zaawansowany</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sugerowane terminy</label>
+                        <input id="plDates" placeholder="np. Przyszły wtorek lub 15.03" required type="text"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sugerowane godziny</label>
+                        <select id="plHours" required onchange="toggleCustomHour(this.value)">
+                            <option value="po 16">Po 16:00</option>
+                            <option value="przed 16">Przed 16:00</option>
+                            <option value="obojętnie">Obojętnie</option>
+                            <option value="wpiszę własną">Chcę wpisać konkretną godzinę...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customHourGroup" style="display: none;">
+                        <label class="form-label">Wpisz godzinę</label>
+                        <input id="plCustomHour" placeholder="np. 14:30 - 15:30" type="text"/>
+                    </div>
+                    <button class="main-submit" type="submit">ZAPISZ SIĘ</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="confirmationView" style="display: none;">
+            <h2 id="confTitle">PODSUMOWANIE ZAPISU</h2>
+            <div id="confSummary"></div>
+            
+            <div id="paymentInstructions" style="margin-top: 25px; text-align: center;"></div>
+
+            <button class="main-submit" onclick="window.print()" style="margin-top: 20px; background: white; color: black;">Zapisz jako PDF / Drukuj</button>
+            <button class="main-submit" onclick="location.href='index.html'" style="background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1);">Wróć na stronę główną</button>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
+            authDomain: "bogacka-heels.firebaseapp.com",
+            databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bogacka-heels",
+            storageBucket: "bogacka-heels.firebasestorage.app",
+            messagingSenderId: "825219158791",
+            appId: "1:825219158791:web:38acf635db61854739eba2"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function setupPhoneFormatting(id) {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('input', function (e) {
+                    let value = e.target.value.replace(/\D/g, ''); 
+                    if (value.length > 9) value = value.slice(0, 9);
+                    let formattedValue = '';
+                    if (value.length > 0) {
+                        formattedValue = value.substring(0, 3);
+                        if (value.length > 3) formattedValue += '-' + value.substring(3, 6);
+                        if (value.length > 6) formattedValue += '-' + value.substring(6, 9);
+                    }
+                    e.target.value = formattedValue;
+                });
+            }
+        }
+        setupPhoneFormatting('plPhone');
+
+        function toggleCustomHour(val) {
+            document.getElementById('customHourGroup').style.display = val === 'wpiszę własną' ? 'block' : 'none';
+        }
+
+        function showConfirmation(data) {
+            document.getElementById('formView').style.display = 'none';
+            document.getElementById('confirmationView').style.display = 'block';
+            
+            const summary = document.getElementById('confSummary');
+            const instructions = document.getElementById('paymentInstructions');
+            summary.innerHTML = '';
+
+            summary.innerHTML = `
+                <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.fullName}</span></div>
+                <div class="conf-item"><span class="conf-label">Telefon</span><span class="conf-value">${data.phone}</span></div>
+                <div class="conf-item"><span class="conf-label">Rodzaj tańca</span><span class="conf-value">${data.danceType}</span></div>
+                <div class="conf-item"><span class="conf-label">Proponowany termin</span><span class="conf-value">${data.suggestedDates}</span></div>
+                <div class="conf-item"><span class="conf-label">Godzina</span><span class="conf-value">${data.suggestedHours}</span></div>
+            `;
+            instructions.innerHTML = `
+                <div style="background: rgba(212,175,55,0.1); padding: 20px; border-radius: 15px; border: 1px solid var(--accent);">
+                    <p style="margin: 0; font-size: 0.95rem; color: #fff;">Dziękuję za zapisanie! Lekcja zostanie potwierdzona wiadomością SMS.</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('privateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const hoursVal = document.getElementById('plHours').value;
+            const finalHours = hoursVal === 'wpiszę własną' ? document.getElementById('plCustomHour').value : hoursVal;
+
+            const inquiry = {
+                fullName: document.getElementById('plFullName').value,
+                phone: document.getElementById('plPhone').value,
+                danceType: document.getElementById('plDanceType').value,
+                level: document.getElementById('plLevel').value,
+                suggestedDates: document.getElementById('plDates').value,
+                suggestedHours: finalHours,
+                dateAdded: new Date().toLocaleString('pl-PL'),
+                type: 'Private Lesson Inquiry'
+            };
+
+            db.ref('privateInquiries').push(inquiry).then(() => {
+                showConfirmation(inquiry);
+            });
+        });
+    </script>
+</body>
+</html>
