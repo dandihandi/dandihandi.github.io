@@ -387,7 +387,7 @@
                 <div class="table-responsive">
                     <table class="uppercase-table">
                         <thead>
-                            <tr><th>DATA ZGŁOSZENIA</th><th>KURSANT</th><th>RODZAJ TAŃCA</th><th>POZIOM</th><th>SUGEROWANY TERMIN</th><th>TELEFON</th><th>STATUS</th><th>AKCJE</th></tr>
+                            <tr><th>DATA ZGŁOSZENIA</th><th>KURSANT</th><th>RODZAJ TAŃCA</th><th>POZIOM / PIOSENKA</th><th>SUGEROWANY TERMIN</th><th>TELEFON</th><th>STATUS</th><th>AKCJE</th></tr>
                         </thead>
                         <tbody id="lessonsInquiriesBody"></tbody>
                     </table>
@@ -628,6 +628,14 @@
         }
     }
 
+    function formatSongValue(value) {
+        const safeValue = String(value || '-');
+        const isLink = /^https?:\/\//i.test(safeValue);
+        return isLink
+            ? `<a href="${safeValue}" target="_blank" rel="noopener" style="color:var(--primary);text-transform:none;overflow-wrap:anywhere;">Otwórz link do piosenki</a>`
+            : safeValue;
+    }
+
     function initPanel() {
         db.ref('registrations').on('value', snap => {
             const body = document.getElementById('tableBody'); body.innerHTML = '';
@@ -679,7 +687,7 @@
                     <td>${s.dateAdded}</td>
                     <td>${s.fullName}</td>
                     <td>${s.danceType}</td>
-                    <td>${s.level || '-'}</td>
+                    <td>${s.danceType && s.danceType.startsWith('Pierwszy Taniec') ? formatSongValue(s.song || s.songTitle || s.songLink || '-') : (s.level || '-')}</td>
                     <td>${s.suggestedDates}<br><small style="color:var(--text-main)">GODZ: ${s.suggestedHours}</small></td>
                     <td>${s.phone}</td>
                     <td>

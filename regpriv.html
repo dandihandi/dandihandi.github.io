@@ -297,7 +297,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Wybierz rodzaj tańca</label>
-                        <select id="plDanceType" required>
+                        <select id="plDanceType" required onchange="toggleFirstDanceFields()">
                             <option value="Bachata (150 zł)">Bachata (150 zł)</option>
                             <option value="Salsa (150 zł)">Salsa (150 zł)</option>
                             <option value="High Heels (150 zł)">High Heels (150 zł)</option>
@@ -305,7 +305,7 @@
                             <option value="Pierwszy Taniec (150 zł)">Pierwszy Taniec (150 zł)</option>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="levelGroup">
                         <label class="form-label">Poziom zaawansowania</label>
                         <select id="plLevel" required>
                             <option value="od podstaw">Od podstaw</option>
@@ -313,22 +313,17 @@
                             <option value="zaawansowany">Zaawansowany</option>
                         </select>
                     </div>
+                    <div id="firstDanceSongGroup" class="form-group" style="display: none;">
+                        <label class="form-label">Piosenka do pierwszego tańca</label>
+                        <input id="plSong" placeholder="Wpisz tytuł piosenki albo wklej link" type="text"/>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Sugerowane terminy</label>
                         <input id="plDates" placeholder="np. Przyszły wtorek lub 15.03" required type="text"/>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Sugerowane godziny</label>
-                        <select id="plHours" required onchange="toggleCustomHour(this.value)">
-                            <option value="po 16">Po 16:00</option>
-                            <option value="przed 16">Przed 16:00</option>
-                            <option value="obojętnie">Obojętnie</option>
-                            <option value="wpiszę własną">Chcę wpisać konkretną godzinę...</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="customHourGroup" style="display: none;">
-                        <label class="form-label">Wpisz godzinę</label>
-                        <input id="plCustomHour" placeholder="np. 14:30 - 15:30" type="text"/>
+                        <input id="plHours" placeholder="np. 14:30–15:30 lub po 18:00" required type="text"/>
                     </div>
                     <button class="main-submit" type="submit">ZAPISZ SIĘ</button>
                 </form>
@@ -386,9 +381,14 @@
         }
         setupPhoneFormatting('plPhone');
 
-        function toggleCustomHour(val) {
-            document.getElementById('customHourGroup').style.display = val === 'wpiszę własną' ? 'block' : 'none';
+        function toggleFirstDanceFields() {
+            const isFirstDance = document.getElementById('plDanceType').value.startsWith('Pierwszy Taniec');
+            document.getElementById('levelGroup').style.display = isFirstDance ? 'none' : 'block';
+            document.getElementById('plLevel').required = !isFirstDance;
+            document.getElementById('firstDanceSongGroup').style.display = isFirstDance ? 'block' : 'none';
         }
+
+        toggleFirstDanceFields();
 
         function showConfirmation(data) {
             document.getElementById('formView').style.display = 'none';
@@ -402,6 +402,7 @@
                 <div class="conf-item"><span class="conf-label">Osoba</span><span class="conf-value">${data.fullName}</span></div>
                 <div class="conf-item"><span class="conf-label">Telefon</span><span class="conf-value">${data.phone}</span></div>
                 <div class="conf-item"><span class="conf-label">Rodzaj tańca</span><span class="conf-value">${data.danceType}</span></div>
+                ${data.song ? `<div class="conf-item"><span class="conf-label">Piosenka</span><span class="conf-value">${data.song}</span></div>` : ''}
                 <div class="conf-item"><span class="conf-label">Proponowany termin</span><span class="conf-value">${data.suggestedDates}</span></div>
                 <div class="conf-item"><span class="conf-label">Godzina</span><span class="conf-value">${data.suggestedHours}</span></div>
             `;
@@ -414,16 +415,23 @@
 
         document.getElementById('privateForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const hoursVal = document.getElementById('plHours').value;
-            const finalHours = hoursVal === 'wpiszę własną' ? document.getElementById('plCustomHour').value : hoursVal;
+            const danceType = document.getElementById('plDanceType').value;
+            const isFirstDance = danceType.startsWith('Pierwszy Taniec');
+            const song = document.getElementById('plSong').value.trim();
+
+            if (isFirstDance && !song) {
+                alert('Wpisz tytuł piosenki albo wklej link do utworu.');
+                return;
+            }
 
             const inquiry = {
                 fullName: document.getElementById('plFullName').value,
                 phone: document.getElementById('plPhone').value,
-                danceType: document.getElementById('plDanceType').value,
-                level: document.getElementById('plLevel').value,
+                danceType: danceType,
+                level: isFirstDance ? '' : document.getElementById('plLevel').value,
+                song: isFirstDance ? song : '',
                 suggestedDates: document.getElementById('plDates').value,
-                suggestedHours: finalHours,
+                suggestedHours: document.getElementById('plHours').value.trim(),
                 dateAdded: new Date().toLocaleString('pl-PL'),
                 type: 'Private Lesson Inquiry'
             };
