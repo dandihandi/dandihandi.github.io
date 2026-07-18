@@ -351,182 +351,9 @@ footer {
             .info-grid-new { text-align: left; }
         }
 
-        /* PATCH NOTES MODAL */
-        .patch-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: rgba(0,0,0,0.78);
-            backdrop-filter: blur(12px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: patchFade .3s ease;
-        }
-
-        .patch-overlay.show { display: flex; }
-
-        .patch-modal {
-            width: min(620px, 100%);
-            max-height: 88vh;
-            overflow-y: auto;
-            background: linear-gradient(155deg, #202020 0%, #111 100%);
-            border: 1px solid rgba(212,175,55,0.35);
-            border-radius: 24px;
-            box-shadow: 0 35px 100px rgba(0,0,0,0.65);
-            padding: 34px;
-            position: relative;
-            animation: patchPop .35s cubic-bezier(.2,.8,.2,1);
-        }
-
-        .patch-badge {
-            display: inline-flex;
-            padding: 7px 11px;
-            border-radius: 999px;
-            background: rgba(212,175,55,0.12);
-            color: var(--accent);
-            font-size: .68rem;
-            font-weight: 700;
-            letter-spacing: 1.8px;
-            text-transform: uppercase;
-        }
-
-        .patch-title {
-            margin: 18px 0 5px;
-            font-size: clamp(1.7rem, 5vw, 2.5rem);
-            line-height: 1.1;
-            text-transform: uppercase;
-        }
-
-        .patch-version {
-            color: var(--accent);
-            font-weight: 700;
-            letter-spacing: 2px;
-            font-size: .8rem;
-            text-transform: uppercase;
-        }
-
-        .patch-changes {
-            margin: 25px 0;
-            padding: 0;
-            list-style: none;
-        }
-
-        .patch-changes li {
-            position: relative;
-            padding: 12px 12px 12px 38px;
-            margin-bottom: 9px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.035);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: #ddd;
-            font-size: .9rem;
-        }
-
-        .patch-changes li::before {
-            content: "✓";
-            position: absolute;
-            left: 14px;
-            top: 11px;
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .patch-footer {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding-top: 18px;
-            border-top: 1px solid rgba(255,255,255,.08);
-            color: var(--text-dim);
-            font-size: .72rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .patch-confirm {
-            width: 100%;
-            border: 0;
-            margin-top: 24px;
-            padding: 16px;
-            border-radius: 12px;
-            background: var(--accent);
-            color: #000;
-            font: inherit;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: .25s;
-        }
-
-        .patch-confirm:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(212,175,55,.22);
-        }
-
-        @keyframes patchFade {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes patchPop {
-            from { opacity: 0; transform: translateY(20px) scale(.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @media (max-width: 560px) {
-            .patch-modal { padding: 24px 18px; border-radius: 18px; }
-        }
-
-
-        .plain-message-text {
-            margin: 24px 0;
-            white-space: pre-wrap;
-            color: #ddd;
-            line-height: 1.8;
-            font-size: .95rem;
-        }
-
     </style>
 </head>
 <body>
-
-    <div class="patch-overlay" id="announcementOverlay" role="dialog" aria-modal="true" aria-labelledby="announcementModalTitle">
-        <div class="patch-modal">
-            <span class="patch-badge">Komunikat</span>
-            <h2 class="patch-title" id="announcementModalTitle">Informacja</h2>
-            <div class="plain-message-text" id="announcementModalText"></div>
-            <div class="patch-footer">
-                <span></span>
-                <span id="announcementModalAuthor"></span>
-            </div>
-            <button class="patch-confirm" id="announcementConfirmBtn" type="button">Rozumiem</button>
-        </div>
-    </div>
-
-
-    <div class="patch-overlay" id="patchOverlay" role="dialog" aria-modal="true" aria-labelledby="patchModalTitle">
-        <div class="patch-modal">
-            <span class="patch-badge">Nowa aktualizacja</span>
-            <h2 class="patch-title" id="patchModalTitle">Aktualizacja strony</h2>
-            <div class="patch-version" id="patchModalVersion">Wersja —</div>
-
-            <ul class="patch-changes" id="patchModalChanges"></ul>
-
-            <div class="patch-footer">
-                <span id="patchModalDate">Data: —</span>
-                <span id="patchModalAuthor">—</span>
-            </div>
-
-            <button class="patch-confirm" id="patchConfirmBtn" type="button">
-                Rozumiem
-            </button>
-        </div>
-    </div>
-
 
     <div class="bg-glow">
         <div class="orb orb-1"></div>
@@ -580,7 +407,7 @@ footer {
                         </div>
                     </div>
 
-                    <a href="register.html" class="btn-main">Zarezerwuj swoje miejsce</a>
+                    <a href="regclass.html" class="btn-main">Zarezerwuj swoje miejsce</a>
                 </div>
 
             </div>
@@ -589,7 +416,7 @@ footer {
         <div class="card" id="noWorkshopArea" style="display:none;">
             <h2 style="color: #ffffff; text-transform: uppercase;">Aktualnie brak zaplanowanych warsztatów</h2>
             <p style="color: var(--text-dim); margin-bottom: 30px;">Zapisz się na lekcję prywatną lub śledź social media!</p>
-            <a href="register.html" class="btn-main" style="max-width: 300px; margin: 0 auto;">Umów się na lekcję prywatną</a>
+            <a href="regpriv.html" class="btn-main" style="max-width: 300px; margin: 0 auto;">Umów się na lekcję prywatną</a>
         </div>
     </div>
 
@@ -646,106 +473,6 @@ footer {
                 }
             }
         });
-
-
-        function openPatchNotes(patch) {
-            const version = String(patch.version || '').trim();
-            if (!version || patch.enabled !== true) return;
-
-            const storageKey = 'patchSeenVersion';
-            if (localStorage.getItem(storageKey) === version) return;
-
-            document.getElementById('patchModalTitle').innerText =
-                patch.title || 'Aktualizacja strony';
-            document.getElementById('patchModalVersion').innerText =
-                'Wersja ' + version;
-            document.getElementById('patchModalDate').innerText =
-                'Data: ' + (patch.date || '—');
-            document.getElementById('patchModalAuthor').innerText =
-                patch.author ? '— ' + patch.author : '';
-
-            const list = document.getElementById('patchModalChanges');
-            list.innerHTML = '';
-
-            let changes = patch.changes || [];
-            if (!Array.isArray(changes)) {
-                changes = String(changes)
-                    .split('\n')
-                    .map(item => item.trim())
-                    .filter(Boolean);
-            }
-
-            changes.forEach(change => {
-                const li = document.createElement('li');
-                li.textContent = change;
-                list.appendChild(li);
-            });
-
-            const overlay = document.getElementById('patchOverlay');
-            const confirmBtn = document.getElementById('patchConfirmBtn');
-
-            overlay.classList.add('show');
-            document.body.style.overflow = 'hidden';
-            confirmBtn.focus();
-
-            confirmBtn.onclick = () => {
-                localStorage.setItem(storageKey, version);
-                overlay.classList.remove('show');
-                document.body.style.overflow = '';
-            };
-        }
-
-        
-        function openAnnouncement(announcement, onClose) {
-            const id = String(announcement.id || '').trim();
-            if (!id || announcement.enabled !== true) {
-                onClose();
-                return;
-            }
-
-            const storageKey = 'announcementSeenId';
-            if (localStorage.getItem(storageKey) === id) {
-                onClose();
-                return;
-            }
-
-            document.getElementById('announcementModalTitle').innerText =
-                announcement.title || 'Informacja';
-            document.getElementById('announcementModalText').innerText =
-                announcement.text || '';
-            document.getElementById('announcementModalAuthor').innerText =
-                announcement.author ? '— ' + announcement.author : '';
-
-            const overlay = document.getElementById('announcementOverlay');
-            const btn = document.getElementById('announcementConfirmBtn');
-
-            overlay.classList.add('show');
-            document.body.style.overflow = 'hidden';
-
-            btn.onclick = () => {
-                localStorage.setItem(storageKey, id);
-                overlay.classList.remove('show');
-                document.body.style.overflow = '';
-                onClose();
-            };
-        }
-
-        function loadMessages() {
-            Promise.all([
-                database.ref('announcement').once('value'),
-                database.ref('patchNotes').once('value')
-            ]).then(([announcementSnap, patchSnap]) => {
-                const announcement = announcementSnap.val();
-                const patch = patchSnap.val();
-
-                openAnnouncement(announcement || {}, () => {
-                    if (patch) openPatchNotes(patch);
-                });
-            }).catch(error => console.error('Błąd odczytu komunikatów:', error));
-        }
-
-        loadMessages();
-
 
 
         setInterval(() => {
