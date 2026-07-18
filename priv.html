@@ -234,19 +234,75 @@
         }
 
         .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212,175,55,0.3); }
-
-        footer {
-            padding: 40px 20px;
+footer {
+            padding: 26px 20px 22px;
             text-align: center;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(
+                180deg,
+                rgba(0, 0, 0, 0.16) 0%,
+                rgba(0, 0, 0, 0.34) 100%
+            );
+            border-top: 1px solid rgba(212, 175, 55, 0.12);
             margin-top: auto;
         }
 
-        .social-links { display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; }
-        .social-item { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; transition: 0.3s; text-transform: uppercase; }
-        .social-item i { color: var(--accent); }
-        .copyright { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 22px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .social-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.74rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            transition: color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .social-item i {
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+
+        .social-item:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-2px);
+        }
+
+        .copyright {
+            font-size: 0.66rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            opacity: 0.58;
+        }
+
+        @media (max-width: 560px) {
+            footer {
+                padding: 22px 16px 18px;
+            }
+
+            .social-links {
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .social-item {
+                font-size: 0.68rem;
+                padding: 6px 8px;
+            }
+        }
 
         @media (max-width: 768px) {
             .workshop-layout { flex-direction: column; text-align: center; gap: 30px; }
@@ -307,7 +363,7 @@
                         </div>
                     </div>
 
-                    <a href="regpriv.html" class="btn-main">Zapisz się na lekcję prywatną</a>
+                    <a href="register.html" class="btn-main">Umów się na lekcję prywatną</a>
                 </div>
 
             </div>
@@ -316,7 +372,7 @@
 
     <footer>
         <div class="social-links">
-            <a href="https://www.instagram.com/basia_bogacka/" target="_blank" class="social-item"><i class="fab fa-instagram"></i> @basia_bogacka</a>
+            <a href="https://www.instagram.com/basia_bogacka/" target="_blank" class="social-item"><i class="fab fa-instagram"></i> basia_bogacka</a>
             <a href="https://www.facebook.com/basia.bogacka.566" target="_blank" class="social-item"><i class="fab fa-facebook-f"></i> Barbara Bogacka</a>
         </div>
         <div class="copyright">&copy; Barbara Bogacka 2026</div>
