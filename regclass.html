@@ -165,18 +165,126 @@
             transition: 0.3s;
         }
 
+
+        .print-document-header,
+        .print-document-note { display: none; }
+
         @media print {
-            body { background: white !important; padding: 0 !important; }
-            .bg-glow, .back-link, .main-submit, .revolut-btn { display: none !important; }
-            .card { 
-                box-shadow: none !important; 
-                border: 1px solid #ccc !important; 
-                background: white !important; 
-                color: black !important; 
-                margin: 0 auto !important; 
+            @page { size: A4; margin: 22mm 20mm; }
+
+            html, body {
+                background: #fff !important;
+                color: #000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                min-height: auto !important;
             }
-            .conf-item { border: 1px solid #eee !important; background: transparent !important; }
-            .conf-label, .conf-value, h2 { color: black !important; }
+
+            body * { visibility: hidden !important; }
+            #confirmationView,
+            #confirmationView * { visibility: visible !important; }
+
+            #confirmationView {
+                display: block !important;
+                position: absolute !important;
+                inset: 0 auto auto 0 !important;
+                width: 100% !important;
+                color: #000 !important;
+                background: #fff !important;
+                font-family: Arial, Helvetica, sans-serif !important;
+            }
+
+            .bg-glow, .back-link, .main-submit, #paymentInstructions, #confTitle {
+                display: none !important;
+            }
+
+            .card {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                background: #fff !important;
+            }
+
+            .print-document-header {
+                display: block !important;
+                margin: 0 0 26px 0 !important;
+                padding: 0 0 18px 0 !important;
+                border-bottom: 1.5px solid #000 !important;
+                text-align: center !important;
+            }
+
+            .print-document-header h1 {
+                margin: 0 0 8px 0 !important;
+                font-size: 20pt !important;
+                line-height: 1.2 !important;
+                font-weight: 700 !important;
+                letter-spacing: 1.2px !important;
+                color: #000 !important;
+            }
+
+            .print-document-header p {
+                margin: 0 !important;
+                font-size: 9.5pt !important;
+                color: #000 !important;
+            }
+
+            #confSummary {
+                border-top: 1px solid #000 !important;
+            }
+
+            .conf-item {
+                display: grid !important;
+                grid-template-columns: 42% 58% !important;
+                gap: 12px !important;
+                align-items: start !important;
+                margin: 0 !important;
+                padding: 12px 10px !important;
+                border: 0 !important;
+                border-bottom: 1px solid #bdbdbd !important;
+                border-radius: 0 !important;
+                background: #fff !important;
+                page-break-inside: avoid !important;
+            }
+
+            .conf-label {
+                color: #000 !important;
+                font-size: 9pt !important;
+                line-height: 1.4 !important;
+                font-weight: 700 !important;
+                letter-spacing: 0 !important;
+                text-transform: none !important;
+            }
+
+            .conf-value {
+                color: #000 !important;
+                font-size: 10pt !important;
+                line-height: 1.4 !important;
+                font-weight: 400 !important;
+                text-align: left !important;
+                overflow-wrap: anywhere !important;
+            }
+
+            .print-document-note {
+                display: block !important;
+                margin-top: 30px !important;
+                padding-top: 16px !important;
+                border-top: 1px solid #000 !important;
+                font-size: 9.5pt !important;
+                line-height: 1.55 !important;
+                color: #000 !important;
+                text-align: left !important;
+            }
+
+            .print-document-note strong {
+                display: block !important;
+                margin-bottom: 6px !important;
+                color: #000 !important;
+            }
         }
     </style>
 </head>
@@ -218,10 +326,19 @@
         </div>
 
         <div id="confirmationView" style="display: none;">
+            <div class="print-document-header">
+                <h1>POTWIERDZENIE ZAPISU</h1>
+                <p>Barbara Bogacka — zajęcia taneczne</p>
+            </div>
             <h2 id="confTitle">PODSUMOWANIE ZAPISU</h2>
             <div id="confSummary"></div>
             
             <div id="paymentInstructions" style="margin-top: 25px; text-align: center;"></div>
+
+            <div class="print-document-note">
+                <strong>Informacja</strong>
+                Zgłoszenie zostało przyjęte. Rezerwacja miejsca zostanie potwierdzona po zaksięgowaniu wymaganej płatności.
+            </div>
 
             <button class="main-submit" onclick="window.print()" style="margin-top: 20px; background: white; color: black;">Zapisz jako PDF / Drukuj</button>
             <button class="main-submit" onclick="location.href='index.html'" style="background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1);">Wróć na stronę główną</button>
