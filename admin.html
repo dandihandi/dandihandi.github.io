@@ -177,6 +177,10 @@
         td { padding:14px; border-bottom:1px solid var(--border); font-size:.82rem; vertical-align:middle; line-height:1.45; }
         tbody tr:last-child td { border-bottom:0; }
         tbody tr:hover td { background:color-mix(in srgb,var(--primary-soft) 52%,transparent); }
+        tbody tr.confirmed-row td { background:transparent; border-top:1px solid var(--success); border-bottom:1px solid var(--success); }
+        tbody tr.confirmed-row td:first-child { border-left:1px solid var(--success); }
+        tbody tr.confirmed-row td:last-child { border-right:1px solid var(--success); }
+        tbody tr.confirmed-row:hover td { background:color-mix(in srgb,var(--primary-soft) 52%,transparent); }
         .uppercase-table td { text-transform:none; }
         .empty-state { padding:40px 18px; text-align:center; color:var(--text-muted); }
 
@@ -521,34 +525,22 @@
         });
     }
 
+    const notificationStorageKey = 'adminReadNotifications';
+
+    function getReadNotifications() {
+        try { return JSON.parse(localStorage.getItem(notificationStorageKey) || '{}'); }
+        catch (_) { return {}; }
+    }
+
+    function markNotificationAsRead(id) {
+        const read = getReadNotifications();
+        read[id] = Date.now();
+        localStorage.setItem(notificationStorageKey, JSON.stringify(read));
+    }
+
     function initNotifications() {
         const list = document.getElementById('notifList');
         const badge = document.getElementById('notifBadge');
-        const storageKey = 'adminReadNotifications';
-
-        const getReadNotifications = () => {
-            try { return JSON.parse(localStorage.getItem(storageKey) || '{}'); }
-            catch (_) { return {}; }
-        };
-
-        const markNotificationAsRead = (id) => {
-            const read = getReadNotifications();
-            read[id] = Date.now();
-            localStorage.setItem(storageKey, JSON.stringify(read));
-        };
-
-        const cleanOldReadNotifications = (activeIds) => {
-            const read = getReadNotifications();
-            let changed = false;
-            Object.keys(read).forEach(id => {
-                if (!activeIds.has(id)) {
-                    delete read[id];
-                    changed = true;
-                }
-            });
-            if (changed) localStorage.setItem(storageKey, JSON.stringify(read));
-        };
-
         const fetchAndRender = () => {
             let combined = [];
             db.ref('registrations').once('value', regSnap => {
@@ -577,7 +569,6 @@
                         }
                     });
 
-                    cleanOldReadNotifications(new Set(combined.map(n => n.id)));
                     const read = getReadNotifications();
                     const unread = combined.filter(n => !read[n.id]);
 
@@ -648,6 +639,7 @@
                 const name = d.fullName ? d.fullName : (d.firstName + ' ' + d.lastName);
                 
                 const row = body.insertRow();
+                if (d.paid) row.classList.add('confirmed-row');
                 row.innerHTML = `<td>${d.date}</td><td>${name}</td><td>${d.email}</td><td>${d.event}</td>
                 <td>
                     <button class="btn btn-status ${d.paid ? 'btn-success' : 'btn-danger'}" onclick="togglePaid('${child.key}',${d.paid})">
@@ -682,6 +674,7 @@
                 const s = child.val();
                 const row = body.insertRow();
                 const isConfirmed = s.confirmed || false;
+                if (isConfirmed) row.classList.add('confirmed-row');
                 row.innerHTML = `
                     <td>${s.dateAdded}</td>
                     <td>${s.fullName}</td>
@@ -718,8 +711,17 @@
         db.ref('settings').set(data).then(() => showToast('Ustawienia zostały zapisane.')).catch(() => showToast('Nie udało się zapisać ustawień.', 'error')); 
     }
 
-    function togglePaid(key, s) { db.ref('registrations/'+key).update({paid: !s}); }
-    function toggleInquiryConfirm(key, current) { db.ref('privateInquiries/'+key).update({confirmed: !current}); }
+    function togglePaid(key, current) {
+        const next = !current;
+        if (next) markNotificationAsRead(`registration:${key}`);
+        db.ref('registrations/' + key).update({ paid: next });
+    }
+
+    function toggleInquiryConfirm(key, current) {
+        const next = !current;
+        if (next) markNotificationAsRead(`inquiry:${key}`);
+        db.ref('privateInquiries/' + key).update({ confirmed: next });
+    }
     
     const deleteStates = {
         reg: {},
