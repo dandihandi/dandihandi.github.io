@@ -527,17 +527,17 @@ footer {
             history.scrollRestoration = 'manual';
         }
 
-        // Od razu po wejściu ustaw sekcję „Poznaj mnie” na środku ekranu.
+        document.documentElement.style.visibility = 'hidden';
+
         window.addEventListener('load', () => {
             const firstSection = document.getElementById('poznaj-mnie');
-            if (!firstSection) return;
-
-            requestAnimationFrame(() => {
+            if (firstSection) {
                 firstSection.scrollIntoView({
-                    behavior: 'auto',
+                    behavior: 'instant',
                     block: 'center'
                 });
-            });
+            }
+            document.documentElement.style.visibility = 'visible';
         });
 
         const cards = document.querySelectorAll('.reveal-card');
