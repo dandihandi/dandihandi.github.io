@@ -5,20 +5,20 @@
 
     "settings": {
       ".read": true,
-      ".write": "auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02'"
+      ".write": "auth != null && auth.uid === 'b868iDEprMMT0oCLQJzvJpuPxs63'"
     },
 
     "registrations": {
-      ".read": "auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02'",
+      ".read": "auth != null && auth.uid === 'b868iDEprMMT0oCLQJzvJpuPxs63'",
       "$registrationId": {
-        ".write": "(auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02') || (!data.exists() && newData.exists())"
+        ".write": "(auth != null && auth.uid === 'b868iDEprMMT0oCLQJzvJpuPxs63') || (!data.exists() && newData.exists())"
       }
     },
 
     "privateInquiries": {
-      ".read": "auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02'",
+      ".read": "auth != null && auth.uid === 'b868iDEprMMT0oCLQJzvJpuPxs63'",
       "$inquiryId": {
-        ".write": "(auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02') || (!data.exists() && newData.exists())"
+        ".write": "(auth != null && auth.uid === 'b868iDEprMMT0oCLQJzvJpuPxs63') || (!data.exists() && newData.exists())"
       }
     }
   }
