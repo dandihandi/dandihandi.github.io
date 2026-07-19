@@ -1,0 +1,25 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "settings": {
+      ".read": true,
+      ".write": "auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02'"
+    },
+
+    "registrations": {
+      ".read": "auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02'",
+      "$registrationId": {
+        ".write": "(auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02') || (!data.exists() && newData.exists())"
+      }
+    },
+
+    "privateInquiries": {
+      ".read": "auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02'",
+      "$inquiryId": {
+        ".write": "(auth != null && auth.uid === 'wqdnya9MBBW6u3KjzXxwLRragn02') || (!data.exists() && newData.exists())"
+      }
+    }
+  }
+}

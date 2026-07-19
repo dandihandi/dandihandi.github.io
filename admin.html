@@ -6,6 +6,7 @@
     <title>Admin | Barbara Bogacka</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet"/>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -252,7 +253,8 @@
         </h2>
         <div class="login-kicker" style="margin-bottom:18px;">Panel administratora</div>
         
-        <input id="adminPass" placeholder="Wprowadź hasło" type="password" style="margin-bottom: 14px; text-align:center;" onkeydown="if(event.key==='Enter') checkPass()"/>
+        <input id="adminEmail" placeholder="E-mail administratora" type="email" autocomplete="username" style="margin-bottom: 10px; text-align:center;"/>
+        <input id="adminPass" placeholder="Hasło" type="password" autocomplete="current-password" style="margin-bottom: 14px; text-align:center;" onkeydown="if(event.key==='Enter') checkPass()"/>
         <label for="rememberLogin" style="display:flex; align-items:center; justify-content:center; gap:10px; margin:0 0 16px; color:#c6ced9; font-size:.82rem; text-transform:none; letter-spacing:0; cursor:pointer;">
             <input id="rememberLogin" type="checkbox" style="width:18px; min-height:18px; margin:0; accent-color:var(--primary);"/>
             Zapamiętaj logowanie na tym urządzeniu
@@ -412,32 +414,56 @@
         appId: "1:825219158791:web:38acf635db61854739eba2"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.database();
+    let panelInitialized = false;
 
-    function checkPass() {
-        if(document.getElementById('adminPass').value === '123') {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('adminContent').style.display = 'block';
+    async function checkPass() {
+        const email = document.getElementById('adminEmail').value.trim();
+        const password = document.getElementById('adminPass').value;
+        const rememberLogin = document.getElementById('rememberLogin').checked;
 
-            const rememberLogin = document.getElementById('rememberLogin').checked;
-            if (rememberLogin) {
-                localStorage.setItem('adminLoggedIn', '1');
-                sessionStorage.removeItem('adminLoggedIn');
-            } else {
-                sessionStorage.setItem('adminLoggedIn', '1');
-                localStorage.removeItem('adminLoggedIn');
-            }
+        if (!email || !password) {
+            showToast('Podaj e-mail i hasło.', 'error');
+            return;
+        }
 
+        try {
+            await auth.setPersistence(
+                rememberLogin
+                    ? firebase.auth.Auth.Persistence.LOCAL
+                    : firebase.auth.Auth.Persistence.SESSION
+            );
+            await auth.signInWithEmailAndPassword(email, password);
+            document.getElementById('adminPass').value = '';
+        } catch (error) {
+            console.error('Błąd logowania:', error.code);
+            showToast('Nieprawidłowy e-mail lub hasło.', 'error');
+        }
+    }
+
+    function openAdminPanel() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('adminContent').style.display = 'block';
+        if (!panelInitialized) {
+            panelInitialized = true;
             initPanel();
             initNotifications();
-        } else { alert('BŁĘDNE HASŁO!'); }
+        }
+    }
+
+    function closeAdminPanel() {
+        document.getElementById('loginOverlay').style.display = 'grid';
+        document.getElementById('adminContent').style.display = 'none';
     }
 
     function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('adminTheme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); }
-    function logout() {
-        sessionStorage.removeItem('adminLoggedIn');
-        localStorage.removeItem('adminLoggedIn');
-        location.reload();
+    async function logout() {
+        try {
+            await auth.signOut();
+        } finally {
+            location.reload();
+        }
     }
 
     const tabMeta = {
@@ -754,13 +780,18 @@
     
     window.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('adminTheme') === 'light') document.body.classList.remove('dark-mode');
-        if (sessionStorage.getItem('adminLoggedIn') === '1' || localStorage.getItem('adminLoggedIn') === '1') {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('adminContent').style.display = 'block';
-            initPanel(); initNotifications();
-            const savedTab = localStorage.getItem('adminTab');
-            if (savedTab && document.getElementById(savedTab)) showTab(savedTab, document.getElementById('tab-' + savedTab));
-        }
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                openAdminPanel();
+                const savedTab = localStorage.getItem('adminTab');
+                if (savedTab && document.getElementById(savedTab)) {
+                    showTab(savedTab, document.getElementById('tab-' + savedTab));
+                }
+            } else {
+                closeAdminPanel();
+            }
+        });
     });
 
     function deleteInquiry(key) { 
