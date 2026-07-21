@@ -157,6 +157,37 @@
         body.dark-mode { --calendar-filter:invert(1); }
         .helper { display:block; margin-top:8px; color:var(--text-muted); font-size:.76rem; line-height:1.45; }
 
+        .class-place-list { display:grid; gap:14px; margin-top:14px; }
+        .class-place-row {
+            position:relative;
+            padding:18px;
+            background:var(--surface-2);
+            border:1px solid var(--border);
+            border-radius:15px;
+        }
+        .class-place-number {
+            margin:0 0 14px;
+            color:var(--primary);
+            font-size:.72rem;
+            font-weight:800;
+            letter-spacing:.1em;
+            text-transform:uppercase;
+        }
+        .class-place-grid {
+            display:grid;
+            grid-template-columns:repeat(2,minmax(0,1fr));
+            gap:14px;
+        }
+        .class-place-grid .form-group { margin-bottom:0; }
+        .class-place-actions {
+            display:flex;
+            justify-content:flex-end;
+            margin-top:14px;
+        }
+        @media (max-width:700px) {
+            .class-place-grid { grid-template-columns:1fr; }
+        }
+
         .switch-wrapper {
             display:flex; align-items:center; justify-content:space-between; gap:18px;
             min-height:56px; padding:13px 15px; margin-bottom:10px;
@@ -297,6 +328,7 @@
             <button class="tab-btn active" id="tab-registrationsTab" onclick="showTab('registrationsTab', this)">WARSZTATY ZAPISY</button>
             <button class="tab-btn" id="tab-lessonsListTab" onclick="showTab('lessonsListTab', this)">PRIVY ZAPISY</button>
             <button class="tab-btn" id="tab-settingsTab" onclick="showTab('settingsTab', this)">USTAWIENIA WARSZTATÓW</button>
+            <button class="tab-btn" id="tab-classesSettingsTab" onclick="showTab('classesSettingsTab', this)">USTAWIENIA ZAJĘĆ</button>
             <button class="tab-btn" id="tab-backupTab" onclick="showTab('backupTab', this)">BACKUP OSÓB</button>
         </nav>
 
@@ -379,6 +411,39 @@
                     <textarea id="set_eventList" placeholder="10:00-12:00 - GRUPA POCZĄTKUJĄCA, ..." style="text-transform: uppercase;"></textarea>
                 </div>
                 <div class="save-bar"><button class="btn btn-primary" onclick="saveSettings()">Zapisz wszystkie zmiany</button></div>
+            </div>
+        </section>
+
+
+        <section class="section" id="classesSettingsTab">
+            <div class="card" style="max-width: 920px; margin: 0 auto;">
+                <div class="card-header-flex">
+                    <div>
+                        <h3 class="card-title">Konfiguracja strony „Moje zajęcia”</h3>
+                        <p class="card-subtitle">Dodawaj miejsca za pomocą osobnych rubryk. Strona „Moje zajęcia” jest zawsze widoczna.</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>NAGŁÓWEK SEKCJI</label>
+                    <input id="classes_title" type="text" placeholder="MOJE ZAJĘCIA">
+                </div>
+
+                <div class="form-group">
+                    <label>KRÓTKI OPIS</label>
+                    <textarea id="classes_description" placeholder="Miejsca, w których aktualnie prowadzę regularne zajęcia."></textarea>
+                </div>
+
+                <div class="section-label">MIEJSCA PROWADZENIA ZAJĘĆ</div>
+                <div id="classPlacesList" class="class-place-list"></div>
+
+                <button class="btn btn-outline" type="button" onclick="addClassPlace()" style="width:100%;margin-top:14px;">
+                    + Dodaj kolejne miejsce
+                </button>
+
+                <div class="save-bar">
+                    <button class="btn btn-primary" onclick="saveClassesSettings()">Zapisz ustawienia zajęć</button>
+                </div>
             </div>
         </section>
 
@@ -513,6 +578,7 @@
         registrationsTab: ['WARSZTATY ZAPISY', 'Przeglądaj uczestników i aktualizuj status płatności.'],
         settingsTab: ['USTAWIENIA WARSZTATÓW', 'Edytuj ofertę, ceny, lokalizację i dostępne terminy.'],
         lessonsListTab: ['PRIVY ZAPISY', 'Zarządzaj zapytaniami, potwierdzeniami i eksportem do kalendarza.'],
+        classesSettingsTab: ['USTAWIENIA ZAJĘĆ', 'Edytuj zawartość strony „Moje zajęcia” i aktualny grafik.'],
         backupTab: ['BACKUP OSÓB', 'Twórz, eksportuj i czyść kopie danych uczestników.']
     };
 
@@ -779,6 +845,32 @@
             }
         });
 
+
+        db.ref('classesSettings').on('value', snap => {
+            const s = snap.val() || {};
+            document.getElementById('classes_title').value = s.title || 'Moje zajęcia';
+            document.getElementById('classes_description').value = s.description || 'Miejsca, w których aktualnie prowadzę regularne zajęcia.';
+
+            let items = Array.isArray(s.items) ? s.items.filter(Boolean) : [];
+
+            // Obsługa danych zapisanych przez wcześniejszą wersję panelu.
+            if (!items.length && s.list) {
+                items = String(s.list).split('\n').map(line => {
+                    const parts = line.split('|').map(part => part.trim());
+                    return {
+                        city: parts[0] || '',
+                        studio: parts[1] || '',
+                        day: parts[2] || '',
+                        time: parts[3] || '',
+                        level: parts[4] || '',
+                        mapUrl: parts[5] || ''
+                    };
+                }).filter(item => item.city || item.studio);
+            }
+
+            renderClassPlaces(items.length ? items : [{}]);
+        });
+
         db.ref('privateInquiries').on('value', snap => {
             const body = document.getElementById('lessonsInquiriesBody'); body.innerHTML = '';
             let count = 0;
@@ -973,6 +1065,99 @@
         } catch (_) {
             showToast('Nie udało się wyczyścić backupu.', 'error');
         }
+    }
+
+
+
+    function classPlaceTemplate(item = {}, index = 0) {
+        const safe = value => escapeHtml(value || '');
+        return `
+            <div class="class-place-row">
+                <div class="class-place-number">Miejsce ${index + 1}</div>
+                <div class="class-place-grid">
+                    <div class="form-group">
+                        <label>MIASTO</label>
+                        <input class="class-city" type="text" value="${safe(item.city)}" placeholder="NP. KIELCE">
+                    </div>
+                    <div class="form-group">
+                        <label>NAZWA STUDIA</label>
+                        <input class="class-studio" type="text" value="${safe(item.studio)}" placeholder="NP. STUDIO TAŃCA">
+                    </div>
+                    <div class="form-group">
+                        <label>DZIEŃ</label>
+                        <input class="class-day" type="text" value="${safe(item.day)}" placeholder="NP. PONIEDZIAŁEK">
+                    </div>
+                    <div class="form-group">
+                        <label>GODZINA</label>
+                        <input class="class-time" type="text" value="${safe(item.time)}" placeholder="NP. 19:00">
+                    </div>
+                    <div class="form-group">
+                        <label>POZIOM</label>
+                        <input class="class-level" type="text" value="${safe(item.level)}" placeholder="NP. OPEN">
+                    </div>
+                    <div class="form-group">
+                        <label>LINK GOOGLE MAPS</label>
+                        <input class="class-map" type="url" value="${safe(item.mapUrl)}" placeholder="HTTPS://MAPS.GOOGLE.COM/...">
+                    </div>
+                </div>
+                <div class="class-place-actions">
+                    <button class="btn btn-danger" type="button" onclick="removeClassPlace(this)">Usuń miejsce</button>
+                </div>
+            </div>`;
+    }
+
+    function renderClassPlaces(items) {
+        const list = document.getElementById('classPlacesList');
+        list.innerHTML = items.map((item, index) => classPlaceTemplate(item, index)).join('');
+        refreshClassPlaceNumbers();
+    }
+
+    function addClassPlace(item = {}) {
+        const list = document.getElementById('classPlacesList');
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = classPlaceTemplate(item, list.children.length);
+        list.appendChild(wrapper.firstElementChild);
+        refreshClassPlaceNumbers();
+    }
+
+    function removeClassPlace(button) {
+        const row = button.closest('.class-place-row');
+        if (row) row.remove();
+        const list = document.getElementById('classPlacesList');
+        if (!list.children.length) addClassPlace();
+        refreshClassPlaceNumbers();
+    }
+
+    function refreshClassPlaceNumbers() {
+        document.querySelectorAll('#classPlacesList .class-place-row').forEach((row, index) => {
+            const number = row.querySelector('.class-place-number');
+            if (number) number.textContent = `Miejsce ${index + 1}`;
+        });
+    }
+
+    function collectClassPlaces() {
+        return [...document.querySelectorAll('#classPlacesList .class-place-row')]
+            .map(row => ({
+                city: row.querySelector('.class-city').value.trim(),
+                studio: row.querySelector('.class-studio').value.trim(),
+                day: row.querySelector('.class-day').value.trim(),
+                time: row.querySelector('.class-time').value.trim(),
+                level: row.querySelector('.class-level').value.trim(),
+                mapUrl: row.querySelector('.class-map').value.trim()
+            }))
+            .filter(item => item.city || item.studio || item.day || item.time || item.level || item.mapUrl);
+    }
+
+    function saveClassesSettings() {
+        const data = {
+            title: document.getElementById('classes_title').value.trim() || 'Moje zajęcia',
+            description: document.getElementById('classes_description').value.trim(),
+            items: collectClassPlaces()
+        };
+
+        db.ref('classesSettings').set(data)
+            .then(() => showToast('Ustawienia zajęć zostały zapisane.'))
+            .catch(() => showToast('Nie udało się zapisać ustawień zajęć.', 'error'));
     }
 
     function saveSettings() {

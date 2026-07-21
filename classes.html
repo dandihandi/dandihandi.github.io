@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje zajęcia | Barbara Bogacka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --accent: #d4af37;
+            --bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text: #ffffff;
+            --text-dim: #a0a0a0;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(circle at 50% -20%, #2a2a2a 0%, #0a0a0a 100%);
+        }
+
+        .orb {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(212,175,55,.05) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { top: -100px; left: -100px; }
+        .orb-2 { bottom: -100px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            from { transform: translate(0,0); }
+            to { transform: translate(100px,50px); }
+        }
+
+        .hero {
+            min-height: 35vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 0;
+        }
+
+        .tagline {
+            font-size: .8rem;
+            letter-spacing: 5px;
+            color: var(--text);
+            margin: 10px 0 30px;
+            text-transform: uppercase;
+            opacity: .8;
+        }
+
+        .nav-container {
+            background: rgba(255,255,255,.03);
+            backdrop-filter: blur(5px);
+            padding: 5px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,.05);
+            display: flex;
+            gap: 30px;
+        }
+
+        .btn-nav {
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 12px 0;
+            position: relative;
+            transition: .3s;
+        }
+
+        .btn-nav.active, .btn-nav:hover { color: #fff; }
+        .btn-nav.active::after, .btn-nav:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .card {
+            background: rgba(26,26,26,.6);
+            backdrop-filter: blur(15px);
+            padding: 42px;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,.4);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .section-heading {
+            margin-bottom: 28px;
+        }
+
+        .section-kicker {
+            display: block;
+            color: var(--accent);
+            font-size: .66rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+            font-size: 2rem;
+            line-height: 1.2;
+        }
+
+        .section-heading p {
+            color: var(--text-dim);
+            font-size: .9rem;
+            font-weight: 300;
+            margin: 10px 0 0;
+        }
+
+        .classes-list {
+            border-top: 1px solid rgba(255,255,255,.09);
+        }
+
+        .class-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: center;
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255,255,255,.09);
+        }
+
+        .class-main {
+            min-width: 0;
+        }
+
+        .class-city {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .class-studio {
+            color: var(--text-dim);
+            font-size: .9rem;
+            margin-bottom: 9px;
+        }
+
+        .class-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px 16px;
+            color: #ddd;
+            font-size: .78rem;
+        }
+
+        .class-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .class-meta i {
+            color: var(--accent);
+            font-size: .72rem;
+        }
+
+        .btn-map {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--accent);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            font-size: .64rem;
+            font-weight: 600;
+            padding: 10px 14px;
+            border: 1px solid var(--accent);
+            border-radius: 7px;
+            background: rgba(212,175,55,.05);
+            transition: .3s;
+            white-space: nowrap;
+        }
+
+        .btn-map:hover {
+            color: #000;
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            padding: 26px 20px 22px;
+            text-align: center;
+            background: linear-gradient(180deg,rgba(0,0,0,.16),rgba(0,0,0,.34));
+            border-top: 1px solid rgba(212,175,55,.12);
+            margin-top: auto;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 22px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .social-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: .74rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            transition: .3s;
+            text-transform: uppercase;
+        }
+
+        .social-item i { color: var(--accent); }
+        .social-item:hover { color: #fff; background: rgba(255,255,255,.04); transform: translateY(-2px); }
+
+        .copyright {
+            font-size: .66rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1.8px;
+            opacity: .58;
+        }
+
+        @media (max-width: 768px) {
+            .hero { min-height: auto; padding: 30px 15px 35px; }
+            h1 { font-size: 2rem; }
+            .tagline { font-size: .68rem; letter-spacing: 3px; }
+            .nav-container {
+                flex-wrap: nowrap;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                max-width: 430px;
+                margin: 20px auto 0;
+                padding: 8px 10px;
+            }
+            .btn-nav {
+                flex: 1;
+                min-width: 0;
+                text-align: center;
+                font-size: .58rem;
+                letter-spacing: .35px;
+                padding: 12px 2px;
+                white-space: nowrap;
+            }
+            .container { margin-top: 25px; }
+            .card { padding: 28px 22px; }
+            .section-heading h2 { font-size: 1.55rem; }
+            .class-row { grid-template-columns: 1fr; gap: 16px; }
+            .btn-map { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <header class="hero">
+        <h1>Barbara Bogacka</h1>
+        <div class="tagline">Najlepsza tancerka w Polsce</div>
+
+        <nav class="nav-container">
+            <a href="index.html" class="btn-nav">Warsztaty</a>
+            <a href="priv.html" class="btn-nav">Lekcje prywatne</a>
+            <a href="classes.html" class="btn-nav active">Moje zajęcia</a>
+            <a href="me.html" class="btn-nav">O mnie</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <div class="section-heading">
+                <span class="section-kicker">Aktualny grafik</span>
+                <h2 id="classesTitle">Moje zajęcia</h2>
+                <p id="classesDescription">Miejsca, w których aktualnie prowadzę regularne zajęcia.</p>
+            </div>
+
+            <div class="classes-list" id="classesList">
+                <div style="padding:28px 0;color:var(--text-dim);">Ładowanie aktualnego grafiku...</div>
+            </div>
+            <div id="classesEmpty" style="display:none;padding:28px 0;color:var(--text-dim);text-align:center;">
+                Aktualnie brak opublikowanych zajęć.
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://www.instagram.com/basia_bogacka/" target="_blank" rel="noopener" class="social-item"><i class="fab fa-instagram"></i> basia_bogacka</a>
+            <a href="https://www.facebook.com/basia.bogacka.566" target="_blank" rel="noopener" class="social-item"><i class="fab fa-facebook-f"></i> Barbara Bogacka</a>
+        </div>
+        <div class="copyright">&copy; Barbara Bogacka 2026</div>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDssqjSqhRHJ2_BhzqgspuX_-q2KP2ydqs",
+            authDomain: "bogacka-heels.firebaseapp.com",
+            databaseURL: "https://bogacka-heels-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "bogacka-heels",
+            storageBucket: "bogacka-heels.firebasestorage.app",
+            messagingSenderId: "825219158791",
+            appId: "1:825219158791:web:38acf635db61854739eba2"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function safeMapUrl(value) {
+            const url = String(value || '').trim();
+            return /^https?:\/\//i.test(url) ? url : '#';
+        }
+
+        function renderClasses(settings) {
+            const list = document.getElementById('classesList');
+            const empty = document.getElementById('classesEmpty');
+            const title = document.getElementById('classesTitle');
+            const description = document.getElementById('classesDescription');
+
+            title.textContent = settings.title || 'Moje zajęcia';
+            description.textContent = settings.description || 'Miejsca, w których aktualnie prowadzę regularne zajęcia.';
+
+            const rows = String(settings.list || '')
+                .split('\n')
+                .map(row => row.trim())
+                .filter(Boolean)
+                .map(row => row.split('|').map(item => item.trim()))
+                .filter(parts => parts.length >= 2);
+
+            if (!rows.length) {
+                list.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            list.style.display = 'block';
+            empty.style.display = 'none';
+            list.innerHTML = rows.map(parts => {
+                const [city='', studio='', day='', time='', level='', mapUrl=''] = parts;
+                const mapButton = mapUrl
+                    ? `<a class="btn-map" href="${escapeHtml(safeMapUrl(mapUrl))}" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Mapa</a>`
+                    : '';
+
+                return `
+                    <article class="class-row">
+                        <div class="class-main">
+                            <div class="class-city">${escapeHtml(city)}</div>
+                            <div class="class-studio">${escapeHtml(studio)}</div>
+                            <div class="class-meta">
+                                ${day ? `<span><i class="fa-regular fa-calendar"></i> ${escapeHtml(day)}</span>` : ''}
+                                ${time ? `<span><i class="fa-regular fa-clock"></i> ${escapeHtml(time)}</span>` : ''}
+                                ${level ? `<span><i class="fa-solid fa-signal"></i> ${escapeHtml(level)}</span>` : ''}
+                            </div>
+                        </div>
+                        ${mapButton}
+                    </article>`;
+            }).join('');
+        }
+
+        database.ref('classesSettings').on('value', snapshot => {
+            renderClasses(snapshot.val() || {});
+        }, () => {
+            document.getElementById('classesList').innerHTML =
+                '<div style="padding:28px 0;color:var(--text-dim);">Nie udało się wczytać grafiku.</div>';
+        });
+    </script>
+
+</body>
+</html>
