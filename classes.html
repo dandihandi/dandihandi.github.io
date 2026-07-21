@@ -379,12 +379,32 @@
             title.textContent = settings.title || 'Moje zajęcia';
             description.textContent = settings.description || 'Miejsca, w których aktualnie prowadzę regularne zajęcia.';
 
-            const rows = String(settings.list || '')
-                .split('\n')
-                .map(row => row.trim())
-                .filter(Boolean)
-                .map(row => row.split('|').map(item => item.trim()))
-                .filter(parts => parts.length >= 2);
+            let rows = [];
+
+            // Nowy format zapisywany przez panel administratora.
+            if (Array.isArray(settings.items)) {
+                rows = settings.items
+                    .filter(Boolean)
+                    .map(item => [
+                        item.city || '',
+                        item.studio || '',
+                        item.day || '',
+                        item.time || '',
+                        item.level || '',
+                        item.mapUrl || ''
+                    ])
+                    .filter(parts => parts.some(value => String(value).trim()));
+            }
+
+            // Obsługa starszego formatu tekstowego.
+            if (!rows.length && settings.list) {
+                rows = String(settings.list)
+                    .split('\n')
+                    .map(row => row.trim())
+                    .filter(Boolean)
+                    .map(row => row.split('|').map(item => item.trim()))
+                    .filter(parts => parts.length >= 2);
+            }
 
             if (!rows.length) {
                 list.style.display = 'none';
