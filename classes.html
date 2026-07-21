@@ -184,16 +184,6 @@
             margin-bottom: 6px;
         }
 
-        .class-type {
-            display: inline-block;
-            color: var(--accent);
-            font-size: .72rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
         .class-meta {
             display: flex;
             flex-wrap: wrap;
@@ -437,8 +427,8 @@
                         <div class="class-main">
                             <div class="class-city">${escapeHtml(city)}</div>
                             <div class="class-studio">${escapeHtml(studio)}</div>
-                            ${type ? `<div class="class-type">${escapeHtml(type)}</div>` : ''}
                             <div class="class-meta">
+                                ${type ? `<span><i class="fa-solid fa-person-dancing"></i> ${escapeHtml(type)}</span>` : ''}
                                 ${day ? `<span><i class="fa-regular fa-calendar"></i> ${escapeHtml(day)}</span>` : ''}
                                 ${time ? `<span><i class="fa-regular fa-clock"></i> ${escapeHtml(time)}</span>` : ''}
                                 ${level ? `<span><i class="fa-solid fa-signal"></i> ${escapeHtml(level)}</span>` : ''}
