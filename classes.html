@@ -181,7 +181,17 @@
         .class-studio {
             color: var(--text-dim);
             font-size: .9rem;
-            margin-bottom: 9px;
+            margin-bottom: 6px;
+        }
+
+        .class-type {
+            display: inline-block;
+            color: var(--accent);
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
 
         .class-meta {
@@ -388,6 +398,7 @@
                     .map(item => [
                         item.city || '',
                         item.studio || '',
+                        item.type || '',
                         item.day || '',
                         item.time || '',
                         item.level || '',
@@ -403,7 +414,8 @@
                     .map(row => row.trim())
                     .filter(Boolean)
                     .map(row => row.split('|').map(item => item.trim()))
-                    .filter(parts => parts.length >= 2);
+                    .filter(parts => parts.length >= 2)
+                    .map(parts => [parts[0] || '', parts[1] || '', '', parts[2] || '', parts[3] || '', parts[4] || '', parts[5] || '']);
             }
 
             if (!rows.length) {
@@ -415,7 +427,7 @@
             list.style.display = 'block';
             empty.style.display = 'none';
             list.innerHTML = rows.map(parts => {
-                const [city='', studio='', day='', time='', level='', mapUrl=''] = parts;
+                const [city='', studio='', type='', day='', time='', level='', mapUrl=''] = parts;
                 const mapButton = mapUrl
                     ? `<a class="btn-map" href="${escapeHtml(safeMapUrl(mapUrl))}" target="_blank" rel="noopener"><i class="fa-solid fa-location-dot"></i> Mapa</a>`
                     : '';
@@ -425,6 +437,7 @@
                         <div class="class-main">
                             <div class="class-city">${escapeHtml(city)}</div>
                             <div class="class-studio">${escapeHtml(studio)}</div>
+                            ${type ? `<div class="class-type">${escapeHtml(type)}</div>` : ''}
                             <div class="class-meta">
                                 ${day ? `<span><i class="fa-regular fa-calendar"></i> ${escapeHtml(day)}</span>` : ''}
                                 ${time ? `<span><i class="fa-regular fa-clock"></i> ${escapeHtml(time)}</span>` : ''}

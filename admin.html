@@ -860,6 +860,7 @@
                     return {
                         city: parts[0] || '',
                         studio: parts[1] || '',
+                        type: '',
                         day: parts[2] || '',
                         time: parts[3] || '',
                         level: parts[4] || '',
@@ -1084,6 +1085,10 @@
                         <input class="class-studio" type="text" value="${safe(item.studio)}" placeholder="NP. STUDIO TAŃCA">
                     </div>
                     <div class="form-group">
+                        <label>RODZAJ ZAJĘĆ</label>
+                        <input class="class-type" type="text" value="${safe(item.type)}" placeholder="NP. HIGH HEELS / CHOREOGRAFIA">
+                    </div>
+                    <div class="form-group">
                         <label>DZIEŃ</label>
                         <input class="class-day" type="text" value="${safe(item.day)}" placeholder="NP. PONIEDZIAŁEK">
                     </div>
@@ -1140,12 +1145,13 @@
             .map(row => ({
                 city: row.querySelector('.class-city').value.trim(),
                 studio: row.querySelector('.class-studio').value.trim(),
+                type: row.querySelector('.class-type').value.trim(),
                 day: row.querySelector('.class-day').value.trim(),
                 time: row.querySelector('.class-time').value.trim(),
                 level: row.querySelector('.class-level').value.trim(),
                 mapUrl: row.querySelector('.class-map').value.trim()
             }))
-            .filter(item => item.city || item.studio || item.day || item.time || item.level || item.mapUrl);
+            .filter(item => item.city || item.studio || item.type || item.day || item.time || item.level || item.mapUrl);
     }
 
     function saveClassesSettings() {
