@@ -289,14 +289,15 @@
     <div class="container">
         <div class="page-intro">
             <div>
-                <h2 id="pageTitle">Warsztaty zapisy</h2>
+                <h2 id="pageTitle">WARSZTATY ZAPISY</h2>
                 <p id="pageDescription">Przeglądaj uczestników i aktualizuj status płatności.</p>
             </div>
         </div>
         <nav class="nav-tabs" aria-label="Sekcje panelu">
-            <button class="tab-btn active" id="tab-registrationsTab" onclick="showTab('registrationsTab', this)">Warsztaty zapisy</button>
-            <button class="tab-btn" id="tab-lessonsListTab" onclick="showTab('lessonsListTab', this)">Privy zapisy</button>
-            <button class="tab-btn" id="tab-settingsTab" onclick="showTab('settingsTab', this)">Ustawienia warsztatów</button>
+            <button class="tab-btn active" id="tab-registrationsTab" onclick="showTab('registrationsTab', this)">WARSZTATY ZAPISY</button>
+            <button class="tab-btn" id="tab-lessonsListTab" onclick="showTab('lessonsListTab', this)">PRIVY ZAPISY</button>
+            <button class="tab-btn" id="tab-settingsTab" onclick="showTab('settingsTab', this)">USTAWIENIA WARSZTATÓW</button>
+            <button class="tab-btn" id="tab-backupTab" onclick="showTab('backupTab', this)">BACKUP OSÓB</button>
         </nav>
 
         <section class="section active" id="registrationsTab">
@@ -378,6 +379,48 @@
                     <textarea id="set_eventList" placeholder="10:00-12:00 - GRUPA POCZĄTKUJĄCA, ..." style="text-transform: uppercase;"></textarea>
                 </div>
                 <div class="save-bar"><button class="btn btn-primary" onclick="saveSettings()">Zapisz wszystkie zmiany</button></div>
+            </div>
+        </section>
+
+        <section class="section" id="backupTab">
+            <div class="card">
+                <div class="card-header-flex">
+                    <div>
+                        <h3 class="card-title">BACKUP OSÓB</h3>
+                        <p class="card-subtitle">Twórz kopie zapisów z warsztatów i lekcji prywatnych, eksportuj je oraz bezpiecznie czyść archiwum.</p>
+                    </div>
+                    
+                </div>
+
+                <div class="settings-grid" style="margin-bottom:18px;">
+                    <div class="switch-wrapper" style="cursor:default;">
+                        <div>
+                            <div class="switch-label-text">Liczba osób w backupie</div>
+                            <small class="helper" id="backupPeopleCount" style="margin-top:4px;">0 rekordów</small>
+                        </div>
+                    </div>
+                    <div class="switch-wrapper" style="cursor:default;">
+                        <div>
+                            <div class="switch-label-text">Ostatnia aktualizacja</div>
+                            <small class="helper" id="backupLastUpdate" style="margin-top:4px;">Brak danych</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;">
+                    <button class="btn btn-outline" onclick="exportPeopleBackup('txt')">Eksport TXT</button>
+                    <button class="btn btn-outline" onclick="exportPeopleBackup('html')">Eksport HTML</button>
+                    <button id="clear-backup-btn" class="btn btn-danger" onclick="clearPeopleBackup()">Wyczyść backup</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="uppercase-table">
+                        <thead>
+                            <tr><th>DATA BACKUPU</th><th>ŹRÓDŁO</th><th>OSOBA</th><th>KONTAKT</th><th>SZCZEGÓŁY</th><th>AKCJE</th></tr>
+                        </thead>
+                        <tbody id="backupPeopleBody"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -467,9 +510,10 @@
     }
 
     const tabMeta = {
-        registrationsTab: ['Warsztaty zapisy', 'Przeglądaj uczestników i aktualizuj status płatności.'],
-        settingsTab: ['Ustawienia warsztatów', 'Edytuj ofertę, ceny, lokalizację i dostępne terminy.'],
-        lessonsListTab: ['Privy zapisy', 'Zarządzaj zapytaniami, potwierdzeniami i eksportem do kalendarza.']
+        registrationsTab: ['WARSZTATY ZAPISY', 'Przeglądaj uczestników i aktualizuj status płatności.'],
+        settingsTab: ['USTAWIENIA WARSZTATÓW', 'Edytuj ofertę, ceny, lokalizację i dostępne terminy.'],
+        lessonsListTab: ['PRIVY ZAPISY', 'Zarządzaj zapytaniami, potwierdzeniami i eksportem do kalendarza.'],
+        backupTab: ['BACKUP OSÓB', 'Twórz, eksportuj i czyść kopie danych uczestników.']
     };
 
     function showTab(tabId, btn) {
@@ -688,6 +732,38 @@
             if (!count) body.innerHTML = '<tr><td colspan="6"><div class="empty-state">Brak zapisów na warsztaty.</div></td></tr>';
         });
 
+        db.ref('peopleBackup').on('value', snap => {
+            const body = document.getElementById('backupPeopleBody');
+            if (!body) return;
+            body.innerHTML = '';
+            let count = 0;
+            let latest = 0;
+            snap.forEach(child => {
+                count++;
+                const item = child.val() || {};
+                latest = Math.max(latest, Number(item.backupTimestamp || 0));
+                const data = item.data || {};
+                const sourceLabel = item.source === 'registrations' ? 'WARSZTATY' : 'PRIVY';
+                const personName = data.fullName || [data.firstName, data.lastName].filter(Boolean).join(' ') || 'BRAK DANYCH';
+                const contact = [data.email, data.phone].filter(Boolean).join('<br>') || '-';
+                const details = item.source === 'registrations'
+                    ? (data.event || '-')
+                    : [data.danceType, data.level, data.suggestedDates, data.suggestedHours].filter(Boolean).join(' • ') || '-';
+                const backupDate = item.backupTimestamp ? new Date(item.backupTimestamp).toLocaleString('pl-PL') : '-';
+                const row = body.insertRow();
+                row.innerHTML = `
+                    <td>${escapeHtml(backupDate)}</td>
+                    <td>${sourceLabel}</td>
+                    <td>${escapeHtml(personName)}</td>
+                    <td>${contact}</td>
+                    <td>${escapeHtml(details)}</td>
+                    <td><button class="btn btn-danger" style="padding:5px 10px;font-size:.7rem;" onclick="deleteBackupPerson('${child.key}')">USUŃ</button></td>`;
+            });
+            if (!count) body.innerHTML = '<tr><td colspan="6"><div class="empty-state">Backup jest pusty.</div></td></tr>';
+            document.getElementById('backupPeopleCount').textContent = `${count} ${count === 1 ? 'rekord' : 'rekordów'}`;
+            document.getElementById('backupLastUpdate').textContent = latest ? new Date(latest).toLocaleString('pl-PL') : 'Brak danych';
+        });
+
         db.ref('settings').on('value', snap => {
             const s = snap.val(); if(s) {
                 document.getElementById('set_title').value = (s.title || '').toUpperCase();
@@ -732,6 +808,173 @@
         });
     }
 
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function normalizeBackupRecord(source, key, data, reason='manual') {
+        return {
+            source,
+            sourceKey: key,
+            reason,
+            backupTimestamp: Date.now(),
+            data: data || {}
+        };
+    }
+
+    async function backupSingleRecord(source, key, data, reason='manual') {
+        const backupKey = `${source}_${key}`;
+        await db.ref('peopleBackup/' + backupKey).set(normalizeBackupRecord(source, key, data, reason));
+    }
+
+    async function createPeopleBackup() {
+        try {
+            const [registrationsSnap, inquiriesSnap] = await Promise.all([
+                db.ref('registrations').once('value'),
+                db.ref('privateInquiries').once('value')
+            ]);
+            const updates = {};
+            const stamp = Date.now();
+            registrationsSnap.forEach(child => {
+                updates[`peopleBackup/registrations_${child.key}`] = {
+                    source: 'registrations', sourceKey: child.key, reason: 'manual', backupTimestamp: stamp, data: child.val() || {}
+                };
+            });
+            inquiriesSnap.forEach(child => {
+                updates[`peopleBackup/privateInquiries_${child.key}`] = {
+                    source: 'privateInquiries', sourceKey: child.key, reason: 'manual', backupTimestamp: stamp, data: child.val() || {}
+                };
+            });
+            if (!Object.keys(updates).length) {
+                showToast('Brak osób do zapisania w backupie.', 'error');
+                return;
+            }
+            await db.ref().update(updates);
+            showToast('Backup osób został utworzony.');
+        } catch (error) {
+            console.error(error);
+            showToast('Nie udało się utworzyć backupu.', 'error');
+        }
+    }
+
+    async function getPeopleBackupData() {
+        const snap = await db.ref('peopleBackup').once('value');
+        const records = [];
+        snap.forEach(child => records.push({ id: child.key, ...(child.val() || {}) }));
+        return records.sort((a, b) => Number(b.backupTimestamp || 0) - Number(a.backupTimestamp || 0));
+    }
+
+    function downloadBackupFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType + ';charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 200);
+    }
+
+    function csvCell(value) {
+        return `"${String(value ?? '').replaceAll('"', '""')}"`;
+    }
+
+    async function exportPeopleBackup(format) {
+        try {
+            const records = await getPeopleBackupData();
+            if (!records.length) {
+                showToast('Backup jest pusty.', 'error');
+                return;
+            }
+            const date = new Date().toISOString().slice(0, 10);
+            if (format === 'html') {
+                const rows = records.map(item=>{const d=item.data||{}; const name=d.fullName||[d.firstName,d.lastName].filter(Boolean).join(' '); return `<tr><td>${new Date(item.backupTimestamp).toLocaleString('pl-PL')}</td><td>${item.source}</td><td>${name}</td><td>${d.email||''}</td><td>${d.phone||''}</td></tr>`}).join('');
+                const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>BACKUP OSÓB</title><style>body{font-family:Arial;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:8px}</style></head><body><h2>BACKUP OSÓB</h2><table><tr><th>Data</th><th>Źródło</th><th>Osoba</th><th>Email</th><th>Telefon</th></tr>${rows}</table></body></html>`;
+                downloadBackupFile(html, `backup_osob_${date}.html`, 'text/html');
+            } else if (false) {
+                downloadBackupFile(JSON.stringify(records, null, 2), `backup_osob_${date}.json`, 'application/json');
+            } else if (false) {
+                const header = ['Data backupu','Źródło','Imię i nazwisko','E-mail','Telefon','Wydarzenie / rodzaj','Poziom','Termin','Godzina','Status'];
+                const rows = records.map(item => {
+                    const d = item.data || {};
+                    const name = d.fullName || [d.firstName, d.lastName].filter(Boolean).join(' ');
+                    return [
+                        item.backupTimestamp ? new Date(item.backupTimestamp).toLocaleString('pl-PL') : '',
+                        item.source || '', name || '', d.email || '', d.phone || '', d.event || d.danceType || '',
+                        d.level || '', d.suggestedDates || '', d.suggestedHours || '',
+                        item.source === 'registrations' ? (d.paid ? 'OPŁACONE' : 'NIEOPŁACONE') : (d.confirmed ? 'POTWIERDZONE' : 'NIEPOTWIERDZONE')
+                    ].map(csvCell).join(';');
+                });
+                downloadBackupFile('\ufeff' + [header.map(csvCell).join(';'), ...rows].join('\r\n'), `backup_osob_${date}.csv`, 'text/csv');
+            } else {
+                const text = records.map((item, index) => {
+                    const d = item.data || {};
+                    const name = d.fullName || [d.firstName, d.lastName].filter(Boolean).join(' ') || 'BRAK DANYCH';
+                    return [
+                        `${index + 1}. ${name}`,
+                        `Źródło: ${item.source === 'registrations' ? 'Warsztaty' : 'Lekcje prywatne'}`,
+                        `Data backupu: ${item.backupTimestamp ? new Date(item.backupTimestamp).toLocaleString('pl-PL') : '-'}`,
+                        `E-mail: ${d.email || '-'}`,
+                        `Telefon: ${d.phone || '-'}`,
+                        `Szczegóły: ${d.event || d.danceType || '-'}${d.level ? ' | ' + d.level : ''}${d.suggestedDates ? ' | ' + d.suggestedDates : ''}${d.suggestedHours ? ' | ' + d.suggestedHours : ''}`,
+                        '----------------------------------------'
+                    ].join('\r\n');
+                }).join('\r\n');
+                downloadBackupFile(text, `backup_osob_${date}.txt`, 'text/plain');
+            }
+            showToast(`Wyeksportowano plik ${format.toUpperCase()}.`);
+        } catch (error) {
+            console.error(error);
+            showToast('Nie udało się wyeksportować backupu.', 'error');
+        }
+    }
+
+    async function deleteBackupPerson(key) {
+        if (!confirm('Usunąć ten rekord z backupu?')) return;
+        try {
+            await db.ref('peopleBackup/' + key).remove();
+            showToast('Rekord usunięty z backupu.');
+        } catch (_) {
+            showToast('Nie udało się usunąć rekordu.', 'error');
+        }
+    }
+
+    let clearBackupArmed = false;
+    async function clearPeopleBackup() {
+        const btn = document.getElementById('clear-backup-btn');
+        if (!clearBackupArmed) {
+            clearBackupArmed = true;
+            btn.textContent = 'KLIKNIJ PONOWNIE, ABY WYCZYŚCIĆ';
+            btn.style.background = 'var(--danger)';
+            btn.style.color = '#fff';
+            setTimeout(() => {
+                clearBackupArmed = false;
+                if (btn) {
+                    btn.textContent = 'Wyczyść backup';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }
+            }, 5000);
+            return;
+        }
+        try {
+            await db.ref('peopleBackup').remove();
+            clearBackupArmed = false;
+            btn.textContent = 'Wyczyść backup';
+            btn.style.background = '';
+            btn.style.color = '';
+            showToast('Backup został wyczyszczony.');
+        } catch (_) {
+            showToast('Nie udało się wyczyścić backupu.', 'error');
+        }
+    }
+
     function saveSettings() {
         const data = {
             title: document.getElementById('set_title').value.toUpperCase(),
@@ -773,7 +1016,12 @@
             btn.style.background = "var(--danger)";
             btn.style.color = "white";
         } else {
-            db.ref('registrations/'+key).remove(); 
+            db.ref('registrations/' + key).once('value').then(async snap => {
+                const data = snap.val();
+                if (data) await backupSingleRecord('registrations', key, data, 'before-delete');
+                await db.ref('registrations/' + key).remove();
+                showToast('Osoba usunięta. Kopia została w backupie.');
+            }).catch(() => showToast('Nie udało się usunąć osoby.', 'error'));
             delete deleteStates.reg[key];
         }
     }
@@ -802,7 +1050,12 @@
             btn.style.background = "var(--danger)";
             btn.style.color = "white";
         } else {
-            db.ref('privateInquiries/'+key).remove(); 
+            db.ref('privateInquiries/' + key).once('value').then(async snap => {
+                const data = snap.val();
+                if (data) await backupSingleRecord('privateInquiries', key, data, 'before-delete');
+                await db.ref('privateInquiries/' + key).remove();
+                showToast('Zapytanie usunięte. Kopia została w backupie.');
+            }).catch(() => showToast('Nie udało się usunąć zapytania.', 'error'));
             delete deleteStates.inq[key];
         }
     }
