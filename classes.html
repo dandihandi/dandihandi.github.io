@@ -198,7 +198,8 @@
             gap: 7px;
         }
 
-        .class-meta i {
+        .class-meta i,
+        .class-type-icon {
             color: var(--accent);
             font-size: .72rem;
         }
@@ -299,11 +300,12 @@
         }
     
 .class-type-icon{
-    width:15px;
-    height:15px;
-    margin-right:6px;
-    vertical-align:-2px;
-    opacity:.95;
+    width:.72rem;
+    height:.72rem;
+    display:inline-block;
+    vertical-align:-0.08em;
+    margin-right:0;
+    opacity:1;
     filter: brightness(0) saturate(100%) invert(73%) sepia(35%) saturate(884%) hue-rotate(3deg) brightness(98%) contrast(90%);
 }
 
@@ -438,7 +440,7 @@
                             <div class="class-city">${escapeHtml(city)}</div>
                             <div class="class-studio">${escapeHtml(studio)}</div>
                             <div class="class-meta">
-                                ${type ? `<span><img src="high-heels.svg" class="class-type-icon" alt=""> ${escapeHtml(type)}</span>` : ''}
+                                ${type ? `<span><img src="high-heels.svg" class="class-type-icon" alt="">${escapeHtml(type)}</span>` : ''}
                                 ${day ? `<span><i class="fa-regular fa-calendar"></i> ${escapeHtml(day)}</span>` : ''}
                                 ${time ? `<span><i class="fa-regular fa-clock"></i> ${escapeHtml(time)}</span>` : ''}
                                 ${level ? `<span><i class="fa-solid fa-signal"></i> ${escapeHtml(level)}</span>` : ''}
