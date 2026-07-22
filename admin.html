@@ -329,6 +329,7 @@
             <button class="tab-btn" id="tab-lessonsListTab" onclick="showTab('lessonsListTab', this)">PRIVY ZAPISY</button>
             <button class="tab-btn" id="tab-settingsTab" onclick="showTab('settingsTab', this)">USTAWIENIA WARSZTATÓW</button>
             <button class="tab-btn" id="tab-classesSettingsTab" onclick="showTab('classesSettingsTab', this)">USTAWIENIA ZAJĘĆ</button>
+            <button class="tab-btn" id="tab-messagesTab" onclick="showTab('messagesTab', this)">KOMUNIKATY</button>
             <button class="tab-btn" id="tab-backupTab" onclick="showTab('backupTab', this)">BACKUP OSÓB</button>
         </nav>
 
@@ -443,6 +444,41 @@
 
                 <div class="save-bar">
                     <button class="btn btn-primary" onclick="saveClassesSettings()">Zapisz ustawienia zajęć</button>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="section" id="messagesTab">
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <div class="card-header-flex">
+                    <div>
+                        <h3 class="card-title">Komunikat na stronie zapisów prywatnych</h3>
+                        <p class="card-subtitle">Komunikat pokaże się po uruchomieniu strony regpriv.html. Możesz tu np. zasugerować godziny po 18:00.</p>
+                    </div>
+                </div>
+
+                <label class="switch-wrapper" for="message_active">
+                    <span class="switch-label-text">WYŚWIETLAJ KOMUNIKAT</span>
+                    <div class="switch">
+                        <input type="checkbox" id="message_active">
+                        <span class="slider"></span>
+                    </div>
+                </label>
+
+                <div class="form-group" style="margin-top:20px;">
+                    <label>TYTUŁ KOMUNIKATU</label>
+                    <input id="message_title" type="text" placeholder="NP. WAŻNA INFORMACJA">
+                </div>
+
+                <div class="form-group">
+                    <label>TREŚĆ KOMUNIKATU</label>
+                    <textarea id="message_text" rows="7" placeholder="Np. Proszę sugerować terminy po godzinie 18:00."></textarea>
+                    <small class="helper">Puste pole treści spowoduje, że komunikat nie zostanie pokazany, nawet gdy przełącznik jest aktywny.</small>
+                </div>
+
+                <div class="save-bar">
+                    <button class="btn btn-primary" onclick="savePrivateLessonMessage()">Zapisz komunikat</button>
                 </div>
             </div>
         </section>
@@ -579,6 +615,7 @@
         settingsTab: ['USTAWIENIA WARSZTATÓW', 'Edytuj ofertę, ceny, lokalizację i dostępne terminy.'],
         lessonsListTab: ['PRIVY ZAPISY', 'Zarządzaj zapytaniami, potwierdzeniami i eksportem do kalendarza.'],
         classesSettingsTab: ['USTAWIENIA ZAJĘĆ', 'Edytuj zawartość strony „Moje zajęcia” i aktualny grafik.'],
+        messagesTab: ['KOMUNIKATY', 'Edytuj komunikat wyświetlany przy wejściu na zapisy lekcji prywatnych.'],
         backupTab: ['BACKUP OSÓB', 'Twórz, eksportuj i czyść kopie danych uczestników.']
     };
 
@@ -870,6 +907,14 @@
             }
 
             renderClassPlaces(items.length ? items : [{}]);
+        });
+
+
+        db.ref('privateLessonMessage').on('value', snap => {
+            const message = snap.val() || {};
+            document.getElementById('message_active').checked = message.active === true;
+            document.getElementById('message_title').value = message.title || 'Ważna informacja';
+            document.getElementById('message_text').value = message.message || '';
         });
 
         db.ref('privateInquiries').on('value', snap => {
@@ -1164,6 +1209,20 @@
         db.ref('classesSettings').set(data)
             .then(() => showToast('Ustawienia zajęć zostały zapisane.'))
             .catch(() => showToast('Nie udało się zapisać ustawień zajęć.', 'error'));
+    }
+
+
+    function savePrivateLessonMessage() {
+        const data = {
+            active: document.getElementById('message_active').checked,
+            title: document.getElementById('message_title').value.trim() || 'Ważna informacja',
+            message: document.getElementById('message_text').value.trim(),
+            updatedAt: Date.now()
+        };
+
+        db.ref('privateLessonMessage').set(data)
+            .then(() => showToast('Komunikat został zapisany.'))
+            .catch(() => showToast('Nie udało się zapisać komunikatu.', 'error'));
     }
 
     function saveSettings() {
