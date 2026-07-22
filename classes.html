@@ -297,7 +297,17 @@
             .class-row { grid-template-columns: 1fr; gap: 16px; }
             .btn-map { width: 100%; }
         }
-    </style>
+    
+.class-type-icon{
+    width:15px;
+    height:15px;
+    margin-right:6px;
+    vertical-align:-2px;
+    opacity:.95;
+    filter: brightness(0) saturate(100%) invert(73%) sepia(35%) saturate(884%) hue-rotate(3deg) brightness(98%) contrast(90%);
+}
+
+</style>
 </head>
 <body>
     <div class="bg-glow">
@@ -428,7 +438,7 @@
                             <div class="class-city">${escapeHtml(city)}</div>
                             <div class="class-studio">${escapeHtml(studio)}</div>
                             <div class="class-meta">
-                                ${type ? `<span><i class="fa-solid fa-shoe-prints"></i> ${escapeHtml(type)}</span>` : ''}
+                                ${type ? `<span><img src="high-heels.svg" class="class-type-icon" alt=""> ${escapeHtml(type)}</span>` : ''}
                                 ${day ? `<span><i class="fa-regular fa-calendar"></i> ${escapeHtml(day)}</span>` : ''}
                                 ${time ? `<span><i class="fa-regular fa-clock"></i> ${escapeHtml(time)}</span>` : ''}
                                 ${level ? `<span><i class="fa-solid fa-signal"></i> ${escapeHtml(level)}</span>` : ''}
