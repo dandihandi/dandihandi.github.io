@@ -290,6 +290,16 @@
     filter: brightness(0) saturate(100%) invert(73%) sepia(35%) saturate(884%) hue-rotate(3deg) brightness(98%) contrast(90%);
 }
 
+
+.mobile-break{display:none;}
+@media (max-width:768px){
+.mobile-break{display:block;}
+.btn-nav{
+white-space:normal!important;
+line-height:1.2!important;
+}
+}
+
 </style>
 </head>
 <body>
@@ -299,8 +309,8 @@
 
         <nav class="nav-container">
             <a href="index.html" class="btn-nav">Warsztaty</a>
-            <a href="priv.html" class="btn-nav">Lekcje prywatne</a>
-            <a href="classes.html" class="btn-nav active">Moje zajęcia</a>
+            <a href="priv.html" class="btn-nav">Lekcje<br class="mobile-break"> prywatne</a>
+            <a href="classes.html" class="btn-nav active">Moje<br class="mobile-break"> zajęcia</a>
             <a href="me.html" class="btn-nav">O mnie</a>
         </nav>
     </header>
@@ -309,7 +319,7 @@
         <section class="card">
             <div class="section-heading">
                 <span class="section-kicker">Aktualny grafik</span>
-                <h2 id="classesTitle">Moje zajęcia</h2>
+                <h2 id="classesTitle">Moje<br class="mobile-break"> zajęcia</h2>
                 <p id="classesDescription">Miejsca, w których aktualnie prowadzę regularne zajęcia.</p>
             </div>
 

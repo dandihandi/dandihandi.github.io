@@ -320,6 +320,16 @@ footer {
 
 }
 
+
+.mobile-break{display:none;}
+@media (max-width:768px){
+.mobile-break{display:block;}
+.btn-nav{
+white-space:normal!important;
+line-height:1.2!important;
+}
+}
+
 </style>
 </head>
 <body>
@@ -328,7 +338,7 @@ footer {
 <div class="tagline">Najlepsza tancerka w Polsce</div>
 <div class="nav-container">
 <a class="btn-nav" href="index.html">Warsztaty</a>
-<a class="btn-nav active" href="priv.html">Lekcje Prywatne</a><a class="btn-nav" href="classes.html">Moje Zajęcia</a>
+<a class="btn-nav active" href="priv.html">Lekcje<br class="mobile-break"> Prywatne</a><a class="btn-nav" href="classes.html">Moje<br class="mobile-break"> Zajęcia</a>
 <a class="btn-nav" href="me.html">O Mnie</a>
 </div>
 </div>
