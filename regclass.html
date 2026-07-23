@@ -358,6 +358,26 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+const WORKER_URL = "https://discord-webhook.idanielowskyy.workers.dev";
+
+async function sendDiscordNotification(data) {
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Worker returned ${response.status}`);
+    }
+  } catch (e) {
+    console.error("Discord notification failed", e);
+  }
+}
+
+
+
         let globalPrice = "...";
 
         db.ref('settings').on('value', snapshot => {
@@ -407,6 +427,13 @@
                 type: 'Workshop'
             };
             db.ref('registrations').push(newReg).then(() => {
+                sendDiscordNotification({
+                    type: "workshop",
+                    fullName: newReg.fullName,
+                    email: newReg.email,
+                    event: newReg.event,
+                    date: newReg.date
+                });
                 showConfirmation(newReg);
             });
         });

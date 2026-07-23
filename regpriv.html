@@ -420,6 +420,26 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+const WORKER_URL = "https://discord-webhook.idanielowskyy.workers.dev";
+
+async function sendDiscordNotification(data) {
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Worker returned ${response.status}`);
+    }
+  } catch (e) {
+    console.error("Discord notification failed", e);
+  }
+}
+
+
+
         function closeStartupMessage() {
             document.getElementById('startupMessageOverlay').classList.remove('visible');
         }
@@ -513,6 +533,14 @@
             };
 
             db.ref('privateInquiries').push(inquiry).then(() => {
+                sendDiscordNotification({
+                    type: "private",
+                    fullName: inquiry.fullName,
+                    phone: inquiry.phone,
+                    danceType: inquiry.danceType,
+                    suggestedDates: inquiry.suggestedDates,
+                    suggestedHours: inquiry.suggestedHours
+                });
                 showConfirmation(inquiry);
             });
         });
